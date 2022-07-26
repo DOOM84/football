@@ -1,0 +1,37 @@
+{
+  "private": true,
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview"
+  },
+  "devDependencies": {
+    "fibers": "^5.0.1",
+    "nuxt": "3.0.0-rc.6",
+    "sass": "^1.54.0",
+    "sass-loader": "^13.0.2"
+  },
+  "dependencies": {
+    "@jobinsjp/vue3-datatable": "^1.0.15",
+    "@vueform/multiselect": "^2.5.2",
+    "algoliasearch": "^4.14.1",
+    "firebase": "^9.9.1",
+    "firebase-admin": "^11.0.0",
+    "formidable": "^3.2.1",
+    "moment": "^2.29.4",
+    "postscribe": "^2.0.8",
+    "sharp": "^0.30.7",
+    "slugify": "^1.6.5",
+    "socket.io": "^4.5.1",
+    "socket.io-client": "^4.5.1",
+    "vanilla-back-to-top": "^7.2.1",
+    "vue-scrollto": "^2.20.0",
+    "vue-star-rating": "^2.1.0",
+    "vue-toastification": "^2.0.0-rc.5",
+    "vue-universal-modal": "^1.1.4",
+    "vue3-tabs-component": "^1.0.8",
+    "vueperslides": "^3.4.2",
+    "yup": "^0.32.11"
+  }
+}
