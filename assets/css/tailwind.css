@@ -1,0 +1,133 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,500;1,600;1,700;1,800&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    *:focus {
+        outline: none;
+    }
+
+    html{
+        font-family: 'Open Sans', sans-serif;
+    }
+
+    body#bg{
+        background: url(/bg.png) no-repeat fixed, linear-gradient(to bottom, #081422, #081422)
+    }
+
+    body#lch_bg{
+        background: url(/lch_bg.png) no-repeat fixed, linear-gradient(to bottom, #081422, #081422)
+    }
+
+    body#le_bg{
+        background: url(/le_bg.png) no-repeat fixed, linear-gradient(to bottom, #081422, #081422)
+    }
+
+    body#lconf_bg{
+        background: url(/lconf_bg.png) no-repeat fixed, linear-gradient(to bottom, #081422, #081422)
+    }
+
+
+    :root {
+
+    }
+}
+
+@layer components {
+    /*.head-bg  {
+        @apply bg-[url('/img/bg.jpg')] bg-cover bg-center bg-fixed;
+    }*/
+
+    .sans {
+        font-family: sans-serif
+    }
+
+    .btn {
+        @apply bg-black p-2 text-white rounded-lg hover:bg-zinc-700 transition duration-300 text-center
+    }
+
+    .showMenu{
+        @apply block animate-[rotateMenu_400ms_ease-in-out_forwards] origin-top-right
+    }
+    .tag{
+        @apply text-xs inline-flex items-center font-bold px-3 py-1 bg-blue-200 text-blue-700 rounded-full cursor-pointer h-9
+    }
+}
+
+.youtube {
+    display:flex;
+    justify-content:center;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+
+.multiselect-tag.is-user {
+    padding: 5px 8px;
+    border-radius: 22px;
+    background: #35495e;
+    margin: 3px 3px 8px;
+}
+
+
+.multiselect-tag.is-user img {
+    width: 30px;
+    border-radius: 50%;
+    height: 30px;
+    margin-right: 8px;
+    border: 2px solid #ffffffbf;
+}
+
+.multiselect-tag.is-user i:before {
+    color: #ffffff;
+    border-radius: 50%;;
+}
+
+.user-image {
+    margin: 0 6px 0 0;
+    border-radius: 50%;
+    height: 22px;
+}
+
+.character-option-icon{
+    margin: 0 6px 0 0;
+    border-radius: 50%;
+    height: 22px;
+}
+
+.withFooter {
+    min-height: calc(100vh - 95px);
+}
+
+.average-rating::before {
+    position: relative !important;
+}
+
+.page-enter-active,
+.page-leave-active {
+    transition: all 0.4s;
+}
+.page-enter-from,
+.page-leave-to {
+    opacity: 0;
+    filter: blur(1rem);
+}
+
+.layout-enter-active,
+.layout-leave-active {
+    transition: all 0.4s;
+}
+.layout-enter-from,
+.layout-leave-to {
+    opacity: 0;
+    filter: blur(1rem);
+}
+
+
+.router-link-active {
+    font-weight: bold;
+}
+.router-link-exact-active {
+    font-weight: bold;
+}
+

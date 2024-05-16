@@ -1,0 +1,153 @@
+<template>
+    <table class="w-full pt-0 mt-0 border-collapse text-[14px] mb-5">
+        <slot v-if="infoType !== 'shortResults' &&
+        infoType !== 'fullStands' && infoType !== 'fullResults' && infoType !== 'ecupResults'
+        && infoType !== 'ecupPoResults' && infoType !== 'ecupPoFullResults'&& infoType !== 'ecupGroupFullResults'">
+            <thead class="pt-0 mt-0">
+            <tr>
+                <th class="text-center pl-1 py-[0.7rem] bg-zinc-100">#</th>
+                <th colspan="2" class="text-left py-[0.7rem] bg-zinc-100">Команда</th>
+                <th class="text-center py-[0.7rem] bg-zinc-100">И</th>
+                <th class="text-center py-[0.7rem] bg-zinc-100">О</th>
+            </tr>
+            </thead>
+        </slot>
+        <tbody v-if="infoType === 'shortStands'">
+        <template v-for="(team, i) in infoToShow">
+            <TheShortStands :info="team" :ind="i"/>
+        </template>
+        </tbody>
+
+        <template v-else-if="infoType === 'fullStands'">
+        <TheFullStands :info="infoToShow"/>
+        </template>
+
+        <template v-else-if="infoType === 'fullResults'">
+            <TheFullResults :info="infoToShow"/>
+        </template>
+
+        <template v-else-if="infoType === 'shortResults'"
+                  v-for="(results, date, i) in (infoToShow?.tour.scores ? sortObj(infoToShow?.tour?.scores) :  infoToShow?.tour.scores)">
+            <thead>
+            <tr>
+                <th colspan="6" class="center py-[0.7rem] bg-zinc-100">
+                  {{ infoToShow?.tour.scores[date][0]['tour'] }}-й тур. {{ $resultDate(+date) }}
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            <TheShortResults :iter="i" :results="results"/>
+            </tbody>
+        </template>
+
+        <template v-else-if="infoType === 'ecupResults'" v-for="(info, tourNum, i) in infoToShow">
+            <template v-for="(results, date) in sortObj(info)">
+                <thead>
+                <tr>
+                    <th colspan="6" class="text-center pt-1 pb-1">{{ tourNum }}-й тур, {{ $resultDate(+date) }}</th>
+                </tr>
+                </thead>
+                <tbody>
+                <TheShortResults :iter="i"  :results="results"/>
+                </tbody>
+            </template>
+        </template>
+
+        <template v-else-if="infoType === 'ecupPoResults'" v-for="(results, date, i)  in (infoToShow ? sortObj(infoToShow) :  infoToShow)">
+        <thead>
+            <tr>
+                <th colspan="6" class="text-center pt-1 pb-1">{{ $resultDate(+date) }}</th>
+            </tr>
+            </thead>
+            <tbody>
+            <TheShortResults :iter="i" :results="results"/>
+            </tbody>
+        </template>
+
+
+        <template v-else-if="infoType === 'ecupGroupFullResults'" v-for="(tour, group) in sortObj(infoToShow)">
+                <thead>
+                <tr>
+                    <th colspan="6" class="text-center py-3 bg-zinc-800 text-zinc-100">
+                        Группа {{ group }}
+                    </th>
+                </tr>
+                </thead>
+                <template v-for="(info, tourNum, i) in tour">
+
+                    <template v-for="(results, date) in sortObj(info)">
+                        <thead>
+                        <tr>
+                            <th colspan="6" class="text-center py-[0.7rem] bg-zinc-100">
+                                {{ tourNum }}-й тур, {{ $resultDate(+date) }}
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <TheShortResults :iter="i" :results="results"/>
+                        </tbody>
+                    </template>
+                </template>
+            </template>
+
+
+        <template v-else-if="infoType === 'ecupPoFullResults'" v-for="source in infoToShow">
+            <thead>
+            <tr>
+                <th colspan="6" class="text-center py-3 bg-zinc-800 text-zinc-100">
+                    {{ source.stage }}
+                </th>
+            </tr>
+            </thead>
+            <template v-for="(results, date, i) in sortObj(source.scores)">
+                <thead>
+                <tr>
+                    <th colspan="6" class="text-center py-[0.7rem] bg-zinc-100">{{ $resultDate(+date) }}</th>
+                </tr>
+                </thead>
+                <tbody>
+                <TheShortResults :iter="i" :results="results"/>
+                </tbody>
+            </template>
+        </template>
+
+
+        <tbody v-else-if="infoType === 'scorers'">
+        <template  v-for="(player, i) in infoToShow?.players">
+            <TheScorers :player="player"/>
+        </template>
+        </tbody>
+
+        <tbody v-else-if="infoType === 'ecupTableStands'">
+        <template v-for="(team, i) in infoToShow">
+            <TheShortStands :info="team" :ind="i"/>
+        </template>
+        </tbody>
+
+        <tbody v-else-if="infoType === 'ecupTableFullStands'">
+        <template v-for="(team, i) in infoToShow">
+            <TheEcupFullStands :info="team" :ind="i"/>
+        </template>
+        </tbody>
+
+        <tbody v-else-if="infoType === 'ecupStands'">
+        <template v-for="(team, i) in infoToShow?.teams">
+            <TheShortStands :info="team" :ind="i"/>
+        </template>
+        </tbody>
+    </table>
+</template>
+
+<script setup lang="ts">
+const {$resultDate} = useNuxtApp();
+import sortObj from "~/helpers/sortObj";
+
+const props = defineProps({
+    infoType: String,
+    infoToShow: [Object, Array],
+})
+</script>
+
+<style scoped>
+
+</style>

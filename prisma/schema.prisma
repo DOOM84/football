@@ -1,0 +1,488 @@
+datasource db {
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+  provider  = "postgresql"
+}
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-1.0.x", "debian-openssl-1.1.x"]
+}
+
+model Champ {
+  id           Int      @id @default(autoincrement())
+  api_id       Int?
+  name         String
+  slug         String
+  all_tours    Int
+  current_tour Int?
+  posts        Post[]
+  teams        Team[]
+  scorers      Scorer[]
+  results      Result[]
+  tour         Tour[]
+  status       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Ecup {
+  id        Int          @id @default(autoincrement())
+  api_id    Int?
+  name      String
+  slug      String
+  stage     String
+  stands    EcupStand[]
+  results   EcupResult[]
+  posts     Post[]
+  status    Boolean      @default(true)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+}
+
+model Team {
+  id           Int            @id @default(autoincrement())
+  api_id       Int            @unique
+  name         String
+  slug         String
+  img          String?
+  sprite       String?
+  champ        Champ          @relation(fields: [champ_id], references: [id])
+  champ_id     Int
+  games        Int            @default(0)
+  win          Int            @default(0)
+  draw         Int            @default(0)
+  lost         Int            @default(0)
+  goals        Int            @default(0)
+  missed       Int            @default(0)
+  diff         Int            @default(0)
+  points       Int            @default(0)
+  order        Int?
+  team_info    Json?
+  status       Boolean        @default(true)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  posts        TeamsOnPosts[]
+  players      Player[]
+  results1     Result[]       @relation("home")
+  results2     Result[]       @relation("away")
+  resultsTour1 Tour[]         @relation("tourHome")
+  resultsTour2 Tour[]         @relation("tourAway")
+  ecupTeam     EcupTeam?
+}
+
+model Team23 {
+  id        Int      @id @default(autoincrement())
+  api_id    Int      @unique
+  name      String
+  slug      String
+  img       String?
+  sprite    String?
+  champ_id  Int
+  games     Int      @default(0)
+  win       Int      @default(0)
+  draw      Int      @default(0)
+  lost      Int      @default(0)
+  goals     Int      @default(0)
+  missed    Int      @default(0)
+  diff      Int      @default(0)
+  points    Int      @default(0)
+  order     Int?
+  team_info Json?
+  status    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Team22 {
+  id        Int      @id @default(autoincrement())
+  api_id    Int      @unique
+  name      String
+  slug      String
+  img       String?
+  sprite    String?
+  champ_id  Int
+  games     Int      @default(0)
+  win       Int      @default(0)
+  draw      Int      @default(0)
+  lost      Int      @default(0)
+  goals     Int      @default(0)
+  missed    Int      @default(0)
+  diff      Int      @default(0)
+  points    Int      @default(0)
+  order     Int?
+  team_info Json?
+  status    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Result {
+  id        Int        @id @default(autoincrement())
+  date      BigInt?
+  res1      Int?
+  res2      Int?
+  champ     Champ      @relation(fields: [champ_id], references: [id])
+  champ_id  Int
+  home      Team       @relation(fields: [team1], references: [id], name: "home")
+  team1     Int
+  away      Team       @relation(fields: [team2], references: [id], name: "away")
+  team2     Int
+  stamp     BigInt?
+  api_id    BigInt?    @unique
+  is_info   Boolean    @default(false)
+  time      String?
+  tour      Int
+  tourRes   Tour?
+  info      MatchInfo?
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model MatchInfo {
+  id          Int         @id @default(autoincrement())
+  info        Json?
+  lineups     Json?
+  champResult Result?     @relation(fields: [ch_res], references: [api_id])
+  ch_res      BigInt?     @unique
+  ecupResult  EcupResult? @relation(fields: [ecup_res], references: [api_id])
+  ecup_res    BigInt?     @unique
+}
+
+model MatchInfo22 {
+  id       Int     @id @default(autoincrement())
+  info     Json?
+  lineups  Json?
+  ch_res   BigInt? @unique
+  ecup_res BigInt? @unique
+}
+
+model MatchInfo23 {
+  id       Int     @id @default(autoincrement())
+  info     Json?
+  lineups  Json?
+  ch_res   BigInt? @unique
+  ecup_res BigInt? @unique
+}
+
+model Result23 {
+  id        Int      @id @default(autoincrement())
+  date      BigInt?
+  res1      Int?
+  res2      Int?
+  champ_id  Int
+  team1     Int
+  team2     Int
+  stamp     BigInt?
+  api_id    BigInt?  @unique
+  is_info   Boolean  @default(false)
+  time      String?
+  tour      Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Result22 {
+  id        Int      @id @default(autoincrement())
+  date      BigInt?
+  res1      Int?
+  res2      Int?
+  champ_id  Int
+  team1     Int
+  team2     Int
+  stamp     BigInt?
+  api_id    BigInt?  @unique
+  is_info   Boolean  @default(false)
+  time      String?
+  tour      Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Tour {
+  id        Int      @id @default(autoincrement())
+  date      BigInt?
+  res1      Int?
+  res2      Int?
+  champ     Champ    @relation(fields: [champ_id], references: [id])
+  champ_id  Int
+  home      Team     @relation(fields: [team1], references: [id], name: "tourHome")
+  team1     Int
+  away      Team     @relation(fields: [team2], references: [id], name: "tourAway")
+  team2     Int
+  stamp     BigInt?
+  info      Result?  @relation(fields: [api_id], references: [api_id])
+  api_id    BigInt?  @unique
+  is_info   Boolean  @default(false)
+  time      String?
+  tour      Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model EcupTeam {
+  id        Int          @id @default(autoincrement())
+  api_id    Int?
+  name      String
+  sprite    String
+  team      Team?        @relation(fields: [team_id], references: [id])
+  ecupStand EcupStand[]
+  results1  EcupResult[] @relation("home")
+  results2  EcupResult[] @relation("away")
+  team_id   Int?         @unique
+  status    Boolean      @default(true)
+}
+
+model EcupStand {
+  id       Int       @id @default(autoincrement())
+  games    Int       @default(0)
+  win      Int       @default(0)
+  draw     Int       @default(0)
+  lost     Int       @default(0)
+  goals    Int       @default(0)
+  missed   Int       @default(0)
+  diff     Int       @default(0)
+  points   Int       @default(0)
+  order    Int?
+  group    String?
+  ecup     Ecup      @relation(fields: [ecup_id], references: [id])
+  ecup_id  Int
+  ecupTeam EcupTeam? @relation(fields: [team_id], references: [id])
+  team_id  Int?
+}
+
+model EcupStand23 {
+  id      Int     @id @default(autoincrement())
+  games   Int     @default(0)
+  win     Int     @default(0)
+  draw    Int     @default(0)
+  lost    Int     @default(0)
+  goals   Int     @default(0)
+  missed  Int     @default(0)
+  diff    Int     @default(0)
+  points  Int     @default(0)
+  order   Int?
+  group   String?
+  ecup_id Int
+  team_id Int?
+}
+
+model EcupStand22 {
+  id      Int     @id @default(autoincrement())
+  games   Int     @default(0)
+  win     Int     @default(0)
+  draw    Int     @default(0)
+  lost    Int     @default(0)
+  goals   Int     @default(0)
+  missed  Int     @default(0)
+  diff    Int     @default(0)
+  points  Int     @default(0)
+  order   Int?
+  group   String?
+  ecup_id Int
+  team_id Int?
+}
+
+model EcupResult {
+  id        Int        @id @default(autoincrement())
+  date      BigInt?
+  res1      Int?
+  res2      Int?
+  ecup      Ecup       @relation(fields: [ecup_id], references: [id])
+  ecup_id   Int
+  home      EcupTeam   @relation(fields: [team1], references: [id], name: "home")
+  team1     Int
+  away      EcupTeam   @relation(fields: [team2], references: [id], name: "away")
+  team2     Int
+  stamp     BigInt?
+  api_id    BigInt?    @unique
+  is_info   Boolean    @default(false)
+  time      String?
+  tour      Int?
+  group     String?
+  stage     String?
+  order     Int?
+  info      MatchInfo?
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model EcupResult23 {
+  id        Int      @id @default(autoincrement())
+  date      BigInt?
+  res1      Int?
+  res2      Int?
+  ecup_id   Int
+  team1     Int
+  team2     Int
+  stamp     BigInt?
+  api_id    BigInt?  @unique
+  is_info   Boolean  @default(false)
+  time      String?
+  tour      Int?
+  group     String?
+  stage     String?
+  order     Int?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model EcupResult22 {
+  id        Int      @id @default(autoincrement())
+  date      BigInt?
+  res1      Int?
+  res2      Int?
+  ecup_id   Int
+  team1     Int
+  team2     Int
+  stamp     BigInt?
+  api_id    BigInt?  @unique
+  is_info   Boolean  @default(false)
+  time      String?
+  tour      Int?
+  group     String?
+  stage     String?
+  order     Int?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Country {
+  id         Int      @id @default(autoincrement())
+  name       String
+  parse_name String
+  players    Player[]
+}
+
+model Post {
+  id          Int              @id @default(autoincrement())
+  img         Json
+  title       String
+  slug        String
+  subtitle    String
+  body        String
+  source      String?
+  champ       Champ?           @relation(fields: [champ_id], references: [id])
+  champ_id    Int?
+  ecup        Ecup?            @relation(fields: [ecup_id], references: [id])
+  ecup_id     Int?
+  rates       Rate[]
+  teams       TeamsOnPosts[]
+  players     PlayersOnPosts[]
+  tags        TagsOnPosts[]
+  date        BigInt
+  is_headline Boolean          @default(false)
+  status      Boolean          @default(true)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  comments    Comment[]
+}
+
+model Tag {
+  id        Int           @id @default(autoincrement())
+  name      String
+  slug      String
+  posts     TagsOnPosts[]
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+}
+
+model TagsOnPosts {
+  post       Post     @relation(fields: [post_id], references: [id])
+  post_id    Int
+  tag        Tag      @relation(fields: [tag_id], references: [id])
+  tag_id     Int
+  assignedAt DateTime @default(now())
+
+  @@id([post_id, tag_id])
+}
+
+model Player {
+  id          Int              @id @default(autoincrement())
+  api_id      Int              @unique
+  name        String
+  slug        String           @unique
+  img         String
+  team        Team?            @relation(fields: [team_id], references: [id])
+  team_id     Int?
+  country     Country?         @relation(fields: [country_id], references: [id])
+  country_id  Int?
+  position_id Int
+  info        Json?
+  scorer      Scorer?
+  posts       PlayersOnPosts[]
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+}
+
+model Scorer {
+  id        Int     @id @default(autoincrement())
+  api_id    Int?
+  champ     Champ   @relation(fields: [champ_id], references: [id])
+  champ_id  Int
+  goals     Int     @default(0)
+  name      String
+  player    Player? @relation(fields: [player_id], references: [id])
+  player_id Int?    @unique
+}
+
+model Rate {
+  id      Int     @id @default(autoincrement())
+  user    Profile @relation(fields: [user_id], references: [id])
+  user_id Int
+  post    Post    @relation(fields: [post_id], references: [id])
+  post_id Int
+  rate    Float
+}
+
+model Profile {
+  id           Int           @id @default(autoincrement())
+  user_id      String        @unique
+  rates        Rate[]
+  login        String?
+  avatar       String?
+  email        String?
+  comments     Comment[]
+  commentLikes CommentLike[]
+}
+
+model Comment {
+  id        Int           @id @default(autoincrement())
+  user      Profile       @relation(fields: [user_id], references: [id])
+  user_id   Int
+  post      Post          @relation(fields: [post_id], references: [id])
+  post_id   Int
+  body      String?
+  userLikes CommentLike[]
+  quote     Json?
+  stamp     BigInt?
+}
+
+model CommentLike {
+  id         Int     @id @default(autoincrement())
+  user       Profile @relation(fields: [user_id], references: [id])
+  user_id    Int
+  comment    Comment @relation(fields: [comment_id], references: [id], onDelete: Cascade)
+  comment_id Int
+  like       Int     @default(0)
+}
+
+model PlayersOnPosts {
+  post       Post     @relation(fields: [post_id], references: [id])
+  post_id    Int
+  player     Player   @relation(fields: [player_id], references: [id])
+  player_id  Int
+  assignedAt DateTime @default(now())
+
+  @@id([post_id, player_id])
+}
+
+model TeamsOnPosts {
+  post       Post     @relation(fields: [post_id], references: [id])
+  post_id    Int
+  team       Team     @relation(fields: [team_id], references: [id])
+  team_id    Int
+  assignedAt DateTime @default(now())
+
+  @@id([post_id, team_id])
+}
