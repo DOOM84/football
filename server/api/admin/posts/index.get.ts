@@ -57,7 +57,11 @@ export default defineEventHandler(async (event) => {
             },
         });
 
-        return {posts, champs, ecups, tags, teams};
+        return {posts: posts.map(post => ({...post,
+                tags: post.tags.map(t => t.tag),
+                teams: post.teams.map(t => t.team),
+                players: post.players.map(t => t.player),
+            })), champs, ecups, tags, teams, players: []};
 
     }catch (e) {
         console.log(e);

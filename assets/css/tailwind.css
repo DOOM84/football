@@ -76,6 +76,7 @@
     height: 30px;
     margin-right: 8px;
     border: 2px solid #ffffffbf;
+    background: white;
 }
 
 .multiselect-tag.is-user i:before {

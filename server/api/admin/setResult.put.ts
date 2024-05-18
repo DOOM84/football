@@ -176,14 +176,14 @@ export default defineEventHandler(async (event) => {
                 if(updated.is_info){
                     const homeTeam = await prisma.team.findFirst({
                         where: {
-                            id: tourChamp.team1 as unknown as number,
+                            id: tourChamp.team1 || resChamp.team1  as unknown as number,
                         },
                         select: {api_id: true}
                     })  as unknown as ITeamInfo
 
                     const awayTeam = await prisma.team.findFirst({
                         where: {
-                            id: tourChamp.team2 as unknown as number,
+                            id: tourChamp.team2 || resChamp.team2  as unknown as number,
                         },
                         select: {api_id: true}
                     }) as unknown as ITeamInfo;

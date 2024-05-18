@@ -13,7 +13,7 @@ model Champ {
   id           Int      @id @default(autoincrement())
   api_id       Int?
   name         String
-  slug         String
+  slug         String   @unique
   all_tours    Int
   current_tour Int?
   posts        Post[]
@@ -30,7 +30,7 @@ model Ecup {
   id        Int          @id @default(autoincrement())
   api_id    Int?
   name      String
-  slug      String
+  slug      String       @unique
   stage     String
   stands    EcupStand[]
   results   EcupResult[]
@@ -44,7 +44,7 @@ model Team {
   id           Int            @id @default(autoincrement())
   api_id       Int            @unique
   name         String
-  slug         String
+  slug         String         @unique
   img          String?
   sprite       String?
   champ        Champ          @relation(fields: [champ_id], references: [id])
@@ -358,7 +358,7 @@ model Post {
   id          Int              @id @default(autoincrement())
   img         Json
   title       String
-  slug        String
+  slug        String           @unique
   subtitle    String
   body        String
   source      String?
@@ -381,7 +381,7 @@ model Post {
 model Tag {
   id        Int           @id @default(autoincrement())
   name      String
-  slug      String
+  slug      String        @unique
   posts     TagsOnPosts[]
   createdAt DateTime      @default(now())
   updatedAt DateTime      @updatedAt
