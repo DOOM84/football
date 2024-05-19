@@ -63,8 +63,8 @@ export default defineEventHandler(async (event) => {
 
         const {fields, files} = response;
 
-        const champ =  fields.champ ? {name: fields.champ.name, slug: fields.champ.slug} : null;
-        const ecup =   fields.ecup ? {name: fields.ecup.name, slug: fields.ecup.slug} : null;
+        const champ =  fields.champ?.name ? {name: fields.champ.name, slug: fields.champ.slug} : null;
+        const ecup =   fields.ecup?.name ? {name: fields.ecup.name, slug: fields.ecup.slug} : null;
 
         delete fields.champ;
         delete fields.ecup;

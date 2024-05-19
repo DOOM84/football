@@ -6,21 +6,27 @@ import algoliasearch from "algoliasearch";
 export default defineEventHandler(async (event) => {
 
         try {
-            const {id, path} = await readBody(event);
+            const {id, path, slug} = await readBody(event);
 
             const client = algoliasearch(runtimeConfig.algoliaAppId, runtimeConfig.algoliaKey);
             const index = client.initIndex('posts');
 
-            const post = await prisma.post.findFirst({
-                where: {id}
+            const promisesToExec = Object.values(path as Record<string, string>).map(file => {
+                return new Promise(async (resolve, reject) => {
+                        try {
+                            if (fs.existsSync(setFilePath('/public' + file))) {
+                                fs.unlinkSync(setFilePath('/public' + file));
+                            }
+                            resolve(true);
+                        } catch (e) {
+                            console.log(e);
+                            reject(e)
+                        }
+                    }
+                )
             })
 
-            if (fs.existsSync(setFilePath('/public' + path.original))) {
-                fs.unlinkSync(setFilePath('/public' + path.original));
-            }
-            if (fs.existsSync(setFilePath('/public' + path.thumbnail))) {
-                fs.unlinkSync(setFilePath('/public' + path.thumbnail));
-            }
+            const updRes = await Promise.all(promisesToExec) as boolean[];
 
             await prisma.post.update({
                 where: {
@@ -51,7 +57,7 @@ export default defineEventHandler(async (event) => {
                     },
                 })
 
-            await index.deleteObject(post!.slug);
+            await index.deleteObject(slug);
 
             return {
                 id

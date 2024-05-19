@@ -63,7 +63,8 @@
                       valueProp="slug"
                       label="name"
                       @change="champChanged"
-                      placeholder="Выберите чемпионат">
+                      placeholder="Выберите чемпионат"
+                  >
 
                   </Multiselect>
                 </div>
@@ -77,7 +78,8 @@
                       valueProp="slug"
                       label="name"
                       @change="ecupChanged"
-                      placeholder="Выберите еврокубок">
+                      placeholder="Выберите еврокубок"
+                  >
 
                   </Multiselect>
                 </div>
@@ -259,7 +261,7 @@
                 <button @click.prevent="updateItem(row)" class="p-1 border-none btn m-0">
                   <Icon name="material-symbols:edit-square-outline" size="20"/>
                 </button>
-                <button @click.prevent="removeItem(row.id, row.img)" class="p-1 border-none btn m-0">
+                <button @click.prevent="removeItem(row.id, row.img, row.slug)" class="p-1 border-none btn m-0">
                   <Icon name="ion:trash-b" size="20"/>
                 </button>
               </div>
@@ -343,12 +345,11 @@ closeModal(): void {
 }
 
 async function updateItem(post: IPost): Promise<void> {
-  console.log(post);
   mode.value = 'edit';
   postToUpdate.value = {
     ...post,
-    ecup: !postToUpdate.value.ecup ?  {slug: ''} : postToUpdate.value.ecup,
-    champ: !postToUpdate.value.champ ?  {slug: ''} : postToUpdate.value.champ,
+    ecup: !post.ecup ?  {slug: ''} : post.ecup,
+    champ: !post.champ ?  {slug: ''} : post.champ,
   };
 
   showDlg.value = true;
@@ -485,7 +486,7 @@ async function storeItem(): Promise<void> {
   }
 }
 
-async function removeItem(dbId: string, path: string): Promise<void> {
+async function removeItem(dbId: string, path: IPost['img'], slug: string): Promise<void> {
   if (confirm('Are you sure?')) {
     try {
 
@@ -493,7 +494,7 @@ async function removeItem(dbId: string, path: string): Promise<void> {
 
       const {id} = await $fetch<{ id: number }>('/api/admin/posts/remove', {
         method: 'DELETE',
-        body: {id: dbId, path},
+        body: {id: dbId, path, slug},
       })
 
       data.value?.posts.splice(data.value.posts.findIndex((item: IPost) => item.id === id), 1);
@@ -542,9 +543,6 @@ function tagChanged(tags: Partial<IPost['tags']>) {
 
 function playerChanged(players: Partial<IPost['players']>) {
   postToUpdate.value.players = players;
- // console.log(players);
- // return
- // postToUpdate.value.playersDb = players.map(player => player?.id) as number[];
 }
 
 async function teamChanged(teams: Partial<IPost['teams']> /*teams*/): Promise<void> {

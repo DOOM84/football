@@ -1,15 +1,16 @@
 import formidable, {Fields, Files} from "formidable";
 import prisma from '~/helpers/prisma';
-import fs from "fs";
-import { object, string, number, mixed, ObjectSchema, } from 'yup';
-import prepareFileInfo from "~/helpers/upload/prepareFileInfo";
-import sharp from "sharp";
-import setFilePath from "~/helpers/upload/setFilePath";
-import {IError, ITag} from "~/types/interfaces";
+//import fs from "fs";
+import { object, string, mixed, ObjectSchema, lazy } from 'yup';
+//import prepareFileInfo from "~/helpers/upload/prepareFileInfo";
+//import sharp from "sharp";
+import {IError, IPost, ITag} from "~/types/interfaces";
 const runtimeConfig = useRuntimeConfig();
 import algoliasearch from "algoliasearch";
+import {Upload} from "~/classes/upload";
 
-const schema: ObjectSchema<{title: string,
+const schema: ObjectSchema<{
+    title: string,
     subtitle: string,
     body: string,
 }> = object({
@@ -21,7 +22,19 @@ const schema: ObjectSchema<{title: string,
         then: (schema) => schema.required('Выберите чемпионат и/или еврокубок'),
         otherwise: (schema) => schema.notRequired()
     }),
+    image: lazy((value) => {
+        if (value?.media_file) {
+            return mixed<formidable.Files<string> | any>().test("image-present", "Выберите изображение с правильным типом",
+                files => {
+                    return  files && Array.isArray(files.media_file) && files.media_file.length > 0 &&
+                        files.media_file![0].mimetype!.startsWith("image/")
+                })
+        }
+        return mixed().nullable().optional();
+    }),
 })
+
+
 export default defineEventHandler(async (event) => {
     try {
         // @ts-ignore: Unreachable code error
@@ -32,7 +45,8 @@ export default defineEventHandler(async (event) => {
         const client = algoliasearch(runtimeConfig.algoliaAppId, runtimeConfig.algoliaKey);
         const index = client.initIndex('posts');
 
-        const form =  formidable({
+
+        const form = formidable({
             keepExtensions: true,
             allowEmptyFiles: false,
             maxFileSize: 500 * 1024 * 1024 * 1024 * 1024,
@@ -45,153 +59,98 @@ export default defineEventHandler(async (event) => {
                 if (err) {
                     reject(err)
                 }
-                resolve({ fields: JSON.parse(fields.data as unknown as string), files })
+                resolve({fields: JSON.parse(fields.data as unknown as string), files})
             })
         })
 
-        const { fields, files } = response;
+        const {fields, files} = response;
 
-        await schema.validate(fields);
+        const champ =  fields.champ?.name ? {name: fields.champ.name, slug: fields.champ.slug} : null;
+        const ecup =   fields.ecup?.name ? {name: fields.ecup.name, slug: fields.ecup.slug} : null;
 
-        const updated: any = await new Promise<any>(async (resolve, reject) => {
+        delete fields.champ;
+        delete fields.ecup;
 
-            if(files && Object.keys(files).length > 0){
-                if (files.media_file[0].mimetype.startsWith("image/")) {
+        await schema.validate({...fields, image: files});
 
-                    if (fs.existsSync(setFilePath('/public' + fields.img.original))) {
-                        fs.unlinkSync(setFilePath('/public' + fields.img.original));
+        if(Array.isArray(files.media_file)) {
+            const uploadPicsInst = new Upload(files['media_file'],
+                '/img/posts/', Object.values(fields.img),
+                {
+                    width: 800,
+                    height: 446,
+                    fit: 'cover',
+                    position: 'right top'
+                },
+                [{
+                    dest: '/img/posts/thumbnails/',
+                    resizeOpts: {
+                        width: 150,
+                        height: 89,
+                        fit: 'cover',
+                        position: 'right top',
                     }
-                    if (fs.existsSync(setFilePath('/public' + fields.img.thumbnail))) {
-                        fs.unlinkSync(setFilePath('/public' + fields.img.thumbnail));
-                    }
+                },
+                ]);
 
-                    const origFileName: string = files.media_file[0].originalFilename;
+            const {paths} = await uploadPicsInst.uploadFile() as unknown as { paths: string[] };
 
-                    const ext: string = origFileName.substring(origFileName.lastIndexOf('.') + 1);
-
-                    const fileName: string = Date.now().toString()+'.'+ext; // fields.name.split(' ').join('_')+'.'+ext;
-                    const oldPath = files.media_file[0].filepath;
-
-                    const img = {
-                        original: "/img/posts/" + fileName,
-                        thumbnail: "/img/posts/thumbnails/" + fileName}
-
-                    const newOrigPath = prepareFileInfo(fileName, '/public/img/posts/', fileName);
-                    const newThumbPath = prepareFileInfo(fileName, '/public/img/posts/thumbnails/', fileName);
-
-                    // fs.copyFileSync(oldPath, newPath);
-                   // const {width, height} =  await sharp(oldPath).metadata();
-
-                    const stream = fs.createReadStream(oldPath);
-
-                    stream.on('open', () => {
-
-                        const origStream = fs.createWriteStream(newOrigPath);
-                        const thumbStream = fs.createWriteStream(newThumbPath);
-
-                        const resizeOrig = {
-                            width: 800, //width > 370 ? 370 : null,
-                            height: 446,
-                           // fit: 'cover',
-                            position: 'right top',
-                        }
-
-                        const transformerOrig = sharp()
-                            .resize(resizeOrig);
-
-                        stream
-                            .pipe(transformerOrig)
-                            .pipe(origStream);
-
-
-                        const resizeThumb = {
-                            width: 150, //width > 370 ? 370 : null,
-                            height: 89,
-                           // fit: 'cover',
-                            position: 'right top',
-                        }
-
-                        const transformerThumb = sharp()
-                            .resize(resizeThumb);
-
-                        stream
-                            .pipe(transformerThumb)
-                            .pipe(thumbStream);
-
-                    })
-
-                    await new Promise(resolve => setTimeout(resolve, 2000));
-
-                    resolve({
-                        ...fields,
-                        img
-                    });
-                } else {
-                    reject('Please upload images only.');
-                }
-            }else{
-                resolve({
-                    ...fields,
-                });
+            fields.img = {
+                original: paths[0],
+                thumbnail: `/img/posts/thumbnails/${paths[0].substring(paths[0].lastIndexOf('/') + 1)}`,
             }
-        });
+        }
 
-        if(Array.isArray(updated.newTags) && updated.newTags.length){
-            await Promise.all(updated.newTags.map(async (tag: ITag) => {
-                const {id} = await prisma.tag.create({data: tag})
-                updated.tags.push(id)
+        const newTags: number[] = [];
+
+        if (Array.isArray(fields.tags) && fields.tags.length) {
+            await Promise.all(fields.tags.map(async (tag: any) => {
+
+                const {id} = await prisma.tag.upsert({
+                    where: {slug: tag.slug},
+                    update: tag,
+                    create: tag,
+                })
+                newTags.push(id)
             }))
         }
 
-        delete updated.newTags
-
-        await prisma.post.update({
+        const {id} = await prisma.post.update({
             where: {
-                id: updated.id,
+                id: +fields.id,
             },
             data: {
-                ...updated,
-                players: {
+                ...fields,
+                date: +fields.date,
+                tags: {
                     deleteMany: {},
-                    create: updated.players.map((p: number) => ({ player: { connect: { id: +p }}}))
+                    create: newTags.map((t: number) => ({tag: {connect: {id: +t}}}))
                 },
                 teams: {
                     deleteMany: {},
-                    create: updated.teams.map((tm: number) => ({ team: { connect: { id: +tm }}}))
+                    create: fields.teams.map((tm: number) => ({team: {connect: {id: +tm}}}))
                 },
-                tags: {
+                players: {
                     deleteMany: {},
-                    create: updated.tags.map((tg: number) => ({ tag: { connect: { id: +tg }}}))
+                    create: fields.players.map((p: number) => ({player: {connect: {id: +p}}}))
                 },
-                }
+            }
         });
-
-        const champ = await prisma.champ.findFirst({
-            where: {
-                id: updated?.champ_id || undefined
-            }
-        })
-
-        const ecup = await prisma.ecup.findFirst({
-            where: {
-                id: updated?.ecup_id || undefined
-            }
-        })
 
         await index.saveObject({
-            objectID: updated.slug,
-            img: updated.img,
-            title: updated.title,
-            slug: updated.slug,
-            subtitle: updated.subtitle,
-            body: updated.body,
-            date: updated.date,
-            status: updated.status,
-            champ: champ ? {name: champ.name, slug: champ.slug} : null,
-            ecup: ecup ? {name: ecup.name, slug: ecup.slug} : null,
+            objectID: fields.slug,
+            img: fields.img,
+            title: fields.title,
+            slug: fields.slug,
+            subtitle: fields.subtitle,
+            body: fields.body,
+            date: fields.date,
+            status: fields.status,
+            champ,
+            ecup,
         });
 
-        return {result: updated}
+        return {result: {id, img: fields.img}}
 
     }catch (e) {
         console.log(e);
