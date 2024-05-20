@@ -115,7 +115,7 @@ const queryParam = computed(()=>{
 async function setResult(res: IScore) {
   const {data} = await auth.getUser();
 
-  if (!user.value || !user.value.app_metadata?.admin || !data.user || !data.user.user_metadata?.admin) {
+  if (!user.value || !user.value.app_metadata?.admin || !data.user || !data.user.app_metadata?.admin) {
     useNuxtApp().$toast.error('Вы не авторизованы');
     return
   }

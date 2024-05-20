@@ -1,8 +1,8 @@
 <template>
-  <main class="withFooter text-center">
-    <p class="text-3xl my-3 text-zinc-800">
+  <div class="min-h-[calc(100vh-160px)] max-w-[1300px] px-3 md:px-10 text-white m-auto">
+    <div class="text-3xl font-bold border-solid border-b border-zinc-50/50 p-7 mb-7">
       Чемпионаты
-    </p>
+    </div>
     <div v-if="pending || !data">
       <TheLoading loader="dots"/>
     </div>
@@ -68,7 +68,7 @@
             </template>
           </TheModal>
         </Teleport>
-        <AdminDtable v-if="showTable" @endFilter="toFilter = false"
+        <AdminDtable  @endFilter="toFilter = false"
                      :data="data.champs"
                      :toFilter="toFilter"
                      :filtering="filtering"
@@ -77,12 +77,14 @@
             <table-head>
               <div class="flex justify-center items-center">
                 <strong>Название</strong>
-                <Icon @click.prevent="filter('name', 'asc')" name="ant-design:caret-up-filled"
-                      class="cursor-pointer ml-1"
-                      size="10"/>
-                <Icon @click.prevent="filter('name', 'desc')" name="ant-design:caret-down-filled"
-                      class="cursor-pointer"
-                      size="10"/>
+                <template v-if="data.champs && data.champs.length">
+                  <Icon @click.prevent="filter('name', 'asc')" name="ant-design:caret-up-filled"
+                        class="cursor-pointer ml-1"
+                        size="10"/>
+                  <Icon @click.prevent="filter('name', 'desc')" name="ant-design:caret-down-filled"
+                        class="cursor-pointer"
+                        size="10"/>
+                </template>
               </div>
             </table-head>
             <table-head>
@@ -103,12 +105,14 @@
             <table-head>
               <div class="flex justify-center items-center">
                 <strong>Опубликовано</strong>
+                <template v-if="data.champs && data.champs.length">
                 <Icon @click.prevent="filter('status', 'asc')" name="ant-design:caret-up-filled"
                       class="cursor-pointer ml-1"
                       size="10"/>
                 <Icon @click.prevent="filter('status', 'desc')" name="ant-design:caret-down-filled"
                       class="cursor-pointer"
                       size="10"/>
+                  </template>
               </div>
             </table-head>
             <table-head/>
@@ -135,20 +139,21 @@
               {{ row.status ? 'Да' : 'Нет' }}
             </table-body>
             <table-body>
-              <button @click.prevent="updateItem(row)">
-                <Icon name="material-symbols:edit-square-outline" size="20"/>
-              </button>
-              <button @click.prevent="removeItem(row.id)">
-                <Icon name="ion:trash-b" size="20"/>
-              </button>
+              <div class="flex justify-center items-center gap-1">
+                <button @click.prevent="updateItem(row)" class="p-1 border-none btn m-0">
+                  <Icon name="material-symbols:edit-square-outline" size="20"/>
+                </button>
+                <button @click.prevent="removeItem(row.id)" class="p-1 border-none btn m-0">
+                  <Icon name="ion:trash-b" size="20"/>
+                </button>
+              </div>
             </table-body>
           </template>
         </AdminDtable>
       </ClientOnly>
     </template>
 
-
-  </main>
+  </div>
 </template>
 
 <script lang="ts" setup>
@@ -163,7 +168,6 @@ definePageMeta({
 
 const {data, pending} = useLazyFetch<{ champs: Partial<IChampDB>[] }>('/api/admin/champs')
 
-const showTable = ref<boolean>(true);
 
 useHead({
   titleTemplate: '%s - Чемпионаты'
@@ -171,13 +175,15 @@ useHead({
 
 const {filtering, toFilter, showDlg, mode, filter} = useFilter();
 
-const champToUpdate = ref<Partial<IChampDB>>({status: false, name: ''});
+const initChampData: Partial<IChampDB> = {status: false, name: ''};
+
+const champToUpdate = ref<typeof initChampData>({});
 
 const showLoading = ref<boolean>(false);
 
 
 function closeModal(): void {
-  champToUpdate.value = {status: false, name: ''}
+  champToUpdate.value = {...initChampData};
   showDlg.value = false;
   mode.value = null;
 }
@@ -188,8 +194,6 @@ async function addChampSquad(): Promise<void> {
 
     const {players} = await $fetch<{ players: IPlayer[] }>('/api/admin/remote/squad',
         {params: {champApiId: champToUpdate.value.api_id}});
-
-    console.log(players);
 
     useNuxtApp().$toast.success('Сохранено успешно!');
 
@@ -212,7 +216,7 @@ function updateItem(champ: IChampDB): void {
 
 function addItem(): void {
   mode.value = 'add';
-  champToUpdate.value = {status: false}
+  champToUpdate.value = {...initChampData}
   showDlg.value = true;
 }
 
@@ -229,8 +233,6 @@ async function storeItem(): Promise<void> {
       all_tours: +champToUpdate.value?.all_tours!,
       slug: champToUpdate.value.slug || slugify(champToUpdate.value?.name as string || '', {strict: true, lower: true}),
     }
-
-    showTable.value = false;
 
     if (mode.value === 'edit') {
       const {result} = await $fetch<{ result: IChampDB }>('/api/admin/champs/edit', {
@@ -251,6 +253,8 @@ async function storeItem(): Promise<void> {
         data.value.champs.unshift({...champToUpdate.value, id: result.id});
       }
     }
+
+    filter('', '');
 
     closeModal();
 
@@ -273,7 +277,6 @@ async function storeItem(): Promise<void> {
 
   } finally {
     showLoading.value = false;
-    showTable.value = true;
   }
 }
 
@@ -289,7 +292,6 @@ async function removeItem(dbId: number): Promise<void> {
         body: {id: dbId},
       })
 
-      showTable.value = false;
 
       if (data.value) {
         data.value.champs.splice(data.value.champs.findIndex((item) => item.id === +id), 1);
@@ -317,7 +319,6 @@ async function removeItem(dbId: number): Promise<void> {
 
     } finally {
       showLoading.value = false;
-      showTable.value = true;
     }
   }
 }
