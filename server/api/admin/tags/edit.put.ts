@@ -6,7 +6,7 @@ const schema: ObjectSchema<{
     name: string;
     slug: string;
 }> = object({
-    name: string().trim().required('Введите название (укр.)'),
+    name: string().trim().required('Введите название'),
     slug: string().trim().required('Введите название'),
 })
 

@@ -140,7 +140,7 @@ import Multiselect from '@vueform/multiselect';
 
 definePageMeta({
   layout: 'admin',
-  middleware: ["auth"]
+  middleware: ["admin"]
 })
 
 const {data, pending} = useLazyFetch<{ecups: Partial<IEcupDB>[]}>('/api/admin/ecups')

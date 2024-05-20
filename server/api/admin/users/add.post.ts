@@ -1,12 +1,10 @@
 import type {IError, IUser} from "~/types/interfaces";
 import { object, string, ObjectSchema, ref } from 'yup';
 import { serverSupabaseServiceRole } from '#supabase/server';
-type AdminUser = Omit<IUser, 'id' | 'admin' | 'avatar' | 'user_id'>;
-import formidable, {Fields} from "formidable";
-import fs from "fs";
-import prepareFileInfo from "~/helpers/upload/prepareFileInfo";
-import sharp from "sharp";
+type AdminUser = Pick<IUser, 'login' | 'email' | 'password' | 'passwordConfirmation'>;
+import formidable, {type Fields} from "formidable";
 import prisma from "~/helpers/prisma";
+import {Upload} from "~/classes/upload";
 
 const schema: ObjectSchema<AdminUser> = object({
 
@@ -56,69 +54,23 @@ export default defineEventHandler(async (event) => {
 
             await schema.validate(fields);
 
-            const updated: any = await new Promise<any>(async (resolve, reject) => {
+            const user_metadata: {avatar: string | null; login: string} = {avatar: null, login: fields.login}
 
-                if (files && Object.keys(files).length > 0) {
-                    if (files.media_file[0].mimetype.startsWith("image/")) {
+            if (files && Object.keys(files).length > 0) {
+                const uploadInst = new Upload(files['media_file'], '/img/avatars/', undefined,   {height: 80, width: 80});
 
-                        const origFileName: string = files.media_file[0].originalFilename;
+                const updated = await uploadInst.uploadFile() as unknown as {paths: string[]};
 
-                        const ext: string = origFileName.substring(origFileName.lastIndexOf('.') + 1);
+                 user_metadata.avatar = updated.paths[0] || null;
+            }
 
-                        const fileName: string = Date.now().toString() + '.' + ext; // fields.name.split(' ').join('_')+'.'+ext;
-
-                        const oldPath = files.media_file[0].filepath;
-
-                        const avatar = "/img/avatars/" + fileName;
-
-                        const newOrigPath = prepareFileInfo(fileName, '/public/img/avatars/', fileName);
-
-                        const stream = fs.createReadStream(oldPath);
-
-                        stream.on('open', () => {
-
-                            const origStream = fs.createWriteStream(newOrigPath);
-
-                            const resizeOrig = {
-                                width: 80, //width > 370 ? 370 : null,
-                                height: 80,
-                                // fit: 'cover',
-                                // position: 'right top',
-                            }
-
-                            const transformerOrig = sharp()
-                                .resize(resizeOrig);
-
-                            stream
-                                .pipe(transformerOrig)
-                                .pipe(origStream);
-
-                        })
-
-                        await new Promise(resolve => setTimeout(resolve, 2000));
-
-                        resolve({
-                            ...fields,
-                            avatar
-                        });
-                    } else {
-                        reject('Файл должен быть изображением.');
-                    }
-                } else {
-                    resolve({
-                        ...fields,
-                    });
-                }
-            });
-
-            const user_metadata=  { login: updated.login, admin: updated.admin, avatar: updated.avatar || null};
-
-            if(!user_metadata.admin){user_metadata.admin = null}
+            const app_metadata = {admin: fields.admin || undefined}
 
             const { data, error } = await client.auth.admin.createUser({
-                email: updated.email,
-                password: updated.password,
+                email: fields.email,
+                password: fields.password,
                 user_metadata,
+                app_metadata,
                 email_confirm: true,
             })
 
@@ -127,19 +79,19 @@ export default defineEventHandler(async (event) => {
             await prisma.profile.create({
                 data: {
                     user_id: data.user.id,
-                    login: updated.login,
-                    email: updated.email,
-                    avatar: updated.avatar || null,
+                    login: fields.login,
+                    email: fields.email,
+                    avatar: user_metadata.avatar,
                 }
             })
 
             return {
                 result: {
                     id: data.user.id,
-                    login: updated.login,
-                    email: updated.email,
-                    admin: updated.admin,
-                    avatar: updated.avatar || null,
+                    login: fields.login,
+                    email: fields.email,
+                    admin: fields.admin,
+                    avatar: user_metadata.avatar,
                 }
             };
 

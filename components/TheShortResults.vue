@@ -3,7 +3,7 @@
         :class="isLive(result.stamp*1000)">
         <td class="text-center res-time">
             <small class="block">{{$matchTime(result.stamp*1000) }}</small>
-          <template v-if="user?.user_metadata?.admin">
+          <template v-if="user?.app_metadata?.admin">
             <label for="status" class="text-xs">Онлайн</label>
             <input type="checkbox" @change="setResult(result)" v-model="result.is_info"  id="status">
             <br />
@@ -115,7 +115,7 @@ const queryParam = computed(()=>{
 async function setResult(res: IScore) {
   const {data} = await auth.getUser();
 
-  if (!user.value || !user.value.user_metadata?.admin || !data.user || !data.user.user_metadata?.admin) {
+  if (!user.value || !user.value.app_metadata?.admin || !data.user || !data.user.user_metadata?.admin) {
     useNuxtApp().$toast.error('Вы не авторизованы');
     return
   }

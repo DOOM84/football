@@ -1,17 +1,13 @@
 import type {IError, IUser} from "~/types/interfaces";
-import {object, string, ObjectSchema, ref, mixed, number} from 'yup';
+import {object, string, ObjectSchema, ref, mixed} from 'yup';
 import {serverSupabaseServiceRole} from '#supabase/server';
+type AdminUser = Pick<IUser, 'login' | 'email'>;
 import formidable, {Fields} from "formidable";
-import fs from "fs";
-import setFilePath from "~/helpers/upload/setFilePath";
-import prepareFileInfo from "~/helpers/upload/prepareFileInfo";
-import sharp from "sharp";
 import prisma from "~/helpers/prisma";
+import {Upload} from "~/classes/upload";
 
-type AdminUser = Omit<IUser, 'id' | 'admin' | 'avatar' | 'password' | 'passwordConfirmation' | 'user_id'>;
 
 const schema: ObjectSchema<AdminUser> = object({
-
     login: string().trim('Логин некорректный')
         .min(3, 'Логин некорректный')
         .max(100, 'Логин некорректный')
@@ -59,82 +55,28 @@ export default defineEventHandler(async (event) => {
 
         await schema.validate(fields);
 
-        const updated: any = await new Promise<any>(async (resolve, reject) => {
+        const user_metadata: {avatar: string | null; login: string} = {avatar: fields.avatar, login: fields.login}
 
-            if (files && Object.keys(files).length > 0) {
-                if (files.media_file[0].mimetype.startsWith("image/")) {
+        const app_metadata = {admin: fields.admin || null}
 
-                    if (fs.existsSync(setFilePath('/public' + fields.avatar))) {
-                        fs.unlinkSync(setFilePath('/public' + fields.avatar));
-                    }
+        if (files && Object.keys(files).length > 0) {
 
-                    const origFileName: string = files.media_file[0].originalFilename;
+            const uploadInst = new Upload(files['media_file'], '/img/avatars/', fields.avatar || undefined,   {height: 80, width: 80});
 
-                    const ext: string = origFileName.substring(origFileName.lastIndexOf('.') + 1);
+            const updated = await uploadInst.uploadFile() as unknown as {paths: string[]};
 
-                    const fileName: string = Date.now().toString() + '.' + ext; // fields.name.split(' ').join('_')+'.'+ext;
-
-                    const oldPath = files.media_file[0].filepath;
-
-                    const avatar = "/img/avatars/" + fileName;
-
-                    const newOrigPath = prepareFileInfo(fileName, '/public/img/avatars/', fileName);
-
-                    const stream = fs.createReadStream(oldPath);
-
-                    stream.on('open', () => {
-
-                        const origStream = fs.createWriteStream(newOrigPath);
-
-                        const resizeOrig = {
-                            width: 80, //width > 370 ? 370 : null,
-                            height: 80,
-                            // fit: 'cover',
-                            // position: 'right top',
-                        }
-
-                        const transformerOrig = sharp()
-                            .resize(resizeOrig);
-
-                        stream
-                            .pipe(transformerOrig)
-                            .pipe(origStream);
-
-                    })
-
-                    await new Promise(resolve => setTimeout(resolve, 2000));
-
-                    resolve({
-                        ...fields,
-                        avatar
-                    });
-                } else {
-                    reject('Файл должен быть изображением.');
-                }
-            } else {
-                resolve({
-                    ...fields,
-                });
-            }
-        });
-
-        const user_metadata = {login: updated.login, admin: updated.admin, avatar: updated.avatar || null};
-
-        const app_metadata = {admin: updated.admin || null}
-
-        if (!user_metadata.admin) {
-            user_metadata.admin = null
+            user_metadata.avatar = updated.paths[0] || null;
         }
 
         const {data, error} = await client.auth.admin.updateUserById(
-            updated.id as string,
-            updated.password ? {
-                email: updated.email,
-                password: updated.password,
+            fields.id as string,
+            fields.password ? {
+                email: fields.email,
+                password: fields.password,
                 user_metadata,
                 app_metadata
             } : {
-                email: updated.email,
+                email: fields.email,
                 user_metadata,
                 app_metadata
             }
@@ -144,18 +86,18 @@ export default defineEventHandler(async (event) => {
 
         await prisma.profile.upsert({
             where: {
-                user_id: updated.id
+                user_id: fields.id
             },
             update: {
-                login: updated.login,
-                email: updated.email,
-                avatar: updated.avatar || null,
+                login: fields.login,
+                email: fields.email,
+                avatar: user_metadata.avatar || null,
             },
             create: {
-                user_id: updated.id,
-                login: updated.login,
-                email: updated.email,
-                avatar: updated.avatar || null,
+                user_id: fields.id,
+                login: fields.login,
+                email: fields.email,
+                avatar: user_metadata.avatar || null,
             }
         });
 
@@ -163,11 +105,11 @@ export default defineEventHandler(async (event) => {
 
         return {
             result: {
-                id: updated.id,
-                login: updated.login,
-                email: updated.email,
-                admin: updated.admin,
-                avatar: updated.avatar || null,
+                id: fields.id,
+                login: fields.login,
+                email: fields.email,
+                admin: fields.admin,
+                avatar: user_metadata.avatar || null,
             }
         };
 

@@ -25,10 +25,6 @@
               w-full h-8 px-2 py-3 text-md text-zinc-800 border
               border-solid border-zinc-600/30 rounded-md" id="title">
               </div>
-              <div class="flex justify-end items-center gap-1">
-                <label for="status">Опубликовано</label>
-                <input type="checkbox" v-model="tagToUpdate.status" id="status">
-              </div>
               <button
                   type="button"
                   class="btn mt-5 w-full font-bold bg-zinc-800 text-white"
@@ -58,28 +54,12 @@
               </div>
             </table-head>
             <table-head>
-              <div class="flex justify-center items-center">
-                <strong>Опубликовано</strong>
-                <template v-if="data.tags && data.tags.length">
-                  <Icon @click.prevent="filter('status', 'asc')" name="ant-design:caret-up-filled"
-                        class="cursor-pointer ml-1"
-                        size="10"/>
-                  <Icon @click.prevent="filter('status', 'desc')" name="ant-design:caret-down-filled"
-                        class="cursor-pointer"
-                        size="10"/>
-                </template>
-              </div>
-            </table-head>
-            <table-head>
             </table-head>
           </template>
 
           <template #rows="{row}">
             <table-body class="text-center">
               {{ row.name }}
-            </table-body>
-            <table-body class="text-center">
-              {{ row.status ? 'Да' : 'Нет' }}
             </table-body>
             <table-body class="text-center">
               <div class="flex justify-center items-center gap-1">
@@ -107,7 +87,7 @@ import useFilter from "~/helpers/useFilter";
 
 definePageMeta({
   layout: 'admin',
-  middleware: ["auth"]
+  middleware: ["admin"]
 })
 
 useSeoMeta({
@@ -118,7 +98,6 @@ const {filtering, toFilter, showDlg, mode, filter} = useFilter();
 
 const initTagData: Partial<ITag> = {
   name: '',
-  status: false,
 }
 
 const tagToUpdate = ref<typeof initTagData>({});

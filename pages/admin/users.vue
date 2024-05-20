@@ -1,8 +1,8 @@
 <template>
-  <main class="withFooter text-center">
-    <p class="text-3xl my-3 text-zinc-800">
+  <div class="min-h-[calc(100vh-160px)] max-w-[1300px] px-3 md:px-10 text-white m-auto">
+    <div class="text-3xl font-bold border-solid border-b border-zinc-50/50 p-7 mb-7">
       Пользователи
-    </p>
+    </div>
     <div v-if="pending || !data">
       <TheLoading loader="dots"/>
     </div>
@@ -17,7 +17,7 @@
       </div>
       <ClientOnly>
         <Teleport to="body">
-          <TheModal :show="showDlg" @close="closeModal" :showLoading="showLoading">
+          <TheModal class="text-zinc-800" :show="showDlg" @close="closeModal" :showLoading="showLoading">
             <template #body>
               <div class="relative">
                 <ClientOnly>
@@ -25,11 +25,11 @@
                 </ClientOnly>
 
                 <div class="flex justify-center my-3">
-                  <img :src="userToUpdate.avatar || '/no_avatar.png'" width="80" alt="">
+                  <img :src="userToUpdate.avatar || '/img/no_avatar.png'" width="80" alt="">
                 </div>
 
                 <div class="my-3">
-                  <label for="title">Логин</label>
+                  <label for="login">Логин</label>
                   <input type="text" v-model.trim="userToUpdate.login" class="block
               w-full h-8 px-2 py-3 text-md text-zinc-800 border
               border-solid border-zinc-600/30 rounded-md" id="login">
@@ -46,7 +46,7 @@
                   <div v-if="showSpinner" class="text-center">
                     <Icon name="svg-spinners:12-dots-scale-rotate" size="40"/>
                   </div>
-                  <img :src="picToLoad" width="200" alt="">
+                  <img :src="picToLoad" width="200" alt="avatar">
                 </div>
 
                 <div class="my-3">
@@ -89,7 +89,7 @@
 
                 <button
                     type="button"
-                    class="btn mt-5 w-full font-bold"
+                    class="btn mt-5 w-full font-bold bg-zinc-800 text-white"
                     @click.prevent="storeItem">
                   Сохранить
                 </button>
@@ -135,35 +135,36 @@
           </template>
 
           <template #rows="{row}">
-            <table-body>
+            <table-body class="text-center">
               {{ row.login }}
             </table-body>
-            <table-body>
+            <table-body class="text-center">
               <div class="flex justify-center">
-              <img :src="row.avatar || '/no_avatar.png'" width="80" alt="">
+                <img :src="row.avatar || '/img/no_avatar.png'" width="80" alt="">
               </div>
             </table-body>
-            <table-body>
+            <table-body class="text-center">
               {{ row.email }}
             </table-body>
-            <table-body>
+            <table-body class="text-center">
               {{ row.admin ? 'Да': 'Нет' }}
             </table-body>
-            <table-body>
-              <button @click.prevent="updateItem(row)">
-                <Icon name="material-symbols:edit-square-outline" size="20"/>
-              </button>
-              <button @click.prevent="removeItem(row.id, row.avatar)">
-                <Icon name="ion:trash-b" size="20"/>
-              </button>
+            <table-body class="text-center">
+              <div class="flex justify-center items-center gap-1">
+                <button @click.prevent="updateItem(row)" class="p-1 border-none btn m-0">
+                  <Icon name="material-symbols:edit-square-outline" size="20"/>
+                </button>
+                <button @click.prevent="removeItem(row.id, row.avatar)" class="p-1 border-none btn m-0">
+                  <Icon name="ion:trash-b" size="20"/>
+                </button>
+              </div>
+
             </table-body>
           </template>
         </AdminDtable>
       </ClientOnly>
     </template>
-
-
-  </main>
+  </div>
 </template>
 
 <script lang="ts" setup>
@@ -171,7 +172,7 @@ import type {IError, IUser} from "~/types/interfaces";
 
 definePageMeta({
   layout: 'admin',
-  middleware: ["auth"]
+  middleware: ["admin"]
 })
 
 const showSpinner = ref<boolean>(false);
@@ -180,11 +181,11 @@ const picToLoad = ref<string>();
 
 const selectedFile = ref<File>();
 
-useHead({
-  titleTemplate: '%s - Пользователи'
+useSeoMeta({
+  title: () => 'Пользователи',
 })
 
-const {data, pending} = useLazyFetch<{ users: IUser[] }>('/api/admin/users')
+const {data, pending} = await useLazyFetch<{ users: IUser[] }>('/api/admin/users')
 
 import useFilter from "~/helpers/useFilter";
 
@@ -194,13 +195,19 @@ const showLoading = ref<boolean>(false);
 
 const banTerm = ref<string>('');
 
-const userToUpdate = ref<{admin: boolean, email: '', login: '', avatar: null, id: null} | IUser>({admin: false, email: '', login: ''});
+const initUserData: Partial<IUser> = {
+  admin: false,
+  email: '',
+  login: '',
+  avatar: null,
+}
+
+const userToUpdate = ref<typeof initUserData>({});
 
 function closeModal(): void {
   showDlg.value = false;
   mode.value = null;
-  userToUpdate.value.admin = false;
-  userToUpdate.value.avatar = null;
+  userToUpdate.value = {...initUserData};
   selectedFile.value = undefined;
 }
 
@@ -212,17 +219,17 @@ function updateItem(user: IUser): void {
 
 function addItem(): void {
   mode.value = 'add';
-  userToUpdate.value = {admin: false, login: '', email: ''}
+  userToUpdate.value = {...initUserData};
   showDlg.value = true;
 }
 
-function handleFileChange(event: { target: { files: (File | undefined)[]; }; }): void {
+function handleFileChange(event: Event): void {
 
   picToLoad.value = '';
 
-  selectedFile.value = event.target.files[0]
+  selectedFile.value = (event.target as HTMLInputElement).files![0]
 
-  const file = event.target.files[0]
+  const file = (event.target as HTMLInputElement).files![0]
 
   selectedFile.value = file
 
@@ -370,3 +377,4 @@ async function banUser(): Promise<void> {
 }
 
 </script>
+

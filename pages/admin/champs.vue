@@ -158,7 +158,7 @@ import useFilter from "~/helpers/useFilter";
 
 definePageMeta({
   layout: 'admin',
-  middleware: ["auth"]
+  middleware: ["admin"]
 })
 
 const {data, pending} = useLazyFetch<{ champs: Partial<IChampDB>[] }>('/api/admin/champs')

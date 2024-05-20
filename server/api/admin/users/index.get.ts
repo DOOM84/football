@@ -1,6 +1,6 @@
 import { serverSupabaseServiceRole } from '#supabase/server';
-import prisma from "~/helpers/prisma";
-import player from "~/server/api/player";
+//import prisma from "~/helpers/prisma";
+//import player from "~/server/api/player";
 
 export default defineEventHandler(async (event) => {
     try {
@@ -15,7 +15,7 @@ export default defineEventHandler(async (event) => {
             id: user.id,
             email: user.email,
             login: user.user_metadata.login,
-            admin: user.user_metadata.admin,
+            admin: user.app_metadata.admin,
             avatar: user.user_metadata.avatar,
         }))
 

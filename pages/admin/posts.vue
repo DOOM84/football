@@ -284,7 +284,7 @@ import { io, type Socket } from 'socket.io-client';
 
 definePageMeta({
   layout: 'admin',
-  middleware: ["auth"]
+  middleware: ["admin"]
 })
 
 const socket = ref<Socket>();

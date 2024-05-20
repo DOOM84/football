@@ -17,17 +17,20 @@ export default defineEventHandler(async (event) => {
 
             if (error) throw error;
 
-           const user = await prisma.profile.findFirst({
-                where: {
-                    user_id: id
-                },
-            })
 
-            await prisma.comment.deleteMany({
+            await prisma.profile.update({
                 where: {
-                    user_id: user!.id
+                    user_id: id,
                 },
-            })
+                data: {
+                    comments: {
+                        deleteMany: {},
+                    },
+                    rates: {
+                        deleteMany: {},
+                    },
+                }
+            });
 
             await prisma.profile.delete({
                 where: {

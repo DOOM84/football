@@ -451,6 +451,9 @@ function getInfo(info: string) {
   if (info.toLowerCase() === 'unallowed field entering') {
     return 'неразрешенный выход на поле'
   }
+  if (info.toLowerCase() === 'misses next match') {
+    return 'пропускает следующий матч'
+  }
   return info
 }
 

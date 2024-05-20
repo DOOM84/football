@@ -63,8 +63,8 @@
       </div>
 
       <div class="flex my-10 justify-center items-center g-1">
-        <label for="allChampsTour">Обновлять результаты всех чемпионатов каждые 3 мин.</label>
-        <input type="checkbox" class="check ml-2" v-model="intervalUpdate" id="allChampsTour">
+        <label for="allChampsLive">Обновлять результаты всех чемпионатов каждые 3 мин.</label>
+        <input type="checkbox" class="check ml-2" v-model="intervalUpdate" id="allChampsLive">
       </div>
 
       <div class="mt-2">
@@ -138,7 +138,7 @@ import { io, type Socket } from 'socket.io-client';
 
 definePageMeta({
   layout: 'admin',
-  middleware: ["auth"]
+  middleware: ["admin"]
 })
 
 useHead({

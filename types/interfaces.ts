@@ -286,7 +286,7 @@ export interface IUser extends User{
     admin?: boolean;
     avatar?: string | null;
     email: string;
-    login?: string;
+    login: string;
     password?: string;
     passwordConfirmation?: string;
     banned_until?: string

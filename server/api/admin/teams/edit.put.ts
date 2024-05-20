@@ -1,11 +1,12 @@
 import formidable, {Fields, Files} from "formidable";
 import prisma from '~/helpers/prisma';
-import fs from "fs";
-import { object, string, number, ObjectSchema, } from 'yup';
-import prepareFileInfo from "~/helpers/upload/prepareFileInfo";
-import sharp from "sharp";
-import setFilePath from "~/helpers/upload/setFilePath";
+//import fs from "fs";
+import {object, string, number, ObjectSchema, lazy, mixed,} from 'yup';
+//import prepareFileInfo from "~/helpers/upload/prepareFileInfo";
+//import sharp from "sharp";
+//import setFilePath from "~/helpers/upload/setFilePath";
 import {IError} from "~/types/interfaces";
+import {Upload} from "~/classes/upload";
 
 const schema: ObjectSchema<{
     name: string,
@@ -15,6 +16,16 @@ const schema: ObjectSchema<{
     name: string().trim().required('Введите название'),
     sprite: string().trim().required('Введите координаты иконки в спрайте'),
     champ_id: number().required('Выберите чемпионат'),
+    image: lazy((value) => {
+        if (value?.media_file) {
+            return mixed<formidable.Files<string> | any>().test("image-present", "Выберите изображение с правильным типом",
+                files => {
+                    return  files && Array.isArray(files.media_file) && files.media_file.length > 0 &&
+                        files.media_file![0].mimetype!.startsWith("image/")
+                })
+        }
+        return mixed().nullable().optional();
+    }),
 })
 export default defineEventHandler(async (event) => {
     try {
@@ -42,76 +53,36 @@ export default defineEventHandler(async (event) => {
 
         const { fields, files } = response;
 
-        await schema.validate(fields);
+        delete fields.champ;
+        delete fields.players;
+        delete fields.createdAt;
+        delete fields.updatedAt;
 
-        const updated: any = await new Promise<any>(async (resolve, reject) => {
+        await schema.validate({...fields, image: files});
 
-            if(files && Object.keys(files).length > 0){
-                if (files.media_file[0].mimetype.startsWith("image/")) {
-
-                    if (fs.existsSync(setFilePath('/public' + fields.img))) {
-                        fs.unlinkSync(setFilePath('/public' + fields.img));
-                    }
-
-                    const origFileName: string = files.media_file[0].originalFilename;
-
-                    const ext: string = origFileName.substring(origFileName.lastIndexOf('.') + 1);
-
-                    const fileName: string = Date.now().toString()+'.'+ext; // fields.name.split(' ').join('_')+'.'+ext;
-                    const oldPath = files.media_file[0].filepath;
-
-                    const img = "/img/logos/" + fileName;
-
-                    const newOrigPath = prepareFileInfo(fileName, '/public/img/logos/', fileName);
-
-                    const stream = fs.createReadStream(oldPath);
-
-                    stream.on('open', () => {
-
-                        const origStream = fs.createWriteStream(newOrigPath);
-
-                        const resizeOrig = {
-                            width: 151, //width > 370 ? 370 : null,
-                            height: null,
-                            // fit: 'cover',
-                            // position: 'right top',
-                        }
-
-                        const transformerOrig = sharp()
-                            .resize(resizeOrig);
-
-                        stream
-                            .pipe(transformerOrig)
-                            .pipe(origStream);
-
-                    })
-
-                    await new Promise(resolve => setTimeout(resolve, 2000));
-
-                    resolve({
-                        ...fields,
-                        img
-                    });
-                } else {
-                    reject('Please upload images only.');
-                }
-            }else{
-                resolve({
-                    ...fields,
+        if(Array.isArray(files.media_file)) {
+            const uploadPicsInst = new Upload(files['media_file'],
+                '/img/logos/', fields.img,
+                {
+                    width: 151,
                 });
-            }
-        });
 
-        await prisma.team.update({
+            const {paths} = await uploadPicsInst.uploadFile() as unknown as { paths: string[] };
+
+            fields.img = paths[0];
+        }
+
+        const {id} =  await prisma.team.update({
             where: {
-                id: updated.id,
+                id: fields.id,
             },
             data: {
-                ...updated,
+                ...fields,
+                api_id: +fields.api_id
                 }
         });
 
-        return {result: updated}
+        return {result: {id, img: fields.img}}
 
     }catch (e) {
         console.log(e);

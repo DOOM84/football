@@ -146,7 +146,7 @@ import Multiselect from '@vueform/multiselect';
 
 definePageMeta({
   layout: 'admin',
-  middleware: ['auth']
+  middleware: ['admin']
 })
 
 const {data, pending} = useLazyFetch<{ecupTeams: Partial<ITeamInfo>[],

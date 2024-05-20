@@ -1,8 +1,8 @@
 <template>
-  <main class="withFooter text-center">
-    <p class="text-3xl my-3 text-zinc-800">
-      Команды
-    </p>
+  <div class="min-h-[calc(100vh-160px)] max-w-[1300px] px-3 md:px-10 text-white m-auto">
+    <div class="text-3xl font-bold border-solid border-b border-zinc-50/50 p-7 mb-7">
+      Комады
+    </div>
     <div v-if="pending || !data">
       <TheLoading loader="dots"/>
     </div>
@@ -33,7 +33,7 @@
                   Добавить состав
                 </button>
               </div>
-              <div v-if="mode === 'edit'" class="form-group flex justify-center mt-3">
+              <div v-if="mode === 'edit'" class="flex justify-center mt-3">
                 <img :src="teamToUpdate.img" width="151"  alt="">
               </div>
 
@@ -289,22 +289,22 @@
     </template>
 
 
-  </main>
+  </div>
 </template>
 
 <script lang="ts" setup>
 import slugify from "slugify";
-import type {IError, IChampDB, IPlayer} from "~/types/interfaces";
+import type {IError, IChampDB, IPlayer, ITeamInfo} from "~/types/interfaces";
 import useFilter from "~/helpers/useFilter";
 import Multiselect from '@vueform/multiselect';
-import type {ITeamInfo} from "~/types/interfaces";
 
 definePageMeta({
   layout: 'admin',
-  middleware: ["auth"]
+  middleware: ["admin"]
 })
 
-const {data, pending} = useLazyFetch<{teams: Partial<ITeamInfo>[], champs: Partial<IChampDB>[]}>('/api/admin/teams')
+const {data, pending} = useLazyFetch<{teams: Partial<ITeamInfo>[],
+  champs: Partial<IChampDB>[]}>('/api/admin/teams');
 
 const showTable = ref<boolean>(true);
 
@@ -322,12 +322,19 @@ useHead({
 
 const {filtering, toFilter, showDlg, mode, filter} = useFilter();
 
-const teamToUpdate = ref<Partial<ITeamInfo>>({status: false, name: ''});
+const initTeamData: Partial<ITeamInfo> = {
+  name: '',
+  status: true,
+  team_info: {},
+  champ:{slug:'', name: ''}
+}
+
+const teamToUpdate = ref<typeof initTeamData>({});
 
 const showLoading = ref<boolean>(false);
 
 function closeModal(): void {
-  teamToUpdate.value = {status: false, name: ''}
+  teamToUpdate.value = {...initTeamData}
   picToLoad.value = '';
   showDlg.value = false;
   mode.value = null;
@@ -359,7 +366,8 @@ function champChanged(champ: any): void {
 
 function addItem(): void {
   mode.value = 'add';
-  teamToUpdate.value = {status: true, team_info: {}, champ:{slug:'', name: ''}}
+  //teamToUpdate.value = {status: true, team_info: {}, champ:{slug:'', name: ''}};
+  teamToUpdate.value = {...initTeamData};
   showDlg.value = true;
 }
 
@@ -501,7 +509,11 @@ async function storeItem(): Promise<void> {
 
     showLoading.value = true;
 
-    const teamToDb = {
+    teamToUpdate.value.slug = !teamToUpdate.value.slug ?
+        slugify(teamToUpdate.value?.name as string || '',
+            {strict: true, lower: true}) : teamToUpdate.value.slug;
+
+    /*const teamToDb = {
       id: teamToUpdate.value.id,
       name: teamToUpdate.value.name,
       api_id: +teamToUpdate.value.api_id!,
@@ -520,16 +532,17 @@ async function storeItem(): Promise<void> {
       order: teamToUpdate.value.order,
       team_info: teamToUpdate.value.team_info,
       status: teamToUpdate.value.status,
-    }
+    }*/
 
     const formData = new FormData();
-    formData.append('data', JSON.stringify(teamToDb))
+   // formData.append('data', JSON.stringify(teamToDb));
+    formData.append('data', JSON.stringify(teamToUpdate.value));
 
     if (selectedFile.value) {
       formData.append('media_file', selectedFile.value as File)
     }
 
-    showTable.value = false;
+   // showTable.value = false;
 
     if (mode.value === 'edit') {
       const {result} = await $fetch<{ result: ITeamInfo }>('/api/admin/teams/edit', {
@@ -550,7 +563,7 @@ async function storeItem(): Promise<void> {
         data.value.teams.unshift({...teamToUpdate.value, img: result.img, id: result.id});
       }
     }
-
+    filter('', '');
     closeModal();
 
     useNuxtApp().$toast.success('Сохранено успешно!');
@@ -564,7 +577,7 @@ async function storeItem(): Promise<void> {
 
   } finally {
     showLoading.value = false;
-    showTable.value = true;
+    //showTable.value = true;
   }
 }
 
@@ -580,7 +593,7 @@ async function removeItem(dbId: number, path: string): Promise<void> {
         body: {id: dbId, path},
       })
 
-      showTable.value = false;
+     // showTable.value = false;
 
       if(data.value){
         data.value.teams.splice(data.value.teams.findIndex((item) => item.id === +id), 1);
@@ -598,7 +611,7 @@ async function removeItem(dbId: number, path: string): Promise<void> {
 
     } finally {
       showLoading.value = false;
-      showTable.value = true;
+      //showTable.value = true;
     }
   }
 }

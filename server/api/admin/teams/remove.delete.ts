@@ -18,6 +18,9 @@ export default defineEventHandler(async (event) => {
                     posts: {
                         deleteMany: {},
                     },
+                    ecupTeam: {
+                        delete: {}
+                    }
                 }
             });
 

@@ -28,7 +28,7 @@ import type {IError} from "~/types/interfaces";
 
 definePageMeta({
   layout: 'admin',
-  middleware: ["auth"]
+  middleware: ["admin"]
 })
 
 const showLoading = ref<boolean>(false);

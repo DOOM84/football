@@ -1,10 +1,11 @@
 import formidable, {Fields, Files} from "formidable";
 import prisma from '~/helpers/prisma';
-import fs from "fs";
+//import fs from "fs";
 import {object, string, mixed, ObjectSchema, number,} from 'yup';
-import prepareFileInfo from "~/helpers/upload/prepareFileInfo";
-import sharp from "sharp";
+//import prepareFileInfo from "~/helpers/upload/prepareFileInfo";
+//import sharp from "sharp";
 import {IError} from "~/types/interfaces";
+import {Upload} from "~/classes/upload";
 
 const schema: ObjectSchema<{
     name: string,
@@ -18,7 +19,8 @@ const schema: ObjectSchema<{
     image: mixed<formidable.Files<string>>().required('Выберите изображение') // Pass in the type of `fileUpload`
         .test("image-present", "Выберите изображение",
             files => {
-                return  files && Array.isArray(files.media_file) && files.media_file.length > 0
+                return files && Array.isArray(files.media_file) && files.media_file.length > 0 &&
+                    files.media_file![0].mimetype!.startsWith("image/")
             }
         ),
 })
@@ -50,63 +52,31 @@ export default defineEventHandler(async (event) => {
 
         const { fields, files } = response;
 
+        delete fields.champ;
+        delete fields.players;
+        delete fields.createdAt;
+        delete fields.updatedAt;
+
         await schema.validate({...fields, image: files});
 
-        const updated: any = await new Promise<any>(async (resolve, reject) => {
+        const uploadPicsInst = new Upload(files['media_file'],
+            '/img/logos/', undefined,
+            {
+                width: 151,
+            });
 
-                if (files.media_file[0].mimetype.startsWith("image/")) {
+        const {paths} = await uploadPicsInst.uploadFile() as unknown as { paths: string[] };
 
-                    const origFileName: string = files.media_file[0].originalFilename;
-
-                    const ext: string = origFileName.substring(origFileName.lastIndexOf('.') + 1);
-
-                    const fileName: string = Date.now().toString()+'.'+ext;
-                    const oldPath = files.media_file[0].filepath;
-
-                    const img = "/img/logos/" + fileName;
-
-                    const newOrigPath = prepareFileInfo(fileName, '/public/img/logos/', fileName);
-
-                    const stream = fs.createReadStream(oldPath);
-
-                    stream.on('open', () => {
-
-                        const origStream = fs.createWriteStream(newOrigPath);
-
-                        const resizeOrig = {
-                            width: 151, //width > 370 ? 370 : null,
-                            height: null,
-                           // fit: 'cover',
-                           // position: 'right top',
-                        }
-
-                        const transformerOrig = sharp()
-                            .resize(resizeOrig);
-
-                        stream
-                            .pipe(transformerOrig)
-                            .pipe(origStream);
-
-                    })
-
-                    await new Promise(resolve => setTimeout(resolve, 2000));
-
-                    resolve({
-                        ...fields,
-                        img
-                    });
-                } else {
-                    reject('Файл не является изображением');
-                }
-        });
+        fields.img = paths[0];
 
        const {id} = await prisma.team.create({
             data: {
-                ...updated,
+                ...fields,
+                api_id: +fields.api_id
                 }
         });
 
-        return {result: {...updated, id}}
+        return {result: {id, img: fields.img}}
 
     }catch (e) {
         console.log(e);
