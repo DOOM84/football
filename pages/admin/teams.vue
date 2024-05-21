@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-[calc(100vh-160px)] max-w-[1300px] px-3 md:px-10 text-white m-auto">
+  <div class="withFooter max-w-[1300px] px-3 md:px-10 text-white m-auto">
     <div class="text-3xl font-bold border-solid border-b border-zinc-50/50 p-7 mb-7">
       Комады
     </div>
@@ -224,7 +224,7 @@
             </template>
           </TheModal>
         </Teleport>
-        <AdminDtable v-if="showTable" @endFilter="toFilter = false"
+        <AdminDtable @endFilter="toFilter = false"
                      :data="data.teams"
                      :toFilter="toFilter"
                      :filtering="filtering"
@@ -233,12 +233,14 @@
             <table-head>
               <div class="flex justify-center items-center">
                 <strong>Название</strong>
+                <template v-if="data.teams && data.teams.length">
                 <Icon @click.prevent="filter('name', 'asc')" name="ant-design:caret-up-filled"
                       class="cursor-pointer ml-1"
                       size="10"/>
                 <Icon @click.prevent="filter('name', 'desc')" name="ant-design:caret-down-filled"
                       class="cursor-pointer"
                       size="10"/>
+                </template>
               </div>
             </table-head>
             <table-head>
@@ -249,12 +251,14 @@
             <table-head>
               <div class="flex justify-center items-center">
                 <strong>Опубликовано</strong>
+                <template v-if="data.teams && data.teams.length">
                 <Icon @click.prevent="filter('status', 'asc')" name="ant-design:caret-up-filled"
                       class="cursor-pointer ml-1"
                       size="10"/>
                 <Icon @click.prevent="filter('status', 'desc')" name="ant-design:caret-down-filled"
                       class="cursor-pointer"
                       size="10"/>
+                </template>
               </div>
             </table-head>
             <table-head/>
@@ -276,12 +280,14 @@
             </table-body>
 
             <table-body>
-              <button @click.prevent="updateItem(row)">
-                <Icon name="material-symbols:edit-square-outline" size="20"/>
-              </button>
-              <button @click.prevent="removeItem(row.id, row.img)">
-                <Icon name="ion:trash-b" size="20"/>
-              </button>
+              <div class="flex justify-center items-center gap-1">
+                <button @click.prevent="updateItem(row)" class="p-1 border-none btn m-0">
+                  <Icon name="material-symbols:edit-square-outline" size="20"/>
+                </button>
+                <button @click.prevent="removeItem(row.id, row.img)" class="p-1 border-none btn m-0">
+                  <Icon name="ion:trash-b" size="20"/>
+                </button>
+              </div>
             </table-body>
           </template>
         </AdminDtable>
@@ -306,7 +312,6 @@ definePageMeta({
 const {data, pending} = useLazyFetch<{teams: Partial<ITeamInfo>[],
   champs: Partial<IChampDB>[]}>('/api/admin/teams');
 
-const showTable = ref<boolean>(true);
 
 const showSpinner = ref<boolean>(false);
 
@@ -513,36 +518,13 @@ async function storeItem(): Promise<void> {
         slugify(teamToUpdate.value?.name as string || '',
             {strict: true, lower: true}) : teamToUpdate.value.slug;
 
-    /*const teamToDb = {
-      id: teamToUpdate.value.id,
-      name: teamToUpdate.value.name,
-      api_id: +teamToUpdate.value.api_id!,
-      slug: teamToUpdate.value.slug || slugify(teamToUpdate.value?.name as string || '', {strict: true, lower:true}),
-      img: teamToUpdate.value.img,
-      sprite: teamToUpdate.value.sprite,
-      champ_id: teamToUpdate.value.champ_id,
-      games: teamToUpdate.value.games,
-      win: teamToUpdate.value.win,
-      draw: teamToUpdate.value.draw,
-      lost: teamToUpdate.value.lost,
-      goals: teamToUpdate.value.goals,
-      missed: teamToUpdate.value.missed,
-      diff: teamToUpdate.value.diff,
-      points: teamToUpdate.value.points,
-      order: teamToUpdate.value.order,
-      team_info: teamToUpdate.value.team_info,
-      status: teamToUpdate.value.status,
-    }*/
-
     const formData = new FormData();
-   // formData.append('data', JSON.stringify(teamToDb));
+
     formData.append('data', JSON.stringify(teamToUpdate.value));
 
     if (selectedFile.value) {
       formData.append('media_file', selectedFile.value as File)
     }
-
-   // showTable.value = false;
 
     if (mode.value === 'edit') {
       const {result} = await $fetch<{ result: ITeamInfo }>('/api/admin/teams/edit', {
@@ -577,7 +559,6 @@ async function storeItem(): Promise<void> {
 
   } finally {
     showLoading.value = false;
-    //showTable.value = true;
   }
 }
 
@@ -592,8 +573,6 @@ async function removeItem(dbId: number, path: string): Promise<void> {
         method: 'DELETE',
         body: {id: dbId, path},
       })
-
-     // showTable.value = false;
 
       if(data.value){
         data.value.teams.splice(data.value.teams.findIndex((item) => item.id === +id), 1);
@@ -611,16 +590,11 @@ async function removeItem(dbId: number, path: string): Promise<void> {
 
     } finally {
       showLoading.value = false;
-      //showTable.value = true;
     }
   }
 }
 
 function handleFileChange(event: { target: { files: (File | undefined)[]; }; }): void {
-
-  /* [...event.target.files].forEach((mediaFile, index) => {
-     //form.append('media_file_' + index, mediaFile)
-   })*/
 
   picToLoad.value = '';
 

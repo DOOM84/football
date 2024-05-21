@@ -1,8 +1,8 @@
 <template>
-  <main class="withFooter text-center">
-    <p class="text-3xl my-3 text-zinc-800">
+  <div class="withFooter max-w-[1300px] px-3 md:px-10 text-white m-auto">
+    <div class="text-3xl font-bold border-solid border-b border-zinc-50/50 p-7 mb-7">
       Еврокубки
-    </p>
+    </div>
     <div v-if="pending || !data">
       <TheLoading loader="dots"/>
     </div>
@@ -58,7 +58,7 @@
             </template>
           </TheModal>
         </Teleport>
-        <AdminDtable v-if="showTable" @endFilter="toFilter = false"
+        <AdminDtable @endFilter="toFilter = false"
                      :data="data.ecups"
                      :toFilter="toFilter"
                      :filtering="filtering"
@@ -67,12 +67,14 @@
             <table-head>
               <div class="flex justify-center items-center">
                 <strong>Название</strong>
+                <template v-if="data.ecups && data.ecups.length">
                 <Icon @click.prevent="filter('name', 'asc')" name="ant-design:caret-up-filled"
                       class="cursor-pointer ml-1"
                       size="10"/>
                 <Icon @click.prevent="filter('name', 'desc')" name="ant-design:caret-down-filled"
                       class="cursor-pointer"
                       size="10"/>
+                </template>
               </div>
             </table-head>
             <table-head>
@@ -88,12 +90,14 @@
             <table-head>
               <div class="flex justify-center items-center">
                 <strong>Опубликовано</strong>
+                <template v-if="data.ecups && data.ecups.length">
                 <Icon @click.prevent="filter('status', 'asc')" name="ant-design:caret-up-filled"
                       class="cursor-pointer ml-1"
                       size="10"/>
                 <Icon @click.prevent="filter('status', 'desc')" name="ant-design:caret-down-filled"
                       class="cursor-pointer"
                       size="10"/>
+                </template>
               </div>
             </table-head>
             <table-head/>
@@ -116,12 +120,14 @@
               {{ row.status ? 'Да' : 'Нет' }}
             </table-body>
             <table-body>
-              <button @click.prevent="updateItem(row)">
-                <Icon name="material-symbols:edit-square-outline" size="20"/>
-              </button>
-              <button @click.prevent="removeItem(row.id)">
-                <Icon name="ion:trash-b" size="20"/>
-              </button>
+              <div class="flex justify-center items-center gap-1">
+                <button @click.prevent="updateItem(row)" class="p-1 border-none btn m-0">
+                  <Icon name="material-symbols:edit-square-outline" size="20"/>
+                </button>
+                <button @click.prevent="removeItem(row.id)" class="p-1 border-none btn m-0">
+                  <Icon name="ion:trash-b" size="20"/>
+                </button>
+              </div>
             </table-body>
           </template>
         </AdminDtable>
@@ -129,12 +135,12 @@
     </template>
 
 
-  </main>
+  </div>
 </template>
 
 <script lang="ts" setup>
 import slugify from "slugify";
-import type {IEcupDB, IError} from "~/types/interfaces";
+import type {IChampDB, IEcupDB, IError} from "~/types/interfaces";
 import useFilter from "~/helpers/useFilter";
 import Multiselect from '@vueform/multiselect';
 
@@ -145,7 +151,6 @@ definePageMeta({
 
 const {data, pending} = useLazyFetch<{ecups: Partial<IEcupDB>[]}>('/api/admin/ecups')
 
-const showTable = ref<boolean>(true);
 
 const stages = [{name: 'Групповой турнир', slug: 'group'},{name: 'Плей-офф', slug: 'playoff'}];
 
@@ -155,12 +160,14 @@ useHead({
 
 const {filtering, toFilter, showDlg, mode, filter} = useFilter();
 
-const ecupToUpdate = ref<Partial<IEcupDB>>({status: false, name: ''});
+const initEcupData: Partial<IEcupDB> = {status: false, name: ''};
+
+const ecupToUpdate = ref<typeof initEcupData>({});
 
 const showLoading = ref<boolean>(false);
 
 function closeModal(): void {
-  ecupToUpdate.value = {status: false, name: ''}
+  ecupToUpdate.value = {...initEcupData};
   showDlg.value = false;
   mode.value = null;
 }
@@ -175,7 +182,7 @@ async function updateItem(ecup: IEcupDB) {
 
 function addItem(): void {
   mode.value = 'add';
-  ecupToUpdate.value = {status: false}
+  ecupToUpdate.value = {...initEcupData}
   showDlg.value = true;
 }
 
@@ -190,8 +197,6 @@ async function storeItem(): Promise<void> {
       api_id: +ecupToUpdate.value?.api_id!,
       slug: ecupToUpdate.value.slug || slugify(ecupToUpdate.value?.name as string || '', {strict: true, lower:true}),
     }
-
-    showTable.value = false;
 
     if (mode.value === 'edit') {
       const {result} = await $fetch<{ result: IEcupDB }>('/api/admin/ecups/edit', {
@@ -212,6 +217,8 @@ async function storeItem(): Promise<void> {
         data.value.ecups.unshift({...ecupToUpdate.value, id: result.id});
       }
     }
+
+    filter('', '');
 
     closeModal();
 
@@ -235,7 +242,6 @@ async function storeItem(): Promise<void> {
 
   } finally {
     showLoading.value = false;
-    showTable.value = true;
   }
 }
 
@@ -250,8 +256,6 @@ async function removeItem(dbId: number): Promise<void> {
         method: 'DELETE',
         body: {id: dbId},
       })
-
-      showTable.value = false;
 
       if(data.value){
         data.value.ecups.splice(data.value.ecups.findIndex((item) => item.id === +id), 1);
@@ -279,7 +283,6 @@ async function removeItem(dbId: number): Promise<void> {
 
     } finally {
       showLoading.value = false;
-      showTable.value = true;
     }
   }
 }

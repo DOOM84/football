@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-[calc(100vh-160px)] max-w-[1300px] px-3 md:px-10 text-white m-auto">
+  <div class="withFooter max-w-[1300px] px-3 md:px-10 text-white m-auto">
     <div class="text-3xl font-bold border-solid border-b border-zinc-50/50 p-7 mb-7">
       Новости
     </div>

@@ -97,7 +97,7 @@
 }
 
 .withFooter {
-    min-height: calc(100vh - 95px);
+    min-height: calc(100vh - 120px);
 }
 
 .average-rating::before {

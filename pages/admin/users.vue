@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-[calc(100vh-160px)] max-w-[1300px] px-3 md:px-10 text-white m-auto">
+  <div class="withFooter max-w-[1300px] px-3 md:px-10 text-white m-auto">
     <div class="text-3xl font-bold border-solid border-b border-zinc-50/50 p-7 mb-7">
       Пользователи
     </div>
@@ -25,7 +25,7 @@
                 </ClientOnly>
 
                 <div class="flex justify-center my-3">
-                  <img :src="userToUpdate.avatar || '/img/no_avatar.png'" width="80" alt="">
+                  <img :src="userToUpdate.avatar || '/no_avatar.png'" width="80" alt="">
                 </div>
 
                 <div class="my-3">
@@ -140,7 +140,7 @@
             </table-body>
             <table-body class="text-center">
               <div class="flex justify-center">
-                <img :src="row.avatar || '/img/no_avatar.png'" width="80" alt="">
+                <img :src="row.avatar || '/no_avatar.png'" width="80" alt="">
               </div>
             </table-body>
             <table-body class="text-center">

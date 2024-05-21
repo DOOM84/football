@@ -1,8 +1,8 @@
 <template>
-  <main class="withFooter text-center">
-    <p class="text-3xl my-3 text-zinc-800">
-      Команды (Еврокубки)
-    </p>
+  <div class="withFooter max-w-[1300px] px-3 md:px-10 text-white m-auto">
+    <div class="text-3xl font-bold border-solid border-b border-zinc-50/50 p-7 mb-7">
+      Комады (Еврокубки)
+    </div>
     <div v-if="pending || !data">
       <TheLoading loader="dots"/>
     </div>
@@ -86,7 +86,7 @@
             </template>
           </TheModal>
         </Teleport>
-        <AdminDtable v-if="showTable" @endFilter="toFilter = false"
+        <AdminDtable @endFilter="toFilter = false"
                      :data="data.ecupTeams"
                      :toFilter="toFilter"
                      :filtering="filtering"
@@ -95,12 +95,14 @@
             <table-head>
               <div class="flex justify-center items-center">
                 <strong>Название</strong>
+                <template v-if="data.ecupTeams && data.ecupTeams.length">
                 <Icon @click.prevent="filter('name', 'asc')" name="ant-design:caret-up-filled"
                       class="cursor-pointer ml-1"
                       size="10"/>
                 <Icon @click.prevent="filter('name', 'desc')" name="ant-design:caret-down-filled"
                       class="cursor-pointer"
                       size="10"/>
+                </template>
               </div>
             </table-head>
             <table-head>
@@ -123,20 +125,20 @@
             </table-body>
 
             <table-body>
-              <button @click.prevent="updateItem(row)">
-                <Icon name="material-symbols:edit-square-outline" size="20"/>
-              </button>
-              <button @click.prevent="removeItem(row.id)">
-                <Icon name="ion:trash-b" size="20"/>
-              </button>
+              <div class="flex justify-center items-center gap-1">
+                <button @click.prevent="updateItem(row)" class="p-1 border-none btn m-0">
+                  <Icon name="material-symbols:edit-square-outline" size="20"/>
+                </button>
+                <button @click.prevent="removeItem(row.id)" class="p-1 border-none btn m-0">
+                  <Icon name="ion:trash-b" size="20"/>
+                </button>
+              </div>
             </table-body>
           </template>
         </AdminDtable>
       </ClientOnly>
     </template>
-
-
-  </main>
+  </div>
 </template>
 
 <script lang="ts" setup>
@@ -152,20 +154,20 @@ definePageMeta({
 const {data, pending} = useLazyFetch<{ecupTeams: Partial<ITeamInfo>[],
   teams: Partial<ITeamInfo>[]}>('/api/admin/ecupTeams')
 
-const showTable = ref<boolean>(true);
-
 useHead({
   titleTemplate: '%s - Команды (Еврокубки)'
 })
 
 const {filtering, toFilter, showDlg, mode, filter} = useFilter();
 
-const ecupTeamToUpdate = ref<Partial<ITeamInfo>>({team: {name: '', slug: ''}});
+const initTeamData: Partial<ITeamInfo> = {name: '', slug: ''};
+
+const ecupTeamToUpdate = ref<typeof initTeamData>({});
 
 const showLoading = ref<boolean>(false);
 
 function closeModal(): void {
-  ecupTeamToUpdate.value = {team: {name: '', slug: ''}}
+  ecupTeamToUpdate.value = {...initTeamData};
   showDlg.value = false;
   mode.value = null;
 }
@@ -173,7 +175,7 @@ function closeModal(): void {
 function teamChanged(team: any) {
 
   if (!team) {
-    ecupTeamToUpdate.value.team = {slug: '', name: ''};
+    ecupTeamToUpdate.value.team = {...initTeamData};
     ecupTeamToUpdate.value.team_id = null;
     ecupTeamToUpdate.value.api_id = null;
     return
@@ -194,7 +196,7 @@ async function updateItem(ecupTeam: ITeamInfo) {
 
 function addItem(): void {
   mode.value = 'add';
-  ecupTeamToUpdate.value = {team: {name: '', slug: ''}}
+  ecupTeamToUpdate.value = {...initTeamData};
   showDlg.value = true;
 }
 
@@ -212,8 +214,6 @@ async function storeItem(): Promise<void> {
       team_id: ecupTeamToUpdate.value.team_id,
       status: ecupTeamToUpdate.value.status,
     }
-
-    showTable.value = false;
 
     if (mode.value === 'edit') {
       const {result} = await $fetch<{ result: ITeamInfo }>('/api/admin/ecupTeams/edit', {
@@ -235,7 +235,7 @@ async function storeItem(): Promise<void> {
         data.value.ecupTeams.unshift({...ecupTeamToUpdate.value, id: result.id});
       }
     }
-
+    filter('', '');
     closeModal();
 
     useNuxtApp().$toast.success('Сохранено успешно!');
@@ -257,7 +257,6 @@ async function storeItem(): Promise<void> {
 
   } finally {
     showLoading.value = false;
-    showTable.value = true;
   }
 }
 
@@ -272,8 +271,6 @@ async function removeItem(dbId: number): Promise<void> {
         method: 'DELETE',
         body: {id: dbId},
       })
-
-      showTable.value = false;
 
       if(data.value){
         data.value.ecupTeams.splice(data.value.ecupTeams.findIndex((item) => item.id === +id), 1);
@@ -301,7 +298,6 @@ async function removeItem(dbId: number): Promise<void> {
 
     } finally {
       showLoading.value = false;
-      showTable.value = true;
     }
   }
 }

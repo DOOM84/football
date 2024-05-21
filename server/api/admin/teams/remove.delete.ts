@@ -18,9 +18,6 @@ export default defineEventHandler(async (event) => {
                     posts: {
                         deleteMany: {},
                     },
-                    ecupTeam: {
-                        delete: {}
-                    }
                 }
             });
 
@@ -35,6 +32,7 @@ export default defineEventHandler(async (event) => {
             }
 
         } catch (e) {
+            console.log(e);
             throw createError({
                     statusCode: 404,
                     statusMessage: 'Error occurred'
