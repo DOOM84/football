@@ -47,12 +47,28 @@ export interface IChamp {
 export interface IEcup {
     id: number;
     api_id: number;
+    name: string;
     slug: string;
     stage: string;
-    stands: IEcupStand[];
+    stands: {id: number;
+        games: number;
+        win: number;
+        draw: number;
+        lost: number;
+        goals: number;
+        missed: number;
+        diff: number;
+        points: number;
+        order: number;
+        group: string;
+        ecup: IEcup;
+        ecupTeam: IEcupTeam;
+        team_id: number;}[];
     results: IEcupResult[];
     posts: IPost[];
     status: boolean;
+    createdAt: string;
+    updatedAt: string;
 }
 
 export interface ITeam {
@@ -137,6 +153,7 @@ export interface IMatchInfo {
 
 export interface IEcupTeam {
     id: number;
+    api_id: number;
     name: string;
     sprite: string;
     team: ITeam;
