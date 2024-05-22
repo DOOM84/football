@@ -89,20 +89,21 @@
 </template>
 
 <script setup lang="ts">
-import type {IChampDB, IEcupStands, IScorer, ISmallPost, ITour} from "~/types/interfaces";
+import type {IChamp, IEcupStand, IScorer, IPost, ITourResult} from "~/types/interfaces";
 import { io, type Socket } from 'socket.io-client';
 const socket = ref<Socket>();
 
 const {data, pending} = await useLazyFetch<{
-  champs: IChampDB[],
-  tourResults: ITour[], delayResults: ITour[], ecupStands: IEcupStands[], posts: ISmallPost[], headLines: ISmallPost[], players: IScorer[]
+  champs: IChamp[],
+  tourResults: ITourResult[], delayResults: ITourResult[],
+  ecupStands: IEcupStand[], posts: IPost[], headLines: IPost[], players: IScorer[]
 }>('/api/main')
 
 async function refreshInfo() {
   try {
-    const {tourResults, delayResults} = await $fetch<{tourResults: ITour[], delayResults: ITour[]}>('/api/liveResults');
-    data.value!.tourResults = tourResults as ITour[];
-    data.value!.delayResults = delayResults as ITour[];
+    const {tourResults, delayResults} = await $fetch<{tourResults: ITourResult[], delayResults: ITourResult[]}>('/api/liveResults');
+    data.value!.tourResults = tourResults;
+    data.value!.delayResults = delayResults;
   } catch (e) {
     console.log(e);
   }
@@ -137,29 +138,6 @@ onMounted(async () => {
     await refreshInfo()
   })
 
-  /*useNuxtApp().$socket.on("add-post", (post) => {
-
-    if (post) {
-      data.value?.posts.unshift(post);
-    }
-
-  });
-
-  useNuxtApp().$socket.on("update-tour", (results) => {
-
-    if (data.value?.tourResults) {
-      const ind: number = data.value.tourResults.findIndex(tr => tr.champ.slug === results.champ.slug);
-
-      if (ind > -1) {
-        data.value.tourResults[ind] = {...results};
-      }
-    }
-  });
-
-  useNuxtApp().$socket.on("results-live", async () => {
-    await refreshInfo()
-  });*/
-
 })
 
 onBeforeUnmount(() => {
@@ -167,7 +145,7 @@ onBeforeUnmount(() => {
   socket.value?.disconnect();
 })
 
-function addPosts(loadedPosts: ISmallPost[]): void {
+function addPosts(loadedPosts: IPost[]): void {
   data.value?.posts.push(...loadedPosts)
 }
 </script>

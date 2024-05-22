@@ -1,10 +1,5 @@
 <template>
     <div class="relative p-0">
-<!--        <div v-if="loading" class="fixed z-[9999] top-0 left-0 w-full h-full bg-neutral-700/60 flex">
-          <div class="flex m-auto text-neutral-300">
-            <Icon name="svg-spinners:12-dots-scale-rotate" size="80"/>
-          </div>
-        </div>-->
 
         <transition name="overlay">
             <div @click="toggleSideBar(false)" ref="overlay" v-if="showSidebar" id="overlay"
@@ -43,17 +38,6 @@ provide('season', '');
 useHead({
   title: 'Новости европейского футбола',
 })
-
-//const nuxtApp = useNuxtApp();
-//const loading = ref(true);
-
-/*nuxtApp.hook("page:finish", () => {
-  loading.value = false;
-});*/
-
-/*onMounted(()=>{
-  loading.value = false;
-})*/
 
 const bodyBg = computed(() => route.params.ecup === 'lch'
 || route.params.ecup === 'le' || route.params.ecup === 'lconf' ? route.params.ecup + '_bg' : 'bg')

@@ -1,12 +1,5 @@
 import type {Ref} from "vue";
-import type {IChampDB, IEcupDB} from "~/types/interfaces";
-export const useCups = (): Ref<{'champs': IChampDB[] | []; 'ecups': IEcupDB[] | []}> => {
+import type {IChamp, IEcup} from "~/types/interfaces";
+export const useCups = (): Ref<{'champs': IChamp[] | []; 'ecups': IEcup[] | []}> => {
     return useState('cups', () => ({champs: [], ecups: []}))
 }
-
-
-/*
-export const useCups = async () => {
-        const { data } = await useFetch('/api/init');
-        return {champs: data.value?.champs || [], ecups: data.value?.ecups || []}
-    }*/

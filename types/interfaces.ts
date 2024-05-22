@@ -1,4 +1,5 @@
 import type {User} from "@supabase/auth-js";
+
 export interface IError extends Error {
     response?: {
         status: number;
@@ -8,308 +9,334 @@ export interface IError extends Error {
         }
     }
     statusCode?: number;
-
     status?: number;
-
     message: string;
-
     statusMessage: string;
     code?: number | string;
-
     path?: string;
-
     errors?: string[];
 }
 
-export interface ITeamInfo {
-    api_id?: number | null;
-    champ: { name: IChampDB["name"]; slug: IChampDB["slug"]; id?: number };
-    champ_id: IChampDB["id"] | null;
-    team_id?: number | null;
-    team?: Record<string, any>;
+export interface IUser extends User {
+    id: string;
+    user_id?: string;
+    admin?: boolean;
+    avatar?: string | null;
+    email: string;
+    login?: string;
+    password?: string;
+    passwordConfirmation?: string;
+    banned_until?: string
+}
+
+export interface IChamp {
     id: number;
+    api_id: number;
     name: string;
-    slug: string; //| null;
-    img: string;
-    sprite: string;
+    slug: string;
+    all_tours: number;
+    current_tour: number;
+    posts: IPost[];
+    teams: ITeam[];
+    scorers: IScorer[];
+    results: IResult[];
+    tour: IResult[];
     status: boolean;
-    diff: number;
-    win: number;
-    draw: number;
-    games: number;
-    goals: number;
-    lost: number;
-    missed: number;
-    order: number;
-    points: number;
-    team_info?: {
-        pres: string;
-        site: string;
-        year: number;
-        coach: string;
-        stad: string;
-    } | {}
+}
+
+export interface IEcup {
+    id: number;
+    api_id: number;
+    slug: string;
+    stage: string;
+    stands: IEcupStand[];
+    results: IEcupResult[];
+    posts: IPost[];
+    status: boolean;
 }
 
 export interface ITeam {
-    name: string;
-    img: string;
-    slug: string;
-    team_info: ITeamInfo['team_info']
-}
-
-
-export interface IChampDB {
-    all_tours: number;
+    id: number;
     api_id: number;
-    current_tour: number;
-    id: number;
-    name: string;
-    slug: string;
-    status?: boolean;
-    teams: ITeamInfo[];
-    scorers?: IPlayer[];
-    tour?: IScore[]
-    posts?: IPost[]
-}
-
-export interface IPlayer {
-    id: number;
-    champ_id: number;
-    goals: number;
     name: string;
     slug: string;
     img: string;
-    api_id?: number;
-    team_id?: number;
-    country?: Record<string, string | number> | string;
-    info?: Record<string, string | number>;
-    position: string;
-    position_id?: number;
-    number: number;
-    player_id: number;
-    team?: IPlayer["player"]["team"];
-    player: {
-        id: number;
-        api_id: number;
-        name: string;
-        slug: string;
-        img: string;
-        number?: number;
-        team_id: number;
-        country_id: number;
-        country?: Record<string, string | number>;
-        position_id: number;
-        posts?: IPost[];
-        info: Record<string, string | number>
-        team: {
-            name: string;
-            slug: string;
-            sprite: string
-        }
+    sprite: string;
+    champ: IChamp;
+    champ_id: number;
+    games: number;
+    win: number;
+    draw: number;
+    lost: number;
+    goals: number;
+    missed: number;
+    diff: number;
+    points: number;
+    order: number;
+    team_info: {
+        pres: string;
+        site: string;
+        stad: string;
+        year: number;
+        coach: string;
     };
+    status: boolean;
+    posts: IPost[];
+    players: IPlayer[];
+    results1: IResult[];
+    results2: IResult[];
+    resultsTour1: IResult[];
+    resultsTour2: IResult[];
+    ecupTeam: IEcupTeam;
 }
 
 
-
-
-export interface IScorer {
-    champ? : {
-        name: string;
-        slug: string;
-    },
-    players: {
-        name: string;
-        slug: string;
-        goals: number;
-        img: string;
-        team: {
-            name: string;
-            slug: string;
-            sprite: string
-        }
-    }[]
+export interface IResult {
+    id: number;
+    date: number | string;
+    res1: number;
+    res2: number;
+    champ: IChamp;
+    champ_id: number;
+    home: ITeam;
+    away: ITeam;
+    team1: number;
+    team2: number;
+    stamp: number;
+    api_id: number | string;
+    is_info: boolean;
+    time: string;
+    tour: number;
+    info: IMatchInfo;
 }
 
-export interface IEcupDB {
-    api_id?: number;
-    createdAt?: number;
-    updatedAt?: number;
-    id?: number;
-    name: string;
-    slug: string;
-    stage?: string;
-    status?: boolean;
-    stands: {
-        diff: number;
-        win: number;
-        draw: number;
-        games: number;
-        goals: number;
-        lost: number;
-        missed: number;
-        order: number;
-        points: number;
-        group: string;
-        id: number;
-        ecup_id: number;
-        team_id: number;
-        ecupTeam: {
-            api_id: number;
-            id: number;
-            team_id: number;
-            name: string;
-            sprite: string;
-            status: boolean;
-            team: ITeamInfo
-        }
-    }[];
-    posts?: ISmallPost[];
-}
-
-export interface IEcupStands {
-    name?: string;
-    slug?: string;
-    stands:  Record<string | number, {
-        teams: {
-            api_id: number;
-            diff: number;
-            draw: number;
-            games: number;
-            goals: number;
-            lost: number;
-            missed: number;
-            points: number;
-            win: number;
-            order: number;
-            group: string;
-            name: string;
-            slug: string | null;
-            sprite: string;
-        }[]
-    }>
-}
-
-export interface ITour {
+export interface ITourResult {
     champ: {
         name: string;
         slug: string;
     },
     tour: {
         num: number;
-        scores: Record<string | number, IScore[]>
-    }
-}
-
-export interface IScore {
-    home: {
-        name: string;
-        slug: string;
-        sprite: string;
-        team?: any;
-        api_id?: number;
+        scores: {
+            [index: number]: IResult[]
+        }[];
     },
-    away: {
-        name: string;
-        slug: string;
-        sprite: string;
-        team?: any;
-        api_id?: number;
-    },
-    champ?: {
-        name: string;
-        slug: string;
-    },
-    ecup?: {
-        name: string;
-        slug: string;
-    },
-    info?: Record<string, any> | null,
-    champ_id?: number;
-    api_id?: number;
-    is_info?: boolean;
-    id?: number;
-    res1 : number;
-    res2 : number;
-    stamp: number | string;
-    team1? : number;
-    team2? : number;
-    date : string| number;
-    time : string;
-    tour : number;
-    stage? : string;
-    order?: number;
-    scores?: Record<string | number, Record<string | number, IScore[]>>
 }
 
 
-export interface ISmallPost {
+
+export interface IMatchInfo {
     id: number;
-    img: {original: string; thumbnail: string;}/* | string;*/
-    title: string;
-    date: string | number;
-    slug: string;
-    status?: boolean;
+    lineups: Record<string, any>;
+    info: Record<string, any>[];
+    champResult: IResult;
+    ch_res: number;
+    ecupResult: IEcupResult;
+    ecup_res: number;
 }
-export interface IPost extends ISmallPost{
-    champ: {id?: number; name?: string; slug?: string} | null;
-    champ_id?: number | null;
-    ecup_id?: number | null;
-    ecup: {id?: number; name?: string; slug: string} | null;
+
+export interface IEcupTeam {
+    id: number;
+    name: string;
+    sprite: string;
+    team: ITeam;
+    ecupStand: IEcupStand[];
+    results1: IEcupResult[];
+    results2: IEcupResult[];
+    team_id: number;
+    status: boolean;
+}
+
+/*export interface IEcupStand{
+    id: number;
+    games: number;
+    win: number;
+    draw: number;
+    lost: number;
+    goals: number;
+    missed: number;
+    diff: number;
+    points: number;
+    order: number;
+    group: string;
+    ecup: IEcup;
+    ecupTeam: IEcupTeam;
+    team_id: number;
+}*/
+
+export interface IEcupStand {
+    name: string;
+    slug: string;
+    stands: {
+        [index: string]: {
+            teams: {
+                games: number;
+                win: number;
+                draw: number;
+                lost: number;
+                goals: number;
+                missed: number;
+                diff: number;
+                points: number;
+                slug: string;
+                sprite: string;
+            }[]
+        }
+    };
+}
+
+
+export interface IEcupResult {
+    id: number;
+    date: number;
+    res1: number;
+    res2: number;
+    ecup: IEcup;
+    ecup_id: number;
+    home: IEcupTeam;
+    team1: number;
+    team2: number;
+    away: IEcupTeam;
+    stamp: number;
+    api_id: number;
+    is_info: boolean;
+    time: string;
+    tour: number;
+    group: string;
+    stage: string;
+    order: number;
+    info: IMatchInfo
+}
+
+export interface ICountry {
+    id: number;
+    name: string;
+    parse_name: string;
+    players: IPlayer[];
+}
+
+export interface IPost {
+    id: number;
+    img: {
+        original: string;
+        thumbnail: string;
+    };
+    title: string;
+    slug: string;
     subtitle: string;
-    rates?: {rate: number}[];
-    rate: number;
-    comments: IComment[];
-    teamsDb?: number[];
-    playersDb?: number[];
-    tagsDb?: number[];
-    newTags?: Partial<ITag>[];
     body: string;
+    source: string;
+    champ: IChamp;
+    champ_id: number;
+    ecup: IEcup;
+    ecup_id: number;
+    rates: IRate[];
+    teams: ITeam[];
+    players: IPlayer[];
+    tags: ITag[];
+    comments: IComment[];
+    date: number;
     is_headline: boolean;
-    source?: string;
-    tags: {id?: number; name: string; slug: string; tag?: any}[];
-    players: {id?: number; name: string; slug: string; img: string; player?: any}[];
-    teams: {id?: number; name: string; slug: string, sprite: string; team?: any}[];
-    updatedAt?: number | string;
-    createdAt?: number | string;
+    status: boolean;
 }
 
 export interface ITag {
     id: number;
     name: string;
     slug: string;
+    posts: IPost;
 }
 
-export interface IUser extends User{
-    id: string;
-    user_id?: string;
-    admin?: boolean;
-    avatar?: string | null;
-    email: string;
-    login: string;
-    password?: string;
-    passwordConfirmation?: string;
-    banned_until?: string
+export interface IPlayer {
+    id: number;
+    api_id: number;
+    name: string;
+    slug: string;
+    img: string;
+    team: ITeam;
+    team_id: number;
+    country: ICountry;
+    country_id: number;
+    position_id: number;
+    info: Record<string, any>;
+    scorer: IScorer;
+    posts: IPost[];
 }
+
+
+/*export interface IScorer {
+    id: number;
+    api_id: number;
+    champ: IChamp;
+    champ_id: number;
+    goals: number;
+    name: string;
+    player: IPlayer;
+    player_id: number;
+}*/
+
+export interface IScorer {
+    champ: {
+        name: string;
+        slug: string;
+    },
+    goals: number;
+    img: string;
+    name: string;
+    slug: string;
+    team: {
+        name: string,
+        slug: string,
+        sprite: string,
+    }
+}
+
+export interface IRate {
+    id: number;
+    user: IProfile;
+    user_id: number;
+    post: IPost;
+    post_id: number;
+    rate: number;
+}
+
+
+export interface IProfile {
+    id: number;
+    user_id: string;
+    rates: IRate[];
+    login: string;
+    avatar: string;
+    email: string;
+    comments: IComment[];
+    commentLikes: ICommentLike[];
+}
+
 
 export interface IComment {
     id: number;
-    post_id: number;
+    user: IProfile;
     user_id: number;
+    post: IPost;
+    post_id: number;
     body: string;
-    stamp: string | number;
-    _count: { userLikes: number};
-    quote: {
-        body: string;
-        stamp: number;
-        user: { login: string }
-    } | null,
-    user: {
-        avatar: string;
-        email: string;
-        id: number;
-        login: string;
-        user_id: string;
-    } | null
-
+    userLikes: ICommentLike[];
+    quote: Record<string, any>;
+    stamp: number;
 }
+
+
+export interface ICommentLike {
+    id: number;
+    user: IProfile;
+    user_id: number;
+    comment: IComment;
+    comment_id: number;
+    like: number;
+}
+
+
+
+
+
+

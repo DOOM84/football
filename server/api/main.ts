@@ -1,7 +1,7 @@
 import prisma from '~/helpers/prisma';
 import ecupTransformer from "~/utils/transformers/ecupTransformer";
 import champTransformer from "~/utils/transformers/champTransformer";
-import {IChampDB, IEcupDB, IEcupStands, IPost, IScorer, ISmallPost, ITour} from "~/types/interfaces";
+import {IChamp, IEcup, IEcupStand, IPost, IScorer, type ITourResult} from "~/types/interfaces";
 import postListTransformer from "~/utils/transformers/postListTransformer";
 import champScorersTransformer from "~/utils/transformers/champScorersTransformer";
 import moment from "moment";
@@ -33,7 +33,7 @@ export default defineEventHandler(async (event) => {
                     }
                 }
             }
-        });
+        }) as unknown as IEcup[];
 
         const postsDb = await prisma.post.findMany({
             where: {
@@ -47,7 +47,7 @@ export default defineEventHandler(async (event) => {
                 champ: true
             },
             take: 35
-        })
+        }) as unknown as IPost[];
 
         const headLinesDb = await prisma.post.findMany({
             where: {
@@ -62,7 +62,7 @@ export default defineEventHandler(async (event) => {
                 champ: true
             },
             take: 4
-        })
+        }) as unknown as IPost[];
 
         const now = Date.now();
 
@@ -141,22 +141,22 @@ export default defineEventHandler(async (event) => {
                     }
                 }
             },
-        });
+        }) as unknown as IChamp[];
 
-        const ecupStands: IEcupStands[] = ecupTransformer(ecups as unknown as IEcupDB[]);
+        const ecupStands: IEcupStand[] = ecupTransformer(ecups);
 
-        const tourResults: ITour[]  = champTransformer(champs as unknown as IChampDB[]);
+        const tourResults: ITourResult[] = champTransformer(champs);
 
-        const delayResults: ITour[]  = champTransformer(champs as unknown as IChampDB[], 'results')
+        const delayResults: ITourResult[]  = champTransformer(champs, 'results')
             .filter(champ => Object.keys(champ.tour!.scores).length);
 
-        const players: IScorer[]  = champScorersTransformer(champs as unknown as IChampDB[]);
+        const players: IScorer[]  = champScorersTransformer(champs);
 
-        const posts: ISmallPost[]  = postListTransformer(postsDb as unknown as IPost[]);
+        const posts: IPost[]  = postListTransformer(postsDb);
 
-        const headLines: ISmallPost[]  = postListTransformer(headLinesDb as unknown as IPost[]);
+        const headLines: IPost[]  = postListTransformer(headLinesDb);
 
-        return {champs, tourResults, ecupStands, posts, headLines, players, delayResults /*rrr*/};
+        return {champs, tourResults, ecupStands, posts, headLines, players, delayResults};
 
     }catch (e) {
         console.log(e);

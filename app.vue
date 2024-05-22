@@ -12,13 +12,13 @@
 </template>
 
 <script setup lang="ts">
-import type {IChampDB, IEcupDB} from "~/types/interfaces";
+import type {IChamp, IEcup} from "~/types/interfaces";
 const loading = ref(true);
 const cups = useCups();
 
 await callOnce(async () => {
     cups.value = await $fetch<{
-      champs: IChampDB[]; ecups: IEcupDB[]
+      champs: IChamp[]; ecups: IEcup[]
     }>('/api/init');
 
 })

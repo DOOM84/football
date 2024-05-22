@@ -1,5 +1,5 @@
 import moment from "moment";
-import type {IChampDB, IPlayer, IScore, IScorer, ITeamInfo} from "~/types/interfaces";
+import type {IChamp, IPlayer, IResult, IScorer, ITeam} from "~/types/interfaces";
 
 const runtimeConfig = useRuntimeConfig();
 const season = 2023;
@@ -71,7 +71,7 @@ export async function addChampSquad(champApiId: number/*, teamId: number*/): Pro
     return squad;
 }
 
-export async function addChampsStands(champs: any[]): Promise<Partial<ITeamInfo>[]> {
+export async function addChampsStands(champs: any[]): Promise<Partial<ITeam>[]> {
 
     const teams = [];
 
@@ -115,7 +115,7 @@ export async function addChampsStands(champs: any[]): Promise<Partial<ITeamInfo>
     return teams;
 }
 
-export async function addChampResults(champId: string | number, champApiId: string | number): Promise<Partial<IScore>[]> {
+export async function addChampResults(champId: string | number, champApiId: string | number): Promise<Partial<IResult>[]> {
 
     const {response} = await $fetch<Record<string, any>>(
         `https://v3.football.api-sports.io/fixtures?league=${champApiId}&season=${season}`, {
@@ -148,7 +148,7 @@ export async function addChampResults(champId: string | number, champApiId: stri
     })
 }
 
-export async function addChampTourResults(champId: string | number, champApiId: string | number, tour: string | number): Promise<Partial<IScore>[]> {
+export async function addChampTourResults(champId: string | number, champApiId: string | number, tour: string | number): Promise<Partial<IResult>[]> {
 
     const {response} = await $fetch<Record<string, any>>(
         `https://v3.football.api-sports.io/fixtures/?league=${champApiId}&season=${season}&round=Regular Season - ${tour}`, {
@@ -180,7 +180,7 @@ export async function addChampTourResults(champId: string | number, champApiId: 
     })
 }
 
-export async function addChampsScorers(champs: IChampDB[]): Promise<Partial<IScorer>[]> {
+export async function addChampsScorers(champs: IChamp[]): Promise<Partial<IScorer>[]> {
 
     const players = []
 
@@ -211,7 +211,7 @@ export async function addChampsScorers(champs: IChampDB[]): Promise<Partial<ISco
     return players.flat()
 }
 
-export async function addEcupResults(ecupApiId: string | number): Promise<Partial<IScore>[]> {
+export async function addEcupResults(ecupApiId: string | number): Promise<Partial<IResult>[]> {
 
     const {response} = await $fetch<Record<string, any>>(
         `https://v3.football.api-sports.io/fixtures?league=${ecupApiId}&season=${season}`, {
@@ -224,7 +224,7 @@ export async function addEcupResults(ecupApiId: string | number): Promise<Partia
     return response;
 }
 
-export async function addEcupStands(ecupApiId: string | number, ecup_teams: ITeamInfo[], ecupId: string | number): Promise<any> {
+export async function addEcupStands(ecupApiId: string | number, ecup_teams: ITeam[], ecupId: string | number): Promise<any> {
 
     const {response} = await $fetch<Record<string, any>>(
         `https://v3.football.api-sports.io/standings?league=${ecupApiId}&season=${season}`, {
