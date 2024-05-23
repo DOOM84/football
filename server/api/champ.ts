@@ -1,5 +1,5 @@
 import prisma from '~/helpers/prisma';
-import {IChampDB, IPost, IScorer, ISmallPost, ITour} from "~/types/interfaces";
+import {IChamp, IPost, IScorer, ITourResult} from "~/types/interfaces";
 import postListTransformer from "~/utils/transformers/postListTransformer";
 import singleChampTransformer from "~/utils/transformers/singleChampTransformer";
 import singleChampScorersTransformer from "~/utils/transformers/singleChampScorersTransformer";
@@ -95,7 +95,7 @@ export default defineEventHandler(async (event) => {
                     }
                 }
             },
-        })
+        }) as unknown as IChamp;
 
         if(!champ){
             throw createError({
@@ -118,17 +118,17 @@ export default defineEventHandler(async (event) => {
                 champ: true
             },
             take: 4
-        })
+        }) as unknown as IPost[];
 
-        const posts: ISmallPost[]  = postListTransformer(champ?.posts as unknown as IPost[]);
+        const posts: Partial<IPost[]>  = postListTransformer(champ?.posts as unknown as IPost[]);
 
-        const tourResults: ITour  = singleChampTransformer(champ as unknown as IChampDB);
+        const tourResults: Partial<ITourResult>  = singleChampTransformer(champ);
 
-        const headLines: ISmallPost[]  = postListTransformer(headLinesDb as unknown as IPost[]);
+        const headLines: Partial<IPost[]>  = postListTransformer(headLinesDb);
 
-        const players: IScorer  = singleChampScorersTransformer(champ as unknown as IChampDB);
+        const players: Partial<IScorer> = singleChampScorersTransformer(champ);
 
-        const delayResults: ITour[]  = champTransformer([champ] as unknown as IChampDB[], 'results')
+        const delayResults: ITourResult[]  = champTransformer([champ], 'results')
             .filter(champ => Object.keys(champ.tour!.scores).length);
 
 

@@ -80,7 +80,7 @@
 </template>
 
 <script setup lang="ts">
-import type {IChampDB, IScorer, ISmallPost, ITour} from "~/types/interfaces";
+import type {IChamp, IScorer, IPost, ITourResult} from "~/types/interfaces";
 import { io, type Socket } from 'socket.io-client';
 
 const socket = ref<Socket>();
@@ -88,8 +88,8 @@ const socket = ref<Socket>();
 const route = useRoute();
 
 const {data, pending, error} = await useLazyFetch<{
-  champ: IChampDB,
-  tourResults: ITour, posts: ISmallPost[], headLines: ISmallPost[], players: IScorer
+  champ: IChamp, delayResults: ITourResult[],
+  tourResults: ITourResult, posts: IPost[], headLines: IPost[], players: IScorer
 }>('/api/champ', {
   params: {champ: route.params.champ, count: 35}, onResponseError({request, response, options}) {
     showError({
@@ -117,11 +117,11 @@ if (error.value) {
 async function refreshInfo() {
   try {
 
-    const {tourResults}  = await $fetch<{tourResults: ITour}>('/api/liveResults', {
+    const {tourResults}  = await $fetch<{tourResults: ITourResult}>('/api/liveResults', {
       params: {champ: route.params.champ},
     });
 
-    data.value!.tourResults = tourResults as ITour;
+    data.value!.tourResults = tourResults;
 
   } catch (e) {
     console.log(e);
@@ -160,37 +160,13 @@ onMounted(async () => {
 
   });
 
-  /*useNuxtApp().$socket.on("add-post", (post) => {
-
-    if (route.params.champ && route.params.champ === post.champ?.slug) {
-
-      if (post) {
-        data.value?.posts.unshift(post);
-      }
-    }
-  });
-
-  useNuxtApp().$socket.on("results-live", async () => {
-    await refreshInfo();
-
-  });
-
-  useNuxtApp().$socket.on("update-tour", (results) => {
-
-    if (data.value?.champ.slug === results.champ.slug) {
-      if (data.value?.tourResults) {
-        data.value.tourResults = {...results};
-      }
-    }
-  });*/
-
 })
 
 onBeforeUnmount(() => {
   socket.value?.disconnect();
 })
 
-function addPosts(loadedPosts: ISmallPost[]): void {
+function addPosts(loadedPosts: IPost[]): void {
   data.value?.posts.push(...loadedPosts)
 }
 

@@ -1,16 +1,16 @@
-import type {IChampDB, IPlayer, IScorer} from "~/types/interfaces";
+import type {IChamp, IScorer} from "~/types/interfaces";
 
-export default ((champ: IChampDB): IScorer => {
+export default ((champ: Partial<IChamp>): IScorer | Partial<IScorer> => {
 
     if(!champ){return {players: []}}
 
-       const res = {
+    const res = {
            champ: {
                name: champ.name,
                slug: champ.slug
            },
 
-           players: champ.scorers?.map((scorer: IPlayer) => {
+           players: champ.scorers?.map((scorer) => {
                return {
                    name: scorer.name,
                    slug: scorer.player?.slug,

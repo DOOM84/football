@@ -3,8 +3,8 @@ import ecupTransformer from "~/utils/transformers/ecupTransformer";
 import champTransformer from "~/utils/transformers/champTransformer";
 import {IChamp, IEcup, IEcupStand, IPost, IScorer, type ITourResult} from "~/types/interfaces";
 import postListTransformer from "~/utils/transformers/postListTransformer";
-import champScorersTransformer from "~/utils/transformers/champScorersTransformer";
 import moment from "moment";
+import singleChampScorersTransformer from "~/utils/transformers/singleChampScorersTransformer";
 
 export default defineEventHandler(async (event) => {
 
@@ -150,11 +150,11 @@ export default defineEventHandler(async (event) => {
         const delayResults: ITourResult[]  = champTransformer(champs, 'results')
             .filter(champ => Object.keys(champ.tour!.scores).length);
 
-        const players: IScorer[]  = champScorersTransformer(champs);
+        const players: IScorer[] | Partial<IScorer>[]  = champs.map(champ => singleChampScorersTransformer(champ));
 
-        const posts: IPost[]  = postListTransformer(postsDb);
+        const posts: Partial<IPost[]> = postListTransformer(postsDb);
 
-        const headLines: IPost[]  = postListTransformer(headLinesDb);
+        const headLines: Partial<IPost[]>  = postListTransformer(headLinesDb);
 
         return {champs, tourResults, ecupStands, posts, headLines, players, delayResults};
 

@@ -38,7 +38,7 @@ export interface IChamp {
     current_tour: number;
     posts: IPost[];
     teams: ITeam[];
-    scorers: IScorer[];
+    scorers: IPlayer[];
     results: IResult[];
     tour: IResult[];
     status: boolean;
@@ -123,7 +123,7 @@ export interface IResult {
     is_info: boolean;
     time: string;
     tour: number;
-    info: IMatchInfo;
+    info: IMatchInfo | null;
 }
 
 export interface ITourResult {
@@ -144,7 +144,7 @@ export interface ITourResult {
 export interface IMatchInfo {
     id: number;
     lineups: Record<string, any>;
-    info: Record<string, any>[];
+    info: Record<string, any>;
     champResult: IResult;
     ch_res: number;
     ecupResult: IEcupResult;
@@ -277,6 +277,18 @@ export interface IPlayer {
     position_id: number;
     info: Record<string, any>;
     scorer: IScorer;
+    goals: number;
+    player: {
+        goals: number;
+        img: string;
+        name: string;
+        slug: string;
+        team: {
+            name: string,
+            slug: string,
+            sprite: string,
+        }
+    };
     posts: IPost[];
 }
 
@@ -297,15 +309,18 @@ export interface IScorer {
         name: string;
         slug: string;
     },
-    goals: number;
-    img: string;
-    name: string;
-    slug: string;
-    team: {
-        name: string,
-        slug: string,
-        sprite: string,
-    }
+    players: {
+        goals: number;
+        img: string;
+        name: string;
+        slug: string;
+        team: {
+            name: string,
+            slug: string,
+            sprite: string,
+        }
+    }[]
+
 }
 
 export interface IRate {

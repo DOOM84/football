@@ -1,7 +1,7 @@
 import groupBy from "~/helpers/groupBy";
-import type {IChampDB, IScore, ITour} from "~/types/interfaces";
+import type {IChamp, ITourResult} from "~/types/interfaces";
 
-export default ((champ: IChampDB): ITour => {
+export default ((champ: Partial<IChamp>): ITourResult | Partial<ITourResult> => {
 
     if (!champ) return {
         champ: {
@@ -12,7 +12,7 @@ export default ((champ: IChampDB): ITour => {
             scores: {},
             num: 0
         }
-    }
+    } as Partial<ITourResult>
 
     if (champ?.posts) {
         delete champ.posts;
@@ -29,7 +29,7 @@ export default ((champ: IChampDB): ITour => {
         tour.info = null;
 
         if(Array.isArray(goalsOnly) && goalsOnly.length){
-            tour.info = groupBy(goalsOnly.map(goal => {
+            (tour.info as unknown as Record<number, Record<string, any>[]>) = groupBy(goalsOnly.map(goal => {
                 goal.teamId = goal.team.id;
                 return goal;
             }), 'teamId');
@@ -45,10 +45,10 @@ export default ((champ: IChampDB): ITour => {
             slug: champ.slug
         },
         tour: {
-            scores: groupBy(champ.tour as IScore[], 'date'),
+            scores: groupBy(champ.tour as unknown as ITourResult['tour']['scores'], 'date'),
             num: champ.current_tour
         }
     }
     delete champ.tour
-    return res
+    return res as ITourResult;
 })

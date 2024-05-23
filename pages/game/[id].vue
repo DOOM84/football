@@ -14,8 +14,8 @@
           <Icon name="eos-icons:loading" class="text-gray-600" size="80"/>
         </div>
 
-        <div class="flex justify-center font-bold flex-row  gap-3 text-lg sm:text-xl mb-3">
-          <div class="flex text-sm sm:text-lg basis-1/3 flex-grow: 0; sm:basis-1/4 flex-col items-center">
+        <div class="flex justify-center font-bold flex-row  gap-3 text-lg sm:text-xl mb-3 items-center">
+          <div class="flex text-sm sm:text-lg basis-1/3 flex-col items-center">
             <div>
               <img class="w-[30px] h-[30px]"
                    :title="data.match.champResult?.home.name || data.match.ecupResult?.home.name"
@@ -33,20 +33,25 @@
               <span v-else>{{ data.match.champResult?.home.name || data.match.ecupResult?.home.name }}</span>
             </div>
           </div>
-          <div class="flex font-bold basis-1/3 flex-grow: 0; sm:basis-1 gap-2 justify-center">
-            <div class=" self-center">
-              {{ data.match.champResult?.res1 >= 0 ? data.match.champResult.res1 : data.match.ecupResult?.res1 }}
+          <div class="flex font-bold basis-1/3 sm:basis-auto gap-2 justify-center items-center">
+            <div class="flex flex-col justify-center">
+              <div class="flex gap-2 justify-center">
+              <div>
+                {{ data.match.champResult?.res1 >= 0 ? data.match.champResult.res1 : data.match.ecupResult?.res1 }}
+              </div>
+              <div>:</div>
+              <div>
+                {{ data.match.champResult?.res2 >= 0 ? data.match.champResult.res2 : data.match.ecupResult?.res2 }}
+              </div>
+              </div>
+              <div class="text-xs font-normal text-center">
+                {{data.match.champResult ? $showDate(+data.match.champResult.stamp*1000) : $showDate(+data.match.ecupResult.stamp*1000)}}
+              </div>
             </div>
-            <!--            <div class=" self-center">{{ data.goals.home.score }}</div>-->
-            <div class="self-center">:</div>
-            <div class=" self-center">
-              {{ data.match.champResult?.res2 >= 0 ? data.match.champResult.res2 : data.match.ecupResult?.res2 }}
-            </div>
-            <!--            <div class=" self-center">{{ data.goals.away.score }}</div>
-                        <div class=" self-center">{{ data.goals.away.score }}</div>-->
+
           </div>
           <div
-              class="flex text-sm sm:text-lg  basis-1/3 flex-grow: 0; sm:basis-1/4 flex-col justify-center items-center">
+              class="flex text-sm sm:text-lg  basis-1/3 flex-grow: 0; flex-col justify-center items-center">
             <div>
               <img class="w-[30px] h-[30px]"
                    :title="data.match.champResult?.away.name || data.match.ecupResult?.away.name"

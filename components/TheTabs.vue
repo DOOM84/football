@@ -46,7 +46,7 @@
             </div>
         </div>
         <transition name="slidecnt">
-            <div :key="infoToShow" class="overflow-hidden">
+            <div :key="infoToShow" class="overflow-hidden hover:overflow-visible">
                 <TheBaseTabInfo :info-to-show="infoToShow" :info-type="infoType">
                     <slot></slot>
                 </TheBaseTabInfo>

@@ -20,11 +20,11 @@
 </template>
 
 <script setup lang="ts">
-import type {ISmallPost} from "~/types/interfaces";
+import type {IPost} from "~/types/interfaces";
 import { io, type Socket } from 'socket.io-client';
 const socket = ref<Socket>();
 
-const {data, pending} = await useLazyFetch<{ posts: ISmallPost[]}>('/api/allNews');
+const {data, pending} = await useLazyFetch<{ posts: IPost[]}>('/api/allNews');
 
 
 useHead({
@@ -52,7 +52,7 @@ onBeforeUnmount(() => {
   socket.value?.disconnect();
 })
 
-function addPosts(loadedPosts: ISmallPost[]): void {
+function addPosts(loadedPosts: IPost[]): void {
   data.value?.posts.push(...loadedPosts)
 }
 </script>

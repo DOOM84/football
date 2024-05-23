@@ -13,7 +13,7 @@ export default defineNuxtPlugin(nuxtApp => {
             },
             showDate: (stamp: number) => {
                 // prepareLocale();
-                return moment(stamp).format('Do MMMM YYYY HH:mm')
+                return moment(stamp).format('Do MMMM YYYY, HH:mm')
             },
             postDate: (stamp: number) => {
                 // prepareLocale();

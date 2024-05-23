@@ -1,22 +1,17 @@
 import groupBy from "~/helpers/groupBy";
-import type {IChampDB, IScore, ITour} from "~/types/interfaces";
+import type {IChamp, IResult, ITourResult} from "~/types/interfaces";
+type champSrc = 'tour' | 'results';
 
-export default ((champs: IChampDB[], source = 'tour'): ITour[] => {
+export default ((champs: IChamp[], source = 'tour'): ITourResult[] => {
    return  champs.map(champ => {
 
-      // console.log(champ.tour);
-
        if(source === 'results'){
-           champ[source] = champ[source].filter(r => +r.tour < +champ.current_tour)
+           champ[source] = champ[source].filter((r: IResult) => +r.tour < +champ.current_tour)
        }
 
-       champ[source]!.map(tour => {
+       (champ[source as champSrc] as IResult[]).map((tour: IResult) => {
 
            let goalsOnly = null;
-
-           /*const goalsOnly = tour.info?.info ?
-               tour.info?.info.filter((event: { type: string; detail: string }) => event.type.toLowerCase() === 'goal' && event.detail.toLowerCase() !== 'missed penalty') || null
-           : tour.info?.info?.info.filter((event: { type: string; detail: string }) => event.type.toLowerCase() === 'goal' && event.detail.toLowerCase() !== 'missed penalty') || null;*/
 
            if(tour.info?.info?.info){
                goalsOnly = tour.info.info.info.filter((event: { type: string; detail: string; comments: string }) => event.type.toLowerCase() === 'goal'
@@ -32,32 +27,29 @@ export default ((champs: IChampDB[], source = 'tour'): ITour[] => {
 
            tour.info = null;
 
-           if(Array.isArray(goalsOnly) && goalsOnly.length){
-              tour.info = groupBy(goalsOnly.map(goal => {
+           if(goalsOnly && Array.isArray(goalsOnly) && goalsOnly.length){
+              (tour.info as unknown as Record<number, Record<string, any>[]>) = groupBy(goalsOnly.map(goal => {
                   goal.teamId = goal.team.id;
                   return goal;
               }), 'teamId');
           }
 
-
            return tour;
        })
 
-     //  champ.tour!.info = champ.tour!.info?.info?.info  || null;
-
        const res = {
-           "champ": {
-               "name": champ.name,
-               "slug": champ.slug
+           champ: {
+               name: champ.name,
+               slug: champ.slug
            },
-           "tour": {
-               "scores": groupBy(champ[source] as IScore[], 'date'),
-               "num": champ.current_tour
+           tour: {
+               scores: groupBy(champ[source as champSrc], 'date'),
+               num: champ.current_tour
            }
        }
-       delete champ[source]
+       delete champ[source as champSrc]
        return res
 
-   })
+   }) as ITourResult[]
 
 })
