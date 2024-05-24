@@ -30,7 +30,7 @@
 </template>
 
 <script setup lang="ts">
-import type {ISmallPost} from "~/types/interfaces";
+import type {IPost} from "~/types/interfaces";
 import type {result} from "~/types/types";
 import { io, type Socket } from 'socket.io-client';
 
@@ -42,7 +42,7 @@ const season = ref<string>('');
 
 provide('season', season);
 
-const {data, pending, error, refresh} =  await useLazyFetch<{champ: string; results: result; posts: ISmallPost[],
+const {data, pending, error, refresh} =  await useLazyFetch<{champ: string; results: result; posts: IPost[],
 }>('/api/calendar', {params: {champ: route.params.champ}, onResponseError({request, response, options}) {
     showError({
       fatal: true,

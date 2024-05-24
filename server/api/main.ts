@@ -147,7 +147,10 @@ export default defineEventHandler(async (event) => {
 
         const tourResults: ITourResult[] = champTransformer(champs);
 
-        const delayResults: ITourResult[]  = champTransformer(champs, 'results')
+        const delayResults: ITourResult[]  = champTransformer(champs, 'delay')
+            .filter(champ => Object.keys(champ.tour!.scores).length);
+
+        const relegationResults: ITourResult[]  = champTransformer(champs, 'relegation', true)
             .filter(champ => Object.keys(champ.tour!.scores).length);
 
         const players: IScorer[] | Partial<IScorer>[]  = champs.map(champ => singleChampScorersTransformer(champ));
@@ -156,7 +159,7 @@ export default defineEventHandler(async (event) => {
 
         const headLines: Partial<IPost[]>  = postListTransformer(headLinesDb);
 
-        return {champs, tourResults, ecupStands, posts, headLines, players, delayResults};
+        return {champs, tourResults, ecupStands, posts, headLines, players, delayResults, relegationResults};
 
     }catch (e) {
         console.log(e);

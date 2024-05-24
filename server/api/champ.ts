@@ -128,11 +128,14 @@ export default defineEventHandler(async (event) => {
 
         const players: Partial<IScorer> = singleChampScorersTransformer(champ);
 
-        const delayResults: ITourResult[]  = champTransformer([champ], 'results')
+        const delayResults: ITourResult[]  = champTransformer([champ], 'delay')
+            .filter(champ => Object.keys(champ.tour!.scores).length);
+
+        const relegationResults: ITourResult[]  = champTransformer([champ], 'relegation', true)
             .filter(champ => Object.keys(champ.tour!.scores).length);
 
 
-        return {champ, tourResults, posts, headLines, players, delayResults};
+        return {champ, tourResults, posts, headLines, players, delayResults, relegationResults};
 
     }catch (e) {
         throw createError({

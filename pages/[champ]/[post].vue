@@ -25,6 +25,11 @@
               <TheBaseTabInfo v-if="data && data.delayResults[0]" :info-to-show="data.delayResults[0]"
                               :info-type="'shortResults'"/>
             </div>
+            <div v-if="data && data.relegationResults && data.relegationResults.length" class="overflow-x-auto">
+              <div class="bg-blue-50">Переходный матч</div>
+              <TheBaseTabInfo v-if="data && data.relegationResults[0]" :info-to-show="data.relegationResults[0]"
+                              :info-type="'shortResults'"/>
+            </div>
           <TheBaseTabInfo v-if="data && data.tourResults" :info-to-show="data.tourResults" :info-type="'shortResults'"/>
           </ClientOnly>
         </div>
@@ -45,7 +50,7 @@
 </template>
 
 <script setup lang="ts">
-import type {IChampDB, IComment, IPost, ISmallPost, ITour} from "~/types/interfaces";
+import type {IChamp, IComment, IPost, ITourResult} from "~/types/interfaces";
 import { io, type Socket } from 'socket.io-client';
 const socket = ref<Socket>();
 const route = useRoute();
@@ -55,8 +60,9 @@ const del = ref<(toDel: number) => void>();
 const cCount = ref<number>();
 
 const {data, pending, error} = await useLazyFetch<{
-  post: IPost, champ: IChampDB,
-  tourResults: ITour, posts: ISmallPost[],
+  post: IPost; champ: IChamp;
+  tourResults: ITourResult[]; delayResults: ITourResult[];
+  relegationResults: ITourResult[]; posts: IPost[];
 }>('/api/post', {
   params: {champ: route.params.champ, slug: route.params.post}, onResponseError({request, response, options}) {
     showError({
@@ -98,11 +104,14 @@ provide('setLike', (like: number, comId: number)=>{
 async function refreshInfo() {
   try {
 
-    const {tourResults}  = await $fetch<{tourResults: ITour}>('/api/liveResults', {
+    const {tourResults, delayResults, relegationResults}  = await $fetch<{tourResults: ITourResult[],
+      delayResults: ITourResult[], relegationResults: ITourResult[]}>('/api/liveResults', {
       params: {champ: route.params.champ},
     });
 
     data.value!.tourResults = tourResults;
+    data.value!.delayResults = delayResults;
+    data.value!.relegationResults = relegationResults;
 
   } catch (e) {
     console.log(e);

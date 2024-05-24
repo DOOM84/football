@@ -1,5 +1,5 @@
 import prisma from '~/helpers/prisma';
-import {IChampDB, IPost, ISmallPost, ITour} from "~/types/interfaces";
+import {IChamp, IPlayer, IPost, ITourResult} from "~/types/interfaces";
 import postTransformer from "~/utils/transformers/postTransformer";
 import singleChampTransformer from "~/utils/transformers/singleChampTransformer";
 import postListTransformer from "~/utils/transformers/postListTransformer";
@@ -85,7 +85,7 @@ export default defineEventHandler(async (event) => {
                     }
                 },
             },
-        })
+        }) as unknown as IChamp;
 
         if(!champ){
             throw createError({
@@ -125,7 +125,7 @@ export default defineEventHandler(async (event) => {
                     }
                 },
             },
-        })
+        }) as unknown as IPost;
 
         if(!postDb){
             throw createError({
@@ -133,16 +133,23 @@ export default defineEventHandler(async (event) => {
                 message: 'Страница не найдена',
             })
         }
-        const posts: ISmallPost[]  = postListTransformer(champ?.posts as unknown as IPost[]);
+        const posts: IPost[]  = postListTransformer(champ.posts);
 
-        const post: Partial<IPost> = postTransformer(postDb as unknown as Partial<IPost>);
+        const post: Partial<IPost> = postTransformer({...postDb,
+            tags: postDb.tags.map(t => t.tag),
+            teams: postDb.teams.map(tm => tm.team),
+            players: postDb.players.map(p => p.player) as IPlayer[],
+        });
 
-        const tourResults: ITour  = singleChampTransformer(champ as unknown as IChampDB);
+        const tourResults: ITourResult | Partial<ITourResult>  = singleChampTransformer(champ as unknown as IChamp);
 
-        const delayResults: ITour[]  = champTransformer([champ] as unknown as IChampDB[], 'results')
+        const delayResults: ITourResult[]  = champTransformer([champ], 'delay')
             .filter(champ => Object.keys(champ.tour!.scores).length);
 
-        return {post, tourResults, posts, champ, delayResults};
+        const relegationResults: ITourResult[]  = champTransformer([champ], 'relegation', true)
+            .filter(champ => Object.keys(champ.tour!.scores).length);
+
+        return {post, tourResults, posts, champ, delayResults, relegationResults};
 
     }catch (e) {
         throw createError({

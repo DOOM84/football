@@ -39,8 +39,10 @@ export interface IChamp {
     posts: IPost[];
     teams: ITeam[];
     scorers: IPlayer[];
-    results: IResult[];
+    results?: IResult[];
     tour: IResult[];
+    relegation: IResult[];
+    delay: IResult[];
     status: boolean;
 }
 
@@ -89,6 +91,7 @@ export interface ITeam {
     diff: number;
     points: number;
     order: number;
+    team: ITeam;
     team_info: {
         pres: string;
         site: string;
@@ -248,6 +251,7 @@ export interface IPost {
     ecup: IEcup;
     ecup_id: number;
     rates: IRate[];
+    rate: number;
     teams: ITeam[];
     players: IPlayer[];
     tags: ITag[];
@@ -262,6 +266,7 @@ export interface ITag {
     name: string;
     slug: string;
     posts: IPost;
+    tag: ITag;
 }
 
 export interface IPlayer {
@@ -352,7 +357,8 @@ export interface IComment {
     post: IPost;
     post_id: number;
     body: string;
-    userLikes: ICommentLike[];
+    userLikes?: ICommentLike[];
+    _count: { userLikes: number};
     quote: Record<string, any>;
     stamp: number;
 }

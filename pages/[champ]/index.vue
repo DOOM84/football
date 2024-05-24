@@ -21,6 +21,12 @@
                     <TheBaseTabInfo v-if="data && data.delayResults[0]" :info-to-show="data.delayResults[0]"
                                     :info-type="'shortResults'"/>
                   </div>
+                  <div v-if="data && data.relegationResults && data.relegationResults.length" class="overflow-x-auto">
+                    <div class="bg-blue-50">Переходный матч</div>
+                    <TheBaseTabInfo v-if="data && data.relegationResults[0]" :info-to-show="data.relegationResults[0]"
+                                    :info-type="'shortResults'"/>
+                  </div>
+
                 <TheBaseTabInfo v-if="data && data.tourResults" :info-to-show="data.tourResults"
                                 :info-type="'shortResults'"/>
                 </ClientOnly>
@@ -58,6 +64,11 @@
                 <TheBaseTabInfo v-if="data && data.delayResults[0]" :info-to-show="data.delayResults[0]"
                                 :info-type="'shortResults'"/>
               </div>
+              <div v-if="data && data.relegationResults && data.relegationResults.length" class="overflow-x-auto">
+                <div class="bg-blue-50">Переходный матч</div>
+                <TheBaseTabInfo v-if="data && data.relegationResults[0]" :info-to-show="data.relegationResults[0]"
+                                :info-type="'shortResults'"/>
+              </div>
             <TheBaseTabInfo v-if="data && data.tourResults" :info-to-show="data.tourResults"
                             :info-type="'shortResults'"/>
             </ClientOnly>
@@ -88,8 +99,8 @@ const socket = ref<Socket>();
 const route = useRoute();
 
 const {data, pending, error} = await useLazyFetch<{
-  champ: IChamp, delayResults: ITourResult[],
-  tourResults: ITourResult, posts: IPost[], headLines: IPost[], players: IScorer
+  champ: IChamp, delayResults: ITourResult[], relegationResults: ITourResult[],
+  tourResults: ITourResult[], posts: IPost[], headLines: IPost[], players: IScorer
 }>('/api/champ', {
   params: {champ: route.params.champ, count: 35}, onResponseError({request, response, options}) {
     showError({
@@ -117,11 +128,14 @@ if (error.value) {
 async function refreshInfo() {
   try {
 
-    const {tourResults}  = await $fetch<{tourResults: ITourResult}>('/api/liveResults', {
+    const {tourResults, delayResults, relegationResults}  = await $fetch<{tourResults: ITourResult[],
+      delayResults: ITourResult[], relegationResults: ITourResult[]}>('/api/liveResults', {
       params: {champ: route.params.champ},
     });
 
     data.value!.tourResults = tourResults;
+    data.value!.delayResults = delayResults;
+    data.value!.relegationResults = relegationResults;
 
   } catch (e) {
     console.log(e);

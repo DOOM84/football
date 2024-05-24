@@ -18,6 +18,10 @@
                 <div class="bg-blue-50">Перенесенный матч</div>
                 <TheTabs  :tourResults="data.delayResults" :info-type="'shortResults'"/>
               </div>
+              <div v-if="data && data.relegationResults && data.relegationResults.length" class="overflow-x-auto">
+                <div class="bg-blue-50">Переходный матч</div>
+                <TheTabs  :tourResults="data.relegationResults" :info-type="'shortResults'"/>
+              </div>
               <div class="overflow-x-auto">
                 <TheTabs v-if="data && data.tourResults"
                          :tourResults="data.tourResults" :info-type="'shortResults'"/>
@@ -60,6 +64,10 @@
             <div class="bg-blue-50">Перенесенный матч</div>
             <TheTabs  :tourResults="data.delayResults" :info-type="'shortResults'"/>
           </div>
+          <div v-if="data && data.relegationResults && data.relegationResults.length" class="overflow-x-auto">
+            <div class="bg-blue-50">Переходный матч</div>
+            <TheTabs  :tourResults="data.relegationResults" :info-type="'shortResults'"/>
+          </div>
           <div class="overflow-x-auto">
             <TheTabs v-if="data && data.tourResults"
                      :tourResults="data.tourResults" :info-type="'shortResults'"/>
@@ -94,16 +102,18 @@ import { io, type Socket } from 'socket.io-client';
 const socket = ref<Socket>();
 
 const {data, pending} = await useLazyFetch<{
-  champs: IChamp[],
-  tourResults: ITourResult[], delayResults: ITourResult[],
-  ecupStands: IEcupStand[], posts: IPost[], headLines: IPost[], players: IScorer[]
+  champs: IChamp[];
+  tourResults: ITourResult[]; delayResults: ITourResult[]; relegationResults: ITourResult[];
+  ecupStands: IEcupStand[]; posts: IPost[]; headLines: IPost[]; players: IScorer[];
 }>('/api/main')
 
 async function refreshInfo() {
   try {
-    const {tourResults, delayResults} = await $fetch<{tourResults: ITourResult[], delayResults: ITourResult[]}>('/api/liveResults');
+    const {tourResults, delayResults, relegationResults} = await $fetch<{tourResults: ITourResult[],
+      delayResults: ITourResult[], relegationResults: ITourResult[]}>('/api/liveResults');
     data.value!.tourResults = tourResults;
     data.value!.delayResults = delayResults;
+    data.value!.relegationResults = relegationResults;
   } catch (e) {
     console.log(e);
   }

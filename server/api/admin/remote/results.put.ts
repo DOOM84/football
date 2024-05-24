@@ -41,7 +41,7 @@ export default defineEventHandler(async (event) => {
             results[i].team1 = +team1.id;
             results[i].team2 = +team2.id;
 
-            results[i].tour = !parseInt(results[i].tour) ? results[i-1].tour : results[i].tour;
+            results[i].tour = !parseInt(results[i].tour) ? 99 : results[i].tour;
 
             await prisma.result.upsert({
                 where: { api_id: +results[i].api_id },

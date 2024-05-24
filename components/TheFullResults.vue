@@ -2,7 +2,9 @@
     <template v-for="(dates, tour) in info">
     <thead>
     <tr>
-        <th colspan="6" class="text-center py-3 bg-zinc-800 text-zinc-100">{{ tour }}-й тур.</th>
+        <th colspan="6" class="text-center py-3 bg-zinc-800 text-zinc-100">
+          {{ parseInt(tour) !== 99 ? tour+'-й тур.' : 'Переходный матч'  }}
+        </th>
     </tr>
     </thead>
     <template v-for="(results, date, i) in sortObj(dates)">

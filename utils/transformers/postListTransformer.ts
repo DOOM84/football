@@ -1,7 +1,7 @@
 
 import type {IPost} from "~/types/interfaces";
 
-export default ((posts: IPost[]): Partial<IPost[]> => {
+export default ((posts: IPost[]): IPost[] => {
 
     if(!Array.isArray(posts)){return []}
 
@@ -15,6 +15,6 @@ export default ((posts: IPost[]): Partial<IPost[]> => {
            date: parseInt(post.date as unknown as string)
        }
 
-   }) as Partial<IPost[]>
+   }) as IPost[];
 
 })

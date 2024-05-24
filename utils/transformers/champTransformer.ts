@@ -1,13 +1,25 @@
 import groupBy from "~/helpers/groupBy";
 import type {IChamp, IResult, ITourResult} from "~/types/interfaces";
-type champSrc = 'tour' | 'results';
+type champSrc = 'tour' | 'results' | 'relegation' | 'delay';
 
-export default ((champs: IChamp[], source = 'tour'): ITourResult[] => {
+export default ((champs: IChamp[], source = 'tour', isRelegation: boolean = false): ITourResult[] => {
    return  champs.map(champ => {
 
-       if(source === 'results'){
-           champ[source] = champ[source].filter((r: IResult) => +r.tour < +champ.current_tour)
+       if(source !== 'tour'){
+           if(isRelegation){
+               champ[source as champSrc] = champ.results!.filter((r: IResult) => +r.tour === 99);
+           }else{
+               champ[source as champSrc] = champ.results!.filter((r: IResult) => +r.tour < +champ.current_tour);
+           }
        }
+
+       /*if(source === 'results'){
+           if(isRelegation){
+               champ[source] = champ[source].filter((r: IResult) => +r.tour === 99);
+           }else{
+               champ[source] = champ[source].filter((r: IResult) => +r.tour < +champ.current_tour);
+           }
+       }*/
 
        (champ[source as champSrc] as IResult[]).map((tour: IResult) => {
 
@@ -43,11 +55,14 @@ export default ((champs: IChamp[], source = 'tour'): ITourResult[] => {
                slug: champ.slug
            },
            tour: {
-               scores: groupBy(champ[source as champSrc], 'date'),
+               scores: groupBy(champ[source as champSrc]!, 'date'),
                num: champ.current_tour
            }
        }
-       delete champ[source as champSrc]
+       if(isRelegation) {
+           delete champ[source as champSrc];
+           delete champ.results;
+       }
        return res
 
    }) as ITourResult[]

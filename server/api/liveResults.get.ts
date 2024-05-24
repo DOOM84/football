@@ -1,6 +1,6 @@
 import prisma from '~/helpers/prisma';
 import champTransformer from "~/utils/transformers/champTransformer";
-import {IChampDB, IScore, ITour} from "~/types/interfaces";
+import {IChampDB, IScore, ITour, type ITourResult} from "~/types/interfaces";
 import singleChampTransformer from "~/utils/transformers/singleChampTransformer";
 import singleEcupResultsTransformer from "~/utils/transformers/singleEcupResultsTransformer";
 import moment from "moment";
@@ -132,10 +132,13 @@ export default defineEventHandler(async (event) => {
 
         const tourResults: ITour[]  = champTransformer(champs as unknown as IChampDB[]);
 
-        const delayResults: ITour[]  = champTransformer(champs as unknown as IChampDB[], 'results')
+        const delayResults: ITourResult[]  = champTransformer(champs, 'delay')
             .filter(champ => Object.keys(champ.tour!.scores).length);
 
-        return {tourResults, delayResults};
+        const relegationResults: ITourResult[]  = champTransformer(champs, 'relegation', true)
+            .filter(champ => Object.keys(champ.tour!.scores).length);
+
+        return {tourResults, delayResults, relegationResults};
 
     }catch (e) {
         console.log(e);

@@ -31,7 +31,7 @@
             <thead>
             <tr>
                 <th colspan="6" class="center py-[0.7rem] bg-zinc-100">
-                  {{ infoToShow?.tour.scores[date][0]['tour'] }}-й тур. {{ $resultDate(+date) }}
+                  {{ infoToShow?.tour.scores[date][0]['tour'] !== 99 ? infoToShow?.tour.scores[date][0]['tour']+'-й тур.' : ''  }} {{ $resultDate(+date) }}
                 </th>
             </tr>
             </thead>

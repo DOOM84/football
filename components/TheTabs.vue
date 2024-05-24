@@ -12,7 +12,7 @@
                 </div>
                 <div v-else-if="infoType === 'shortResults'" v-for="(champ, i) in tourResults"
                      :key="infoType + ' ' + champ.champ.name" @click.prevent="showInfo($event, i)"
-                     class="cursor-pointer underline-offset-4 text-[14px] font-semibold">
+                     class="cursor-pointer underline-offset-4 text-[14px] font-semibold whitespace-nowrap">
                     {{ champ.champ.name }}
                 </div>
                 <div v-else-if="infoType === 'scorers'" v-for="(champ, i) in scorers"
