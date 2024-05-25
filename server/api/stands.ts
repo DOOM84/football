@@ -1,5 +1,5 @@
 import prisma from '~/helpers/prisma';
-import {IPost, ISmallPost} from "~/types/interfaces";
+import {IChamp, IPost} from "~/types/interfaces";
 import postListTransformer from "~/utils/transformers/postListTransformer";
 
 export default defineEventHandler(async (event) => {
@@ -45,7 +45,7 @@ export default defineEventHandler(async (event) => {
                     }
                 }
             },
-        })
+        }) as unknown as IChamp;
 
         if(!champ){
             throw createError({
@@ -54,7 +54,7 @@ export default defineEventHandler(async (event) => {
             })
         }
 
-        const posts: ISmallPost[]  = postListTransformer(champ?.posts as unknown as IPost[]);
+        const posts: IPost[]  = postListTransformer(champ.posts);
 
         return {posts, teams: champ.teams, champ: champ.name};
 

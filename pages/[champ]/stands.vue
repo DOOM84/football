@@ -28,14 +28,14 @@
 </template>
 
 <script setup lang="ts">
-import type {ISmallPost, ITeamInfo} from "~/types/interfaces";
+import type {IPost, ITeam} from "~/types/interfaces";
 import { io, type Socket } from 'socket.io-client';
 
 const socket = ref<Socket>();
 const route = useRoute();
 
-const {data, pending, error, refresh} =  await useLazyFetch<{ teams: ITeamInfo[],
-  posts: ISmallPost[], champ: string
+const {data, pending, error, refresh} =  await useLazyFetch<{ teams: ITeam[];
+  posts: IPost[]; champ: string;
 }>('/api/stands', {params: {champ: route.params.champ}, onResponseError({request, response, options}) {
     showError({
       fatal: true,
@@ -52,7 +52,7 @@ if (error.value) {
   })
 }
 
-const showStands = ref(true)
+const showStands = ref<boolean>(true);
 
 const title = computed(()=> 'Новости европейского футбола - Турнирные таблицы - ' + data.value?.champ)
 
@@ -64,7 +64,7 @@ const teams = computed(()=>{
   return data.value!.teams
 })
 
-async function loadSeason(res: ITeamInfo[]) {
+async function loadSeason(res: ITeam[]) {
   showStands.value = false;
   await new Promise(resolve => setTimeout(resolve, 100));
   data.value!.teams = [...res];

@@ -1,5 +1,5 @@
 import prisma from '~/helpers/prisma';
-import {IError, ITeamInfo} from "~/types/interfaces";
+import {IEcupTeam, IError, ITeam} from "~/types/interfaces";
 import {matchInfo, matchSquads} from "~/helpers/remoteApi";
 import groupBy from "~/helpers/groupBy";
 
@@ -19,6 +19,11 @@ export default defineEventHandler(async (event) => {
             }
         })
 
+        const tourChamp =  await prisma.tour.findFirst({
+            where: {
+                api_id: +updated.api_id
+            }
+        })
 
         const ecupChamp =  await prisma.ecupResult.findFirst({
             where: {
@@ -27,7 +32,7 @@ export default defineEventHandler(async (event) => {
         })
 
 
-        if(!isFinishedOrLive((resChamp?.stamp || ecupChamp?.stamp) as unknown as number)){
+        if(!isFinishedOrLive((tourChamp?.stamp || resChamp?.stamp || ecupChamp?.stamp) as unknown as number)){
 
             if(updated.is_info){
                 await prisma.matchInfo.upsert({
@@ -62,14 +67,17 @@ export default defineEventHandler(async (event) => {
                     where: {
                         api_id: resChamp.api_id as any,
                     },
-                    data: {is_info: updated.is_info} //JSON.parse(JSON.stringify(updated))
+                    data: {is_info: updated.is_info,
+                        stamp: tourChamp?.stamp || undefined,
+                        date: tourChamp?.date || undefined,
+                    } //JSON.parse(JSON.stringify(updated))
                 });
 
-                const tourChamp =  await prisma.tour.findFirst({
+                /*const tourChamp =  await prisma.tour.findFirst({
                     where: {
                         api_id: resChamp.api_id
                     }
-                })
+                })*/
 
                 if(tourChamp){
                     await prisma.tour.update({
@@ -138,20 +146,22 @@ export default defineEventHandler(async (event) => {
                         id: resChamp.team1 as unknown as number,
                     },
                     select: {api_id: true}
-                })  as unknown as ITeamInfo
+                })  as unknown as ITeam
 
                 const awayTeam = await prisma.team.findFirst({
                     where: {
                         id: resChamp.team2 as unknown as number,
                     },
                     select: {api_id: true}
-                }) as unknown as ITeamInfo;
+                }) as unknown as ITeam;
 
                 await prisma.result.update({
                     where: {
                         api_id: resChamp.api_id as unknown as number,
                     },
                     data: {
+                        stamp: tourChamp?.stamp || undefined,
+                        date: tourChamp?.date || undefined,
                         is_info: updated.is_info,
                         res1: goals && updated.is_info ? (homeTeam?.api_id && Array.isArray(goals![homeTeam.api_id]) ? goals![homeTeam.api_id].length : 0) : 0,
                         res2: goals && updated.is_info ? (awayTeam?.api_id && Array.isArray(goals![awayTeam.api_id]) ? goals![awayTeam.api_id].length : 0) : 0,
@@ -162,15 +172,18 @@ export default defineEventHandler(async (event) => {
                     where: {
                         api_id: resChamp.api_id as any,
                     },
-                    data: {is_info: updated.is_info} //JSON.parse(JSON.stringify(updated))
+                    data: {is_info: updated.is_info,
+                        stamp: tourChamp?.stamp || undefined,
+                        date: tourChamp?.date || undefined,
+                    } //JSON.parse(JSON.stringify(updated))
                 });
             }
 
-            const tourChamp =  await prisma.tour.findFirst({
+            /*const tourChamp =  await prisma.tour.findFirst({
                 where: {
                     api_id: resChamp.api_id
                 }
-            })
+            })*/
 
             if(tourChamp){
                 if(updated.is_info){
@@ -179,14 +192,14 @@ export default defineEventHandler(async (event) => {
                             id: tourChamp.team1 || resChamp.team1  as unknown as number,
                         },
                         select: {api_id: true}
-                    })  as unknown as ITeamInfo
+                    })  as unknown as ITeam
 
                     const awayTeam = await prisma.team.findFirst({
                         where: {
                             id: tourChamp.team2 || resChamp.team2  as unknown as number,
                         },
                         select: {api_id: true}
-                    }) as unknown as ITeamInfo;
+                    }) as unknown as ITeam;
 
                     await prisma.tour.update({
                         where: {
@@ -219,14 +232,14 @@ export default defineEventHandler(async (event) => {
                         id: ecupChamp.team1 as unknown as number,
                     },
                     select: {api_id: true}
-                })  as unknown as ITeamInfo
+                })  as unknown as IEcupTeam
 
                 const awayTeam = await prisma.ecupTeam.findFirst({
                     where: {
                         id: ecupChamp.team2 as unknown as number,
                     },
                     select: {api_id: true}
-                }) as unknown as ITeamInfo;
+                }) as unknown as IEcupTeam;
 
                 await prisma.ecupResult.update({
                     where: {
@@ -277,9 +290,7 @@ function getPeriod(gameStamp: number){
 function isFinishedOrLive(gameStamp: number){
     return Number(gameStamp) < Math.round(Date.now() / 1000)
 }
-
-
-function getGoals(info: any[] | null): Record<any, any[]> | null{
+function getGoals(info:  any[] | null): Record<any, any[]> | null{
 
     if(!info){
         return null;
@@ -298,9 +309,9 @@ function getGoals(info: any[] | null): Record<any, any[]> | null{
         res = groupBy(goalsOnly.map(goal => {
             goal.teamId = goal.team.id;
             return goal;
-        }), 'teamId') as Record<any, any> ;
+        }), 'teamId') as Record<any, any[]> ;
     }else{
-        return null
+        return null;
     }
-    return res as Record<any, any>;
+    return res;
 }

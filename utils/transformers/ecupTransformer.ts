@@ -1,6 +1,6 @@
 import groupBy from "~/helpers/groupBy";
 import type {IEcup, IEcupStand} from "~/types/interfaces";
-type ecStands = {[index: string] : IEcup['stands']};
+type ecStands = {[index: IEcup['stands'][0]['group']] : IEcup['stands']};
 
 export default ((ecups: IEcup[]): IEcupStand[] => {
    return  ecups.map((ecup: Partial<IEcup>) => {

@@ -1,16 +1,15 @@
 import groupBy from "~/helpers/groupBy";
-import type {IScore} from "~/types/interfaces";
-import {result} from "~/types/types";
+import type {IResult} from "~/types/interfaces";
 
-export default ((results: IScore[]): result => {
+export default ((results: IResult[]): {[index: number]: {[index: number]: Partial<IResult>[]}} => {
 
-    const groupedByTour: Record<string | number, Record<string | number, IScore[]>> = groupBy(results, 'tour');
+    const groupedByTour: {[index: IResult['tour']]: IResult[]} = groupBy(results, 'tour');
 
     for (const tour in groupedByTour) {
-        groupedByTour[tour] = groupBy(groupedByTour[tour] as unknown as IScore[], 'date');
+        (groupedByTour[tour] as unknown as {[index: IResult['date']]: IResult[]}) = groupBy(groupedByTour[tour], 'date') as {[index: IResult['date']]: IResult[]};
 
         for (const date in groupedByTour[tour]) {
-            groupedByTour[tour][date] = groupedByTour[tour][date].map((res: IScore) => {
+            (groupedByTour[tour][date] as unknown as Partial<IResult>[]) = (groupedByTour[tour][date] as unknown as IResult[]).map((res) => {
                 return {
                     away: res.away,
                     date: res.date,
@@ -19,20 +18,20 @@ export default ((results: IScore[]): result => {
                     tour: res.tour,
                     api_id: res.api_id,
                     is_info: res.is_info,
-                    info: getGoals(res.info?.info || null),
+                    info: getGoals((res.info?.info as any[]) || null),
                     time: res.time,
                     res1: res.res1,
                     res2: res.res2,
                     champ: res.champ,
                 }
-            })
+            }) as unknown as Partial<IResult>[]
         }
     }
-    return groupedByTour;
+    return groupedByTour as unknown as {[index: number]: {[index: number]: Partial<IResult>[]}} ;
 
 })
 
-function getGoals(info: any[] | null): Record<any, any> | null{
+function getGoals(info:  any[] | null): Record<any, any[]> | null{
 
     if(!info){
         return null;
@@ -51,9 +50,9 @@ function getGoals(info: any[] | null): Record<any, any> | null{
         res = groupBy(goalsOnly.map(goal => {
             goal.teamId = goal.team.id;
             return goal;
-        }), 'teamId') as Record<any, any> ;
+        }), 'teamId') as Record<any, any[]> ;
     }else{
-        return null
+        return null;
     }
-    return res as Record<any, any>;
+    return res;
 }

@@ -30,8 +30,7 @@
 </template>
 
 <script setup lang="ts">
-import type {IPost} from "~/types/interfaces";
-import type {result} from "~/types/types";
+import type {IChamp, IPost, IResult} from "~/types/interfaces";
 import { io, type Socket } from 'socket.io-client';
 
 const socket = ref<Socket>();
@@ -42,7 +41,9 @@ const season = ref<string>('');
 
 provide('season', season);
 
-const {data, pending, error, refresh} =  await useLazyFetch<{champ: string; results: result; posts: IPost[],
+const {data, pending, error, refresh} =  await useLazyFetch<{champ: IChamp;
+  results: {[index: number]: {[index: number]: Partial<IResult>[]}};
+  posts: IPost[];
 }>('/api/calendar', {params: {champ: route.params.champ}, onResponseError({request, response, options}) {
     showError({
       fatal: true,
@@ -64,7 +65,7 @@ function resetSeason(){
   refresh();
 }
 
-function loadSeason(res: result, seas: string): void {
+function loadSeason(res: {[index: number]: {[index: number]: Partial<IResult>[]}}, seas: string): void {
 
   try {
 
