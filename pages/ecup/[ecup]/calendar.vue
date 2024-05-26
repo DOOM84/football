@@ -31,14 +31,24 @@
 
 <script setup lang="ts">
 
-import type {IEcupDB, IScore, ISmallPost} from "~/types/interfaces";
+import type {IEcup, IEcupResult, IPost} from "~/types/interfaces";
 import { io, type Socket } from 'socket.io-client';
 
 const socket = ref<Socket>();
 const route = useRoute();
 
-const {data, pending, error, refresh} = await useLazyFetch<{ ecup: IEcupDB; posts: ISmallPost[];
-  groupResults:  IScore[]; poResults: IScore[];
+const {data, pending, error, refresh} = await useLazyFetch<{ ecup: IEcup; posts: IPost[];
+  groupResults: {[index: string]: {
+      [index: number]: {
+        [index: number]: Partial<IEcupResult>[]
+      }
+    }};
+  poResults: {
+    stage: string,
+    scores: {
+      [index: number]: Partial<IEcupResult>[]
+    }
+  }[];
 }>('/api/ecupCalendar', {params: {ecup: route.params.ecup}, onResponseError({request, response, options}) {
     showError({
       fatal: true,

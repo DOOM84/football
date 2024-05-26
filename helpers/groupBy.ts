@@ -1,4 +1,4 @@
-export default (data: Record<string, any>[], property: string): {} => {
+export default (data: Record<string | number, any>[], property: string): {} => {
     return data.reduce((acc, obj) => {
         const key = obj[property];
         if (!acc[key]) {

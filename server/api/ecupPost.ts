@@ -1,9 +1,9 @@
 import prisma from '~/helpers/prisma';
-import {IEcupDB, IEcupStands, IPost, IScore, ISmallPost, } from "~/types/interfaces";
+import {IEcup, IEcupStand, IPost, } from "~/types/interfaces";
 import postTransformer from "~/utils/transformers/postTransformer";
 import postListTransformer from "~/utils/transformers/postListTransformer";
 import singleEcupResultsTransformer from "~/utils/transformers/singleEcupResultsTransformer";
-import singleEcupTransformer from "~/utils/transformers/singleEcupTransformer";
+import ecupTransformer from "~/utils/transformers/ecupTransformer";
 
 export default defineEventHandler(async (event) => {
     try {
@@ -67,7 +67,7 @@ export default defineEventHandler(async (event) => {
                     }
                 },
             },
-        })
+        }) as unknown as IEcup;
 
         if(!ecup){
             throw createError({
@@ -107,7 +107,7 @@ export default defineEventHandler(async (event) => {
                     }
                 },
             },
-        })
+        }) as unknown as IPost;
 
         if(!postDb){
             throw createError({
@@ -115,14 +115,14 @@ export default defineEventHandler(async (event) => {
                 message: 'Страница не найдена',
             })
         }
-        const posts: ISmallPost[] = postListTransformer(ecup.posts as unknown as IPost[]);
+        const posts: IPost[] = postListTransformer(ecup.posts);
 
         const {groupResults, poResults} =
-            singleEcupResultsTransformer(ecup.results as unknown as IScore[]);
+            singleEcupResultsTransformer(ecup.results);
 
-        const ecupStands: IEcupStands = singleEcupTransformer(ecup as unknown as IEcupDB);
+        const ecupStands: IEcupStand = ecupTransformer(ecup);
 
-        const post: Partial<IPost> = postTransformer(postDb as unknown as Partial<IPost>);
+        const post: Partial<IPost> = postTransformer(postDb);
 
         return {ecup: {name: ecup.name, slug: ecup.slug, id: ecup.id}, post, posts, ecupStands, groupResults, poResults};
 

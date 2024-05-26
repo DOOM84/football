@@ -44,13 +44,16 @@
 
 <script setup lang="ts">
 
-import type {IEcupDB, IEcupStands, ISmallPost} from "~/types/interfaces";
+import type {IEcup, IEcupStand, IPost} from "~/types/interfaces";
 import { io, type Socket } from 'socket.io-client';
 
 const socket = ref<Socket>();
 const route = useRoute();
 
-const {data, pending, error, refresh} = await useLazyFetch<{ ecup: IEcupDB; posts: ISmallPost[]; ecupStands: IEcupStands;
+const {data, pending, error, refresh} = await useLazyFetch<{
+  ecup: IEcup;
+  posts: IPost[];
+  ecupStands: IEcupStand;
 }>('/api/ecupStands', {params: {ecup: route.params.ecup}, onResponseError({request, response, options}) {
     showError({
       fatal: true,
@@ -73,7 +76,7 @@ useSeoMeta({
   title: () => title.value,
 });
 
-function loadSeason(res: IEcupStands): void {
+function loadSeason(res: IEcupStand): void {
 
   try {
 
@@ -84,7 +87,6 @@ function loadSeason(res: IEcupStands): void {
     //console.log(e);
 
   }
-
 }
 
 

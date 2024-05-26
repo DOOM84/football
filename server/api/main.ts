@@ -143,7 +143,7 @@ export default defineEventHandler(async (event) => {
             },
         }) as unknown as IChamp[];
 
-        const ecupStands: IEcupStand[] = ecupTransformer(ecups);
+        const ecupStands = ecups.map(ecup=> ecupTransformer(ecup));
 
         const tourResults: ITourResult[] = champTransformer(champs);
 

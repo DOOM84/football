@@ -38,7 +38,7 @@
 </template>
 
 <script setup lang="ts">
-import type {IComment, IEcupDB, IEcupStands, IPost, IScore, ISmallPost} from "~/types/interfaces";
+import type {IComment, IEcup, IEcupResult, IEcupStand, IPost} from "~/types/interfaces";
 import { io, type Socket } from 'socket.io-client';
 const socket = ref<Socket>();
 const route = useRoute();
@@ -48,8 +48,19 @@ const del = ref<(toDel: number) => void>();
 const cCount = ref<number>();
 
 const {data, pending, error} = await useLazyFetch<{
-  post: IPost, ecup: IEcupDB; posts: ISmallPost[];
-  groupResults:  Record<string | number, any>; poResults: IScore[]; ecupStands: IEcupStands;
+  post: IPost, ecup: IEcup; posts: IPost[];
+  groupResults: {[index: string]: {
+      [index: number]: {
+        [index: number]: Partial<IEcupResult>[]
+      }
+    }};
+  poResults: {
+    stage: string,
+    scores: {
+      [index: number]: Partial<IEcupResult>[]
+    }
+  }[];
+  ecupStands: IEcupStand;
 }>('/api/ecupPost', {params: {ecup: route.params.ecup,  slug: route.params.post},
   onResponseError({request, response, options}) {
     showError({

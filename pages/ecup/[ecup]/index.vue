@@ -59,15 +59,26 @@
 </template>
 
 <script setup lang="ts">
-import type {IEcupDB, IEcupStands, IScore, ISmallPost, ITour} from "~/types/interfaces";
+import type {IEcup, IEcupResult, IEcupStand, IPost} from "~/types/interfaces";
 import { io, type Socket } from 'socket.io-client';
 
 const socket = ref<Socket>();
 const route = useRoute();
 
 const {data, pending, error} = await useLazyFetch<{
-  ecup: IEcupDB; posts: ISmallPost[]; headLines: ISmallPost[];
-  ecupStands: IEcupStands; groupResults: Record<string | number, any>; poResults: IScore[];
+  ecup: IEcup; posts: IPost[]; headLines: IPost[];
+  ecupStands: IEcupStand;
+  groupResults: {[index: string]: {
+      [index: number]: {
+        [index: number]: Partial<IEcupResult>[]
+      }
+    }};
+  poResults: {
+    stage: string,
+    scores: {
+      [index: number]: Partial<IEcupResult>[]
+    }
+  }[];
 }>('/api/ecup', {
   params: {ecup: route.params.ecup, count: 35}, onResponseError({request, response, options}) {
     showError({
@@ -92,25 +103,35 @@ useSeoMeta({
   title: () => title.value,
 });
 
-function addPosts(loadedPosts: ISmallPost[]): void {
+function addPosts(loadedPosts: IPost[]): void {
   data.value?.posts.push(...loadedPosts)
 }
 
 async function refreshInfo() {
   try {
 
-    const {groupResults, poResults}  = await $fetch<{ groupResults: Record<string | number, any>; poResults: IScore[];
+    const {groupResults, poResults}  = await $fetch<{
+      groupResults: {[index: string]: {
+          [index: number]: {
+            [index: number]: Partial<IEcupResult>[]
+          }
+        }};
+      poResults: {
+        stage: string,
+        scores: {
+          [index: number]: Partial<IEcupResult>[]
+        }
+      }[];
     }>('/api/liveResults', {
       params: {ecup: route.params.ecup},
     });
 
-    data.value!.groupResults = groupResults as Record<string | number, any>;
-    data.value!.poResults = poResults as IScore[];
+    data.value!.groupResults = groupResults;
+    data.value!.poResults = poResults;
 
   } catch (e) {
     console.log(e);
   }
-
 }
 
 onMounted(() => {

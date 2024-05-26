@@ -1,8 +1,8 @@
 import prisma from '~/helpers/prisma';
-import {IEcupDB, IEcupStands, IPost, IScore, ISmallPost} from "~/types/interfaces";
+import {IEcup, IPost} from "~/types/interfaces";
 import postListTransformer from "~/utils/transformers/postListTransformer";
-import singleEcupTransformer from "~/utils/transformers/singleEcupTransformer";
 import singleEcupResultsTransformer from "~/utils/transformers/singleEcupResultsTransformer";
+import ecupTransformer from "~/utils/transformers/ecupTransformer";
 
 export default defineEventHandler(async (event) => {
 
@@ -72,7 +72,7 @@ export default defineEventHandler(async (event) => {
                 }
             },
 
-        })
+        }) as unknown as IEcup;
 
         if(!ecup){
             throw createError({
@@ -94,16 +94,16 @@ export default defineEventHandler(async (event) => {
                 ecup: true,
             },
             take: 4
-        })
+        }) as unknown as IPost[];
 
-        const posts: ISmallPost[] = postListTransformer(ecup?.posts as unknown as IPost[]);
+        const posts = postListTransformer(ecup?.posts);
 
-        const headLines: ISmallPost[] = postListTransformer(headLinesDb as unknown as IPost[]);
+        const headLines = postListTransformer(headLinesDb);
 
-        const ecupStands: IEcupStands = singleEcupTransformer(ecup as unknown as IEcupDB);
+        const ecupStands = ecupTransformer(ecup);
 
         const {groupResults, poResults} =
-            singleEcupResultsTransformer(ecup.results as unknown as IScore[]);
+            singleEcupResultsTransformer(ecup.results);
 
         return {ecup: {name: ecup.name, slug: ecup.slug, id: ecup.id}, posts, headLines, ecupStands, groupResults, poResults};
 

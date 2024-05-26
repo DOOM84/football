@@ -225,7 +225,8 @@ export interface IEcupResult {
     group: string;
     stage: string;
     order: number;
-    info: IMatchInfo
+    info: IMatchInfo;
+    scores: {[index: number]: Partial<IEcupResult>[]};
 }
 
 export interface ICountry {

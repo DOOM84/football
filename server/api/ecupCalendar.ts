@@ -1,5 +1,5 @@
 import prisma from '~/helpers/prisma';
-import {IPost, IScore, ISmallPost} from "~/types/interfaces";
+import {IEcup, IPost} from "~/types/interfaces";
 import postListTransformer from "~/utils/transformers/postListTransformer";
 import singleEcupResultsTransformer from "~/utils/transformers/singleEcupResultsTransformer";
 
@@ -59,7 +59,7 @@ export default defineEventHandler(async (event) => {
                 },
             },
 
-        })
+        }) as unknown as IEcup;
 
         if (!ecup) {
             throw createError({
@@ -68,10 +68,10 @@ export default defineEventHandler(async (event) => {
             })
         }
 
-        const posts: ISmallPost[] = postListTransformer(ecup?.posts as unknown as IPost[]);
+        const posts: IPost[] = postListTransformer(ecup?.posts as unknown as IPost[]);
 
         const {groupResults, poResults} =
-            singleEcupResultsTransformer(ecup.results as unknown as IScore[]);
+            singleEcupResultsTransformer(ecup.results);
 
         return {ecup: {name: ecup.name, slug: ecup.slug, id: ecup.id}, posts, groupResults, poResults};
 

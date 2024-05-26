@@ -3,7 +3,7 @@ import {IScore} from "~/types/interfaces";
 
 import calendarTransformer from "~/utils/transformers/calendarTransformer";
 import singleEcupResultsTransformer from "~/utils/transformers/singleEcupResultsTransformer";
-import singleEcupTransformer from "~/utils/transformers/singleEcupTransformer";
+import ecupTransformer from "~/utils/transformers/ecupTransformer";
 
 export default defineEventHandler(async (event) => {
 
@@ -104,7 +104,7 @@ export default defineEventHandler(async (event) => {
             for (let i = 0; i < DBstands.length; i++) {
                 DBstands[i].ecupTeam = teams.filter(team => team.id === DBstands[i].team_id)[0]
             }
-            return  singleEcupTransformer({stands: DBstands});
+            return  ecupTransformer({stands: DBstands});
         }
 
     }catch (e) {
