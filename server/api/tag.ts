@@ -1,5 +1,5 @@
 import prisma from '~/helpers/prisma';
-import {IPost, ISmallPost} from "~/types/interfaces";
+import type {ITag} from "~/types/interfaces";
 import postListTransformer from "~/utils/transformers/postListTransformer";
 
 export default defineEventHandler(async (event) => {
@@ -28,7 +28,7 @@ export default defineEventHandler(async (event) => {
                     }
                 },
             }
-        })
+        }) as unknown as ITag
 
         if(!tag){
             throw createError({
@@ -37,8 +37,8 @@ export default defineEventHandler(async (event) => {
             })
         }
 
-        const posts: ISmallPost[]  = postListTransformer(tag?.posts.map(post => post.post)
-            .filter(post => post.status) as unknown as IPost[])
+        const posts  = postListTransformer(tag?.posts.map(post => post.post)
+            .filter(post => post.status))
 
 
         return {tag: {id: tag.id, name: tag.name, slug: tag.slug}, posts};

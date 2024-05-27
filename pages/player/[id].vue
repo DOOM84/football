@@ -91,11 +91,14 @@
 </template>
 
 <script setup lang="ts">
-import type {IChampDB, IPlayer, ISmallPost} from "~/types/interfaces";
+import type {IChamp, IPlayer, IPost} from "~/types/interfaces";
 
 const route = useRoute();
 
-const {data, pending, error} = await useLazyFetch<{ player: Partial<IPlayer>; champ:IChampDB; posts: ISmallPost[];
+const {data, pending, error} = await useLazyFetch<{
+  player: IPlayer;
+  champ:IChamp;
+  posts: IPost[];
 }>('/api/player', {params: {slug: route.params.id}, onResponseError({request, response, options}) {
     showError({
       fatal: true,
@@ -118,7 +121,7 @@ useSeoMeta({
   title: () => title.value,
 });
 
-function addPosts(loadedPosts: ISmallPost[]): void {
+function addPosts(loadedPosts: IPost[]): void {
   data.value?.posts.push(...loadedPosts)
 }
 

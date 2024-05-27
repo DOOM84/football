@@ -142,7 +142,7 @@
 </template>
 
 <script lang="ts" setup>
-import type {IError, ITeamInfo} from "~/types/interfaces";
+import type {IError, IEcupTeam, ITeam} from "~/types/interfaces";
 import useFilter from "~/helpers/useFilter";
 import Multiselect from '@vueform/multiselect';
 
@@ -151,8 +151,8 @@ definePageMeta({
   middleware: ['admin']
 })
 
-const {data, pending} = useLazyFetch<{ecupTeams: Partial<ITeamInfo>[],
-  teams: Partial<ITeamInfo>[]}>('/api/admin/ecupTeams')
+const {data, pending} = useLazyFetch<{ecupTeams: Partial<IEcupTeam>[],
+  teams: Partial<ITeam>[]}>('/api/admin/ecupTeams')
 
 useHead({
   titleTemplate: '%s - Команды (Еврокубки)'
@@ -160,7 +160,7 @@ useHead({
 
 const {filtering, toFilter, showDlg, mode, filter} = useFilter();
 
-const initTeamData: Partial<ITeamInfo> = {name: '', slug: ''};
+const initTeamData: Partial<IEcupTeam> = {name: ''};
 
 const ecupTeamToUpdate = ref<typeof initTeamData>({});
 
@@ -172,21 +172,20 @@ function closeModal(): void {
   mode.value = null;
 }
 
-function teamChanged(team: any) {
-
+function teamChanged(team: number) {
   if (!team) {
-    ecupTeamToUpdate.value.team = {...initTeamData};
+    (ecupTeamToUpdate.value.team as Partial<ITeam>) = {...initTeamData, slug: ''} as Partial<ITeam>;
     ecupTeamToUpdate.value.team_id = null;
     ecupTeamToUpdate.value.api_id = null;
     return
   }
 
-  ecupTeamToUpdate.value.team = {...data.value?.teams[data.value.teams.findIndex(tm => tm.id === team)]}
+  (ecupTeamToUpdate.value.team as Partial<ITeam>) = {...data.value?.teams[data.value.teams.findIndex(tm => tm.id === team)]}
   ecupTeamToUpdate.value.team_id = team;
-  ecupTeamToUpdate.value.api_id = ecupTeamToUpdate.value.team.api_id;
+  ecupTeamToUpdate.value.api_id = ecupTeamToUpdate.value!.team!.api_id;
 }
 
-async function updateItem(ecupTeam: ITeamInfo) {
+async function updateItem(ecupTeam: IEcupTeam) {
   mode.value = 'edit';
 
   ecupTeamToUpdate.value = JSON.parse(JSON.stringify(ecupTeam));
@@ -216,18 +215,18 @@ async function storeItem(): Promise<void> {
     }
 
     if (mode.value === 'edit') {
-      const {result} = await $fetch<{ result: ITeamInfo }>('/api/admin/ecupTeams/edit', {
+      const {result} = await $fetch<{ result: IEcupTeam }>('/api/admin/ecupTeams/edit', {
         method: 'PUT',
         body: ecupTeamToDb,
       })
-      const ind: number = data.value?.ecupTeams.findIndex((team: Partial<ITeamInfo>) => team.id === ecupTeamToUpdate.value.id) as number;
+      const ind: number = data.value?.ecupTeams.findIndex((team: Partial<IEcupTeam>) => team.id === ecupTeamToUpdate.value.id) as number;
 
       if(data.value){
         data.value.ecupTeams[ind] = {...ecupTeamToUpdate.value};
       }
 
     } else if (mode.value === 'add') {
-      const {result} = await $fetch<{ result: Partial<ITeamInfo> }>('/api/admin/ecupTeams/add', {
+      const {result} = await $fetch<{ result: Partial<IEcupTeam> }>('/api/admin/ecupTeams/add', {
         method: 'POST',
         body: ecupTeamToDb,
       })

@@ -1,5 +1,5 @@
 import prisma from '~/helpers/prisma';
-import {IPlayer, IPost, ISmallPost} from "~/types/interfaces";
+import {IChamp, IPlayer} from "~/types/interfaces";
 import postListTransformer from "~/utils/transformers/postListTransformer";
 import singlePlayerTransformer from "~/utils/transformers/singlePlayerTransformer";
 
@@ -36,7 +36,7 @@ export default defineEventHandler(async (event) => {
                     take: 10
                 },
             }
-        })
+        }) as unknown as IPlayer;
 
         if(!playerDb){
             throw createError({
@@ -64,12 +64,12 @@ export default defineEventHandler(async (event) => {
                     }
                 }
             },
-        })
+        }) as unknown as IChamp;
 
-        const posts: ISmallPost[]  = postListTransformer(playerDb?.posts.map(post => post.post)
-            .filter(post => post.status) as unknown as IPost[])
+        const posts  = postListTransformer(playerDb?.posts.map(post => post.post)
+            .filter(post => post.status));
 
-        const player: any = singlePlayerTransformer(playerDb as unknown as IPlayer["player"]);
+        const player = singlePlayerTransformer(playerDb);
 
         return {player, champ, posts};
 

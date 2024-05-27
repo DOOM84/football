@@ -132,7 +132,7 @@
 </template>
 <script lang="ts" setup>
 import Multiselect from '@vueform/multiselect';
-import type {IChampDB, IEcupDB, IError} from "~/types/interfaces";
+import type {IChamp, IEcup, IError} from "~/types/interfaces";
 import { io, type Socket } from 'socket.io-client';
 
 
@@ -147,13 +147,11 @@ useHead({
 
 const socket = ref<Socket>();
 
-const router = useRouter();
-
-const champ = ref<IChampDB>();
+const champ = ref<IChamp>();
 
 const showLoading = ref<boolean>(false);
 
-const ecup = ref<IEcupDB>();
+const ecup = ref<IEcup>();
 
 const tUpdate = ref<ReturnType<typeof setInterval>>();
 
@@ -165,8 +163,10 @@ const intervalEcupUpdate = ref<boolean>(false);
 
 const prevTourDelete = ref<boolean>(false);
 
-const {data, pending} = useLazyFetch<{ecups: Partial<IEcupDB>[],
-  champs: Partial<IChampDB>[]}>('/api/admin/remote')
+const {data, pending} = useLazyFetch<{
+  ecups: IEcup[];
+  champs: IChamp[];
+}>('/api/admin/remote')
 
 
 watch(intervalUpdate, () => {
@@ -204,12 +204,12 @@ watch(intervalEcupUpdate, () => {
 })
 
 
-function champChanged(chmp: IChampDB): void{
+function champChanged(chmp: IChamp): void{
   champ.value = {...chmp}
 }
 
 
-function ecupChanged(ecp: IEcupDB): void{
+function ecupChanged(ecp: IEcup): void{
   ecup.value = {...ecp}
 }
 
@@ -390,19 +390,9 @@ async function liveResults(): Promise<void> {
 
       useNuxtApp().$toast.success('Результаты были успешно обновлены');
 
-      //useNuxtApp().$socket.emit("live-results");
       socket.value?.emit( 'live-results');
 
     }, 2000*30*3);
-
-    /*const {results} =  await $fetch('/api/admin/remote/liveResults', {
-      method: 'PUT',
-      body: {leagues: leagues.value},
-    });
-
-    useNuxtApp().$toast.success('Результаты были успешно обновлены');
-
-    useNuxtApp().$socket.emit("live-results", results);*/
 
   }catch (e) {
     const typedError = e as IError;
@@ -466,7 +456,6 @@ async function ecupResults(): Promise<void> {
       body: ecup.value,
     });
 
-    //useNuxtApp().$socket.emit("ecup-updated", results);
     socket.value?.emit( 'ecup-updated', results);
 
     useNuxtApp().$toast.success('Результаты были успешно обновлены');
@@ -528,15 +517,6 @@ async function allEcupResults(): Promise<void> {
     useNuxtApp().$toast.error('Ошибка');
   }
 }
-
-/*onBeforeUnmount(()=>{
-  if(tUpdate.value){
-    clearInterval(tUpdate.value);
-  }
-  if(ecupUpdate.value){
-    clearInterval(ecupUpdate.value);
-  }
-})*/
 
 onMounted(() => {
   socket.value = io({

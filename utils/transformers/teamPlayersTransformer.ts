@@ -1,4 +1,4 @@
-import {IPlayer} from "~/types/interfaces";
+import type {IPlayer} from "~/types/interfaces";
 
 export default ((players: IPlayer[]): Partial<IPlayer>[] => {
 
@@ -8,8 +8,8 @@ export default ((players: IPlayer[]): Partial<IPlayer>[] => {
           slug: player.slug,
           img: player.img,
           team: player.team,
-          number: player.info?.number as number,
-          position: getPosition(player.position_id as number)
+          number: player.info?.number,
+          position: getPosition(player.position_id)
        }
 
    }) as Partial<IPlayer>[]

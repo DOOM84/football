@@ -1,6 +1,6 @@
-import {ITeam, ITeamInfo} from "~/types/interfaces";
+import type {ITeam} from "~/types/interfaces";
 
-export default ((team: ITeamInfo): ITeam => {
+export default ((team: ITeam): Partial<ITeam> => {
 
     return {
         name: team.name,

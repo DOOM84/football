@@ -158,7 +158,7 @@
 
 <script lang="ts" setup>
 import slugify from "slugify";
-import type {IChampDB, IPlayer, IError} from "~/types/interfaces";
+import type {IChamp, IPlayer, IError} from "~/types/interfaces";
 import useFilter from "~/helpers/useFilter";
 
 definePageMeta({
@@ -166,7 +166,7 @@ definePageMeta({
   middleware: ["admin"]
 })
 
-const {data, pending} = useLazyFetch<{ champs: Partial<IChampDB>[] }>('/api/admin/champs')
+const {data, pending} = useLazyFetch<{ champs: Partial<IChamp>[] }>('/api/admin/champs')
 
 
 useHead({
@@ -175,7 +175,7 @@ useHead({
 
 const {filtering, toFilter, showDlg, mode, filter} = useFilter();
 
-const initChampData: Partial<IChampDB> = {status: false, name: ''};
+const initChampData: Partial<IChamp> = {status: false, name: ''};
 
 const champToUpdate = ref<typeof initChampData>({});
 
@@ -206,7 +206,7 @@ async function addChampSquad(): Promise<void> {
 
 }
 
-function updateItem(champ: IChampDB): void {
+function updateItem(champ: IChamp): void {
   mode.value = 'edit';
 
   champToUpdate.value = JSON.parse(JSON.stringify(champ));
@@ -235,17 +235,17 @@ async function storeItem(): Promise<void> {
     }
 
     if (mode.value === 'edit') {
-      const {result} = await $fetch<{ result: IChampDB }>('/api/admin/champs/edit', {
+      const {result} = await $fetch<{ result: IChamp }>('/api/admin/champs/edit', {
         method: 'PUT',
         body: champToDb,
       })
-      const ind: number = data.value?.champs.findIndex((champ: Partial<IChampDB>) => champ.id === champToUpdate.value.id) as number;
+      const ind: number = data.value?.champs.findIndex((champ: Partial<IChamp>) => champ.id === champToUpdate.value.id) as number;
 
       if (data.value) {
         data.value.champs[ind] = {...champToUpdate.value};
       }
     } else if (mode.value === 'add') {
-      const {result} = await $fetch<{ result: Partial<IChampDB> }>('/api/admin/champs/add', {
+      const {result} = await $fetch<{ result: Partial<IChamp> }>('/api/admin/champs/add', {
         method: 'POST',
         body: champToDb,
       })

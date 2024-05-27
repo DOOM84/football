@@ -81,7 +81,7 @@ export interface ITeam {
     img: string;
     sprite: string;
     champ: IChamp;
-    champ_id: number;
+    champ_id: number  | null;
     games: number;
     win: number;
     draw: number;
@@ -156,14 +156,14 @@ export interface IMatchInfo {
 
 export interface IEcupTeam {
     id: number;
-    api_id: number;
+    api_id: number | null;
     name: string;
     sprite: string;
     team: ITeam;
     ecupStand: IEcupStand[];
     results1: IEcupResult[];
     results2: IEcupResult[];
-    team_id: number;
+    team_id: number | null;
     status: boolean;
 }
 
@@ -187,6 +187,9 @@ export interface IEcupTeam {
 export interface IEcupStand {
     name: string;
     slug: string;
+    group: string;
+    team_id: number;
+    ecup: IEcup;
     stands: {
         [index: string]: {
             teams: {
@@ -248,9 +251,9 @@ export interface IPost {
     body: string;
     source: string;
     champ: IChamp;
-    champ_id: number;
+    champ_id: number | null;
     ecup: IEcup;
-    ecup_id: number;
+    ecup_id: number | null;
     rates: IRate[];
     rate: number;
     teams: ITeam[];
@@ -258,6 +261,7 @@ export interface IPost {
     tags: ITag[];
     comments: IComment[];
     date: number;
+    post: IPost;
     is_headline: boolean;
     status: boolean;
 }
@@ -266,7 +270,7 @@ export interface ITag {
     id: number;
     name: string;
     slug: string;
-    posts: IPost;
+    posts: IPost[];
     tag: ITag;
 }
 
@@ -276,10 +280,12 @@ export interface IPlayer {
     name: string;
     slug: string;
     img: string;
-    team: ITeam;
+    team: Partial<ITeam>;
     team_id: number;
-    country: ICountry;
+    number: number;
+    country: ICountry | string;
     country_id: number;
+    position: string;
     position_id: number;
     info: Record<string, any>;
     scorer: IScorer;

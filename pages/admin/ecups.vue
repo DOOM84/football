@@ -140,7 +140,7 @@
 
 <script lang="ts" setup>
 import slugify from "slugify";
-import type {IChampDB, IEcupDB, IError} from "~/types/interfaces";
+import type {IChamp, IEcup, IError} from "~/types/interfaces";
 import useFilter from "~/helpers/useFilter";
 import Multiselect from '@vueform/multiselect';
 
@@ -149,7 +149,7 @@ definePageMeta({
   middleware: ["admin"]
 })
 
-const {data, pending} = useLazyFetch<{ecups: Partial<IEcupDB>[]}>('/api/admin/ecups')
+const {data, pending} = useLazyFetch<{ecups: Partial<IEcup>[]}>('/api/admin/ecups')
 
 
 const stages = [{name: 'Групповой турнир', slug: 'group'},{name: 'Плей-офф', slug: 'playoff'}];
@@ -160,7 +160,7 @@ useHead({
 
 const {filtering, toFilter, showDlg, mode, filter} = useFilter();
 
-const initEcupData: Partial<IEcupDB> = {status: false, name: ''};
+const initEcupData: Partial<IEcup> = {status: false, name: ''};
 
 const ecupToUpdate = ref<typeof initEcupData>({});
 
@@ -172,7 +172,7 @@ function closeModal(): void {
   mode.value = null;
 }
 
-async function updateItem(ecup: IEcupDB) {
+async function updateItem(ecup: IEcup) {
   mode.value = 'edit';
 
   ecupToUpdate.value = JSON.parse(JSON.stringify(ecup));
@@ -199,17 +199,17 @@ async function storeItem(): Promise<void> {
     }
 
     if (mode.value === 'edit') {
-      const {result} = await $fetch<{ result: IEcupDB }>('/api/admin/ecups/edit', {
+      const {result} = await $fetch<{ result: IEcup }>('/api/admin/ecups/edit', {
         method: 'PUT',
         body: ecupToDb,
       })
-      const ind: number = data.value?.ecups.findIndex((ecup: Partial<IEcupDB>) => ecup.id === ecupToUpdate.value.id) as number;
+      const ind: number = data.value?.ecups.findIndex((ecup: Partial<IEcup>) => ecup.id === ecupToUpdate.value.id) as number;
 
       if(data.value){
         data.value.ecups[ind] = {...ecupToUpdate.value};
       }
     } else if (mode.value === 'add') {
-      const {result} = await $fetch<{ result: Partial<IEcupDB> }>('/api/admin/ecups/add', {
+      const {result} = await $fetch<{ result: Partial<IEcup> }>('/api/admin/ecups/add', {
         method: 'POST',
         body: ecupToDb,
       })

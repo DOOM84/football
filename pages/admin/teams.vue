@@ -47,7 +47,7 @@
               <div class="my-3">
                 <label>Чемпионат</label>
                 <Multiselect
-                    v-model="teamToUpdate.champ.slug"
+                    v-model="teamToUpdate.champ!.slug"
                     :options="data.champs"
                     :searchable="true"
                     valueProp="slug"
@@ -159,35 +159,35 @@
 
               <div class="my-3">
                 <label for="coach">Тренер</label>
-                <input type="text" v-model.trim="teamToUpdate.team_info.coach" class="block
+                <input type="text" v-model.trim="teamToUpdate.team_info!.coach" class="block
               w-full h-8 px-2 py-3 text-md text-zinc-800 border
               border-solid border-zinc-600/30 rounded-md" id="coach">
               </div>
 
               <div class="my-3">
                 <label for="pres">Президент</label>
-                <input type="text" v-model.trim="teamToUpdate.team_info.pres" class="block
+                <input type="text" v-model.trim="teamToUpdate.team_info!.pres" class="block
               w-full h-8 px-2 py-3 text-md text-zinc-800 border
               border-solid border-zinc-600/30 rounded-md" id="pres">
               </div>
 
               <div class="my-3">
                 <label for="stad">Стадион</label>
-                <input type="text" v-model.trim="teamToUpdate.team_info.stad" class="block
+                <input type="text" v-model.trim="teamToUpdate.team_info!.stad" class="block
               w-full h-8 px-2 py-3 text-md text-zinc-800 border
               border-solid border-zinc-600/30 rounded-md" id="stad">
               </div>
 
               <div class="my-3">
                 <label for="year">Год основания</label>
-                <input type="text" v-model.trim="teamToUpdate.team_info.year" class="block
+                <input type="text" v-model.trim="teamToUpdate.team_info!.year" class="block
               w-full h-8 px-2 py-3 text-md text-zinc-800 border
               border-solid border-zinc-600/30 rounded-md" id="year">
               </div>
 
               <div class="my-3">
                 <label for="site">Сайт</label>
-                <input type="text" v-model.trim="teamToUpdate.team_info.site" class="block
+                <input type="text" v-model.trim="teamToUpdate.team_info!.site" class="block
               w-full h-8 px-2 py-3 text-md text-zinc-800 border
               border-solid border-zinc-600/30 rounded-md" id="site">
               </div>
@@ -300,7 +300,7 @@
 
 <script lang="ts" setup>
 import slugify from "slugify";
-import type {IError, IChampDB, IPlayer, ITeamInfo} from "~/types/interfaces";
+import type {IError, IChamp, IPlayer, ITeam} from "~/types/interfaces";
 import useFilter from "~/helpers/useFilter";
 import Multiselect from '@vueform/multiselect';
 
@@ -309,8 +309,8 @@ definePageMeta({
   middleware: ["admin"]
 })
 
-const {data, pending} = useLazyFetch<{teams: Partial<ITeamInfo>[],
-  champs: Partial<IChampDB>[]}>('/api/admin/teams');
+const {data, pending} = useLazyFetch<{teams: Partial<ITeam>[],
+  champs: Partial<IChamp>[]}>('/api/admin/teams');
 
 
 const showSpinner = ref<boolean>(false);
@@ -327,11 +327,11 @@ useHead({
 
 const {filtering, toFilter, showDlg, mode, filter} = useFilter();
 
-const initTeamData: Partial<ITeamInfo> = {
+const initTeamData: Partial<ITeam> = {
   name: '',
   status: true,
-  team_info: {},
-  champ:{slug:'', name: ''}
+  team_info: {} as any,
+  champ: {slug:'', name: ''} as any
 }
 
 const teamToUpdate = ref<typeof initTeamData>({});
@@ -347,13 +347,13 @@ function closeModal(): void {
   selectedFile.value = undefined;
 }
 
-function updateItem(team: ITeamInfo): void {
+function updateItem(team: ITeam): void {
   mode.value = 'edit';
 
   teamToUpdate.value = JSON.parse(JSON.stringify(team));
 
   if (!teamToUpdate.value.champ) {
-    teamToUpdate.value.champ = {slug: '', name: ''};
+    (teamToUpdate.value.champ as unknown as Partial<IChamp>) = {slug: '', name: ''};
   }
 
   showDlg.value = true;
@@ -361,11 +361,11 @@ function updateItem(team: ITeamInfo): void {
 
 function champChanged(champ: any): void {
   if (!champ) {
-    teamToUpdate.value.champ = {slug: '', name: ''};
+    (teamToUpdate.value.champ as unknown as Partial<IChamp>) = {slug: '', name: ''};
     teamToUpdate.value.champ_id = null;
     return
   }
-  teamToUpdate.value.champ = {...data.value?.champs[data.value.champs.findIndex(ch => ch.slug === champ)]} as {name: string; slug: string; id: number};
+  teamToUpdate.value.champ = {...data.value?.champs[data.value.champs.findIndex(ch => ch.slug === champ)]} as IChamp;
   teamToUpdate.value.champ_id = teamToUpdate.value.champ?.id;
 }
 
@@ -527,17 +527,17 @@ async function storeItem(): Promise<void> {
     }
 
     if (mode.value === 'edit') {
-      const {result} = await $fetch<{ result: ITeamInfo }>('/api/admin/teams/edit', {
+      const {result} = await $fetch<{ result: ITeam }>('/api/admin/teams/edit', {
         method: 'PUT',
         body: formData,
       })
-      const ind: number = data.value?.teams.findIndex((team: Partial<ITeamInfo>) => team.id === teamToUpdate.value.id) as number;
+      const ind: number = data.value?.teams.findIndex((team: Partial<ITeam>) => team.id === teamToUpdate.value.id) as number;
 
       if(data.value){
         data.value.teams[ind] = {...teamToUpdate.value, img: result.img};
       }
     } else if (mode.value === 'add') {
-      const {result} = await $fetch<{ result: ITeamInfo }>('/api/admin/teams/add', {
+      const {result} = await $fetch<{ result: ITeam }>('/api/admin/teams/add', {
         method: 'POST',
         body: formData,
       })
@@ -594,13 +594,13 @@ async function removeItem(dbId: number, path: string): Promise<void> {
   }
 }
 
-function handleFileChange(event: { target: { files: (File | undefined)[]; }; }): void {
+function handleFileChange(event: Event): void {
 
   picToLoad.value = '';
 
-  selectedFile.value = event.target.files[0]
+  selectedFile.value =  (event.target as HTMLInputElement).files![0]
 
-  const file = event.target.files[0]
+  const file = (event.target as HTMLInputElement).files![0]
 
   selectedFile.value = file
 

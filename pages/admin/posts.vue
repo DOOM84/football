@@ -57,7 +57,7 @@
                 <div class="my-3">
                   <label>Чемпионат</label>
                   <Multiselect
-                      v-model="postToUpdate.champ.slug"
+                      v-model="postToUpdate.champ!.slug"
                       :options="data.champs"
                       :searchable="true"
                       valueProp="slug"
@@ -72,7 +72,7 @@
                 <div class="my-3">
                   <label>Еврокубок</label>
                   <Multiselect
-                      v-model="postToUpdate.ecup.slug"
+                      v-model="postToUpdate.ecup!.slug"
                       :options="data.ecups"
                       :searchable="true"
                       valueProp="slug"
@@ -274,7 +274,7 @@
 </template>
 
 <script lang="ts" setup>
-import type {IError, IPlayer, IPost, ITag} from "~/types/interfaces";
+import type {IChamp, IEcup, IError, IPlayer, IPost, ITag, ITeam} from "~/types/interfaces";
 import Multiselect from '@vueform/multiselect';
 import slugify from "slugify";
 import useFilter from "~/helpers/useFilter";
@@ -311,7 +311,7 @@ useSeoMeta({
 })
 
 const {data, pending} = await useLazyFetch<{ posts: Partial<IPost>[];
-  champs: any, ecups: any, tags: ITag[], teams: any[], players: any[]}>('/api/admin/posts')
+  champs: IChamp[], ecups: IEcup[], tags: ITag[], teams: ITeam[], players: IPlayer[]}>('/api/admin/posts')
 
 const {filtering, toFilter, showDlg, mode, filter} = useFilter();
 
@@ -321,8 +321,8 @@ const initPostData: Partial<IPost> = {
   title: '',
   subtitle: '',
   source: '',
-  champ: {slug: ''},
-  ecup: {slug: ''},
+  champ: {slug: ''} as any,
+  ecup: {slug: ''} as any,
   tags: [],
   teams: [],
   players: [],
@@ -348,8 +348,8 @@ async function updateItem(post: IPost): Promise<void> {
   mode.value = 'edit';
   postToUpdate.value = {
     ...post,
-    ecup: !post.ecup ?  {slug: ''} : post.ecup,
-    champ: !post.champ ?  {slug: ''} : post.champ,
+    ecup: !post.ecup ?  {slug: ''} : post.ecup as IEcup | any,
+    champ: !post.champ ?  {slug: ''} : post.champ as IChamp | any,
   };
 
   showDlg.value = true;
@@ -423,7 +423,7 @@ async function storeItem(): Promise<void> {
         method: 'PUT',
         body: formData,
       })
-      const ind: number = data.value!.posts.findIndex((item: IPost) => item.id === result.id);
+      const ind: number = (data.value!.posts as IPost[]).findIndex((item: IPost) => item.id === result.id);
 
       if(ind > -1){
         data.value!.posts[ind] = {
@@ -497,7 +497,7 @@ async function removeItem(dbId: string, path: IPost['img'], slug: string): Promi
         body: {id: dbId, path, slug},
       })
 
-      data.value?.posts.splice(data.value.posts.findIndex((item: IPost) => item.id === id), 1);
+      data.value?.posts.splice((data.value.posts as IPost[]).findIndex(item => item.id === id), 1);
 
       filter('', '');
 
@@ -542,7 +542,7 @@ function tagChanged(tags: Partial<IPost['tags']>) {
 }
 
 function playerChanged(players: Partial<IPost['players']>) {
-  postToUpdate.value.players = players;
+  (postToUpdate.value.players as Partial<IPost['players']>) = players;
 }
 
 async function teamChanged(teams: Partial<IPost['teams']> /*teams*/): Promise<void> {
@@ -550,23 +550,23 @@ async function teamChanged(teams: Partial<IPost['teams']> /*teams*/): Promise<vo
   if (!Array.isArray(teams) || !teams.length) {
     return;
   }
-  postToUpdate.value.teams = teams;
+  (postToUpdate.value.teams as Partial<IPost['teams']>) = teams;
   await loadPostTeamsPlayers();
 }
 
-function champChanged(champ: any): void {
+function champChanged(champ: string): void {
   if (!champ) {
-    postToUpdate.value.champ = {slug: ''};
+    (postToUpdate.value.champ as Record<string, any>) = {slug: ''};
     postToUpdate.value.champ_id = null;
     return
   }
-  postToUpdate.value.champ = {...data.value?.champs[data.value.champs.findIndex(ch => ch.slug === champ)]};
+  postToUpdate.value.champ = {...data.value?.champs[(data.value.champs as IChamp[]).findIndex(ch => ch.slug === champ)]} as IChamp;
   postToUpdate.value.champ_id = postToUpdate.value.champ.id;
 }
 
 function ecupChanged(ecup: string) {
   if (!ecup) {
-    postToUpdate.value.ecup = {slug: ''};
+    (postToUpdate.value.ecup as Record<string, any>) = {slug: ''};
     postToUpdate.value.ecup_id = null;
     return
   }
@@ -578,7 +578,7 @@ async function loadPostTeamsPlayers(): Promise<void>{
 
   if(data.value && postToUpdate.value.teams!.length){
     try {
-      data.value.players = await $fetch<Partial<IPlayer>[]>('/api/admin/posts/load_players',
+      data.value.players = await $fetch<IPlayer[]>('/api/admin/posts/load_players',
           {params: {teams: JSON.stringify(postToUpdate.value.teams!.map(team => team?.slug))}});
     }catch (e) {
       const typedError = e as IError;

@@ -1,6 +1,6 @@
 import prisma from '~/helpers/prisma';
 import matchInfoTransformer from "~/utils/transformers/matchInfoTransformer";
-import {IChampDB, IPost, IScore, ISmallPost, ITour} from "~/types/interfaces";
+import {IChamp, IEcup, IEcupResult, IMatchInfo, IPost, ITourResult} from "~/types/interfaces";
 import postListTransformer from "~/utils/transformers/postListTransformer";
 import singleEcupResultsTransformer from "~/utils/transformers/singleEcupResultsTransformer";
 import singleChampTransformer from "~/utils/transformers/singleChampTransformer";
@@ -27,7 +27,7 @@ export default defineEventHandler(async (event) => {
                         },
                     }
                 }
-            })
+            }) as unknown as IMatchInfo;
 
         const ecupMatch = await prisma.matchInfo.findFirst({
             where: {
@@ -49,7 +49,7 @@ export default defineEventHandler(async (event) => {
                     }
                 }
             }
-        })
+        }) as unknown as IMatchInfo;
 
         if(!champMatch && !ecupMatch){
             throw createError({
@@ -58,11 +58,11 @@ export default defineEventHandler(async (event) => {
             })
         }
 
-        const res = champMatch || ecupMatch as Record<string, any>;
+        const res = champMatch || ecupMatch;
 
-        let posts: ISmallPost[] = [];
-        let ecupResults: Record<string, any> = {}
-        let tourResults: ITour | {} = {};
+        let posts: IPost[] = [];
+        let ecupResults: IEcupResult | {} = {}
+        let tourResults: ITourResult | {} = {};
 
         if(ecupMatch?.ecupResult?.ecup_id){
             const ecup = await prisma.ecup.findFirst({
@@ -109,12 +109,12 @@ export default defineEventHandler(async (event) => {
                     } : false,
                 },
 
-            })
+            }) as unknown as IEcup;
 
-            posts = postListTransformer(ecup!.posts as unknown as IPost[]);
+            posts = postListTransformer(ecup!.posts);
 
             const {groupResults, poResults} =
-                singleEcupResultsTransformer(ecup!.results as unknown as IScore[]);
+                singleEcupResultsTransformer(ecup!.results);
 
             ecupResults = {groupResults, poResults}
         }
@@ -152,58 +152,12 @@ export default defineEventHandler(async (event) => {
                         }
                     },
                 },
-            })
+            }) as unknown as IChamp;
 
-            posts  = postListTransformer(champ!.posts as unknown as IPost[]);
+            posts  = postListTransformer(champ!.posts);
 
-            tourResults  = singleChampTransformer(champ as unknown as IChampDB);
+            tourResults  = singleChampTransformer(champ);
         }
-
-
-
-
-
-
-     //   let postsDb: unknown = [];
-
-
-        /*if(query.loadPosts){
-            if(res!.champResult?.champ_id){
-                postsDb = await prisma.post.findMany({
-                    where: {
-                        champ_id: +res!.champResult?.champ_id,
-                        status: true,
-                    },
-                    include: {
-                        ecup: true,
-                        champ: true
-                    },
-                    orderBy: {
-                        date: 'desc',
-                    },
-                    take: 10
-                }) as unknown as IPost[]
-            }
-
-            if(res!.ecupResult?.ecup_id){
-                postsDb = await prisma.post.findMany({
-                    where: {
-                        ecup_id: +res!.ecupResult?.ecup_id,
-                        status: true,
-                    },
-                    include: {
-                        ecup: true,
-                        champ: true
-                    },
-                    orderBy: {
-                        date: 'desc',
-                    },
-                    take: 10
-                }) as unknown as IPost[]
-            }
-
-             posts = postListTransformer(postsDb as unknown as IPost[]);
-        }*/
 
         const mixedSquads = [];
 

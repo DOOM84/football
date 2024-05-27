@@ -267,7 +267,7 @@
 </template>
 
 <script setup lang="ts">
-import type {ISmallPost, ITour} from "~/types/interfaces";
+import type {IPost, ITourResult} from "~/types/interfaces";
 import { io, type Socket } from 'socket.io-client';
 
 const socket = ref<Socket>();
@@ -281,9 +281,9 @@ const {data, pending, error} = await useLazyFetch<{
   grouppedCards: Record<string, any>;
   cards: Record<string, any>;
   goals: Record<string, any>;
-  posts: ISmallPost[];
+  posts: IPost[];
   ecupResults: Record<string, any>;
-  tourResults: ITour
+  tourResults: ITourResult;
 }>(route.query.season ? '/api/archiveMatchInfo' : '/api/matchInfo',
     {
       params: {apiId: route.params.id, loadPosts: true, season: route.query.season},
@@ -504,7 +504,7 @@ async function refreshInfo() {
     data.value!.tourResults = res.tourResults;
 
   } catch (e) {
-    console.log(e);
+    //console.log(e);
   } finally {
     refreshIcon.value = false;
   }

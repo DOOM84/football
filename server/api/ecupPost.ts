@@ -1,5 +1,5 @@
 import prisma from '~/helpers/prisma';
-import {IEcup, IEcupStand, IPost, } from "~/types/interfaces";
+import {IEcup, IEcupStand, IPlayer, IPost,} from "~/types/interfaces";
 import postTransformer from "~/utils/transformers/postTransformer";
 import postListTransformer from "~/utils/transformers/postListTransformer";
 import singleEcupResultsTransformer from "~/utils/transformers/singleEcupResultsTransformer";
@@ -122,7 +122,11 @@ export default defineEventHandler(async (event) => {
 
         const ecupStands: IEcupStand = ecupTransformer(ecup);
 
-        const post: Partial<IPost> = postTransformer(postDb);
+        const post: Partial<IPost> = postTransformer({...postDb,
+            tags: postDb.tags.map(t => t.tag),
+            teams: postDb.teams.map(tm => tm.team),
+            players: postDb.players.map(p => p.player) as IPlayer[],
+        });
 
         return {ecup: {name: ecup.name, slug: ecup.slug, id: ecup.id}, post, posts, ecupStands, groupResults, poResults};
 

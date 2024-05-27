@@ -95,12 +95,16 @@
 
 <script setup lang="ts">
 
-import type {IChampDB, IPlayer, ISmallPost, ITeam} from "~/types/interfaces";
+import type {IChamp, IEcupStand, IPlayer, IPost, ITeam} from "~/types/interfaces";
 
 const route = useRoute();
 
 const {data, pending, error} = await useLazyFetch<{
-  team: ITeam; champ: IChampDB; posts: ISmallPost[]; players: Partial<IPlayer>[]
+  ecupStands: IEcupStand[];
+  team: ITeam;
+  champ: IChamp;
+  posts: IPost[];
+  players: IPlayer[]
 }>('/api/team', {
   params: {slug: route.params.id}, onResponseError({request, response, options}) {
     showError({

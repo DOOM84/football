@@ -20,11 +20,11 @@
 </template>
 
 <script setup lang="ts">
-import type {ISmallPost, ITag} from "~/types/interfaces";
+import type {IPost, ITag} from "~/types/interfaces";
 
 const route = useRoute();
 
-const {data, pending, error} = await useLazyFetch<{ posts: ISmallPost[]; tag: ITag}>('/api/tag', {params: {slug: route.params.id}, onResponseError({request, response, options}) {
+const {data, pending, error} = await useLazyFetch<{ posts: IPost[]; tag: ITag}>('/api/tag', {params: {slug: route.params.id}, onResponseError({request, response, options}) {
     showError({
       fatal: true,
       statusCode: 404,
@@ -46,7 +46,7 @@ useSeoMeta({
   title: () => title.value,
 });
 
-function addPosts(loadedPosts: ISmallPost[]): void {
+function addPosts(loadedPosts: IPost[]): void {
   data.value?.posts.push(...loadedPosts)
 }
 </script>

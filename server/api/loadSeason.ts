@@ -1,5 +1,4 @@
 import prisma from '~/helpers/prisma';
-import {IScore} from "~/types/interfaces";
 
 import calendarTransformer from "~/utils/transformers/calendarTransformer";
 import singleEcupResultsTransformer from "~/utils/transformers/singleEcupResultsTransformer";
@@ -36,7 +35,7 @@ export default defineEventHandler(async (event) => {
                 DBresults[i].away = teams.filter(team => team.id === DBresults[i].team2)[0]
 
             }
-            return  calendarTransformer(DBresults as unknown as IScore[]);
+            return  calendarTransformer(DBresults);
         }
 
         if(mode === 'champStands'){
@@ -79,7 +78,7 @@ export default defineEventHandler(async (event) => {
 
             }
 
-            return singleEcupResultsTransformer(DBresults as unknown as IScore[]);
+            return singleEcupResultsTransformer(DBresults);
         }
 
         if(mode === 'ecupStands'){

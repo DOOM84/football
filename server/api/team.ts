@@ -1,5 +1,5 @@
 import prisma from '~/helpers/prisma';
-import {IEcupDB, IEcupStands, IPlayer, IPost, ISmallPost, ITeam, ITeamInfo} from "~/types/interfaces";
+import {IChamp, IEcup, IEcupStand, IPlayer, IPost, ITeam} from "~/types/interfaces";
 import postListTransformer from "~/utils/transformers/postListTransformer";
 import ecupTransformer from "~/utils/transformers/ecupTransformer";
 import teamPlayersTransformer from "~/utils/transformers/teamPlayersTransformer";
@@ -43,7 +43,7 @@ export default defineEventHandler(async (event) => {
                     take: 10,
                 },
             }
-        })
+        }) as unknown as ITeam;
 
         if(!teamDb){
             throw createError({
@@ -70,10 +70,10 @@ export default defineEventHandler(async (event) => {
                     }
                 }
             },
-        })
+        })as unknown as IChamp;
 
-        const posts: ISmallPost[]  = postListTransformer(teamDb?.posts.map(post => post.post)
-            .filter(post => post.status) as unknown as IPost[])
+        const posts: IPost[]  = postListTransformer(teamDb?.posts.map(post => post.post)
+            .filter(post => post.status))
 
         const forFilter: Record<string, {group: string | null; team_id: number | null;}> = {}
 
@@ -103,7 +103,7 @@ export default defineEventHandler(async (event) => {
                     }
                 }
             }
-        });
+        })as unknown as IEcup[];
 
         const ecups = ecupsDb.map(ecup => {
 
@@ -111,16 +111,17 @@ export default defineEventHandler(async (event) => {
                     stand.group === forFilter[ecup.slug].group)}
         })
 
-        const ecupStands: IEcupStands[] = ecupTransformer(ecups as unknown as IEcupDB[]);
+        const ecupStands = ecups.map(ecup => ecupTransformer(ecup)) ;
 
-        const players: Partial<IPlayer>[] = teamPlayersTransformer(teamDb?.players as unknown as IPlayer[])
+        const players = teamPlayersTransformer(teamDb?.players)
 
-        const team: ITeam = singleTeamTransformer(teamDb as unknown as ITeamInfo)
+        const team = singleTeamTransformer(teamDb)
 
 
         return {team, champ, posts, ecupStands, players};
 
     }catch (e) {
+        console.log(e);
         throw createError({
             statusCode: 404,
             message: 'Страница не найдена',
