@@ -24,19 +24,11 @@
 
 <script lang="ts" setup>
 import type {IPlayer} from "~/types/interfaces";
+import htmlDec from "~/helpers/htmlDec";
 
 const props = defineProps<{
   player: IPlayer
 }>()
-
-/*function decodeHtmlCharCodes (str) {
-    return str.replace(/(&#(\d+);)/g, (match, capture, charCode) =>
-        String.fromCharCode(charCode));
-}*/
-
-function htmlDec(str: string): string{
-    return  str.replace("&apos;", "'").replace("&quot;", '"').replace("&ndash;", "-").replace("&mdash;", '—')
-}
 
 
 </script>

@@ -54,7 +54,7 @@
               <img class="rounded-full h-[30px] w-[30px]" :src="player.img"  alt="">
             </div>
             <div>
-              {{player.name}}
+              {{htmlDec(player.name)}}
             </div>
           </nuxt-link>
 
@@ -90,6 +90,7 @@
 import Tweet from 'vue-tweet';
 import { WidgetPost } from 'televue';
 import type {IPost} from "~/types/interfaces";
+import htmlDec from "~/helpers/htmlDec";
 
 const props = defineProps<{
   post: IPost
@@ -104,8 +105,6 @@ const tweetDivs = ref<any[]>([]);
 const tgs = ref([]);
 
 const tgDivs = ref<any[]>([]);
-
-const user = useSupabaseUser();
 
 const rating = ref<number>(0);
 

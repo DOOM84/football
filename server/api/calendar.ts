@@ -62,7 +62,8 @@ export default defineEventHandler(async (event) => {
         return {posts, champ: champ.name, results};
 
     }catch (e) {
-            throw createError({
+        console.log(e);
+        throw createError({
                 statusCode: 404,
                 message: 'Страница не найдена',
             });

@@ -19,7 +19,7 @@
         </tbody>
 
         <template v-else-if="infoType === 'fullStands'">
-        <TheFullStands :info="infoToShow"/>
+        <TheFullStands :info="infoToShow as ITeam[]"/>
         </template>
 
         <template v-else-if="infoType === 'fullResults'">
@@ -27,11 +27,11 @@
         </template>
 
         <template v-else-if="infoType === 'shortResults'"
-                  v-for="(results, date, i) in (infoToShow?.tour.scores ? sortObj(infoToShow?.tour?.scores) :  infoToShow?.tour.scores)">
+                  v-for="(results, date, i) in ((infoToShow as Record<string, any>)?.tour.scores ? sortObj((infoToShow as Record<string, any>)?.tour?.scores) :  (infoToShow as Record<string, any>)?.tour.scores)">
             <thead>
             <tr>
                 <th colspan="6" class="center py-[0.7rem] bg-zinc-100">
-                  {{ infoToShow?.tour.scores[date][0]['tour'] !== 99 ? infoToShow?.tour.scores[date][0]['tour']+'-й тур.' : ''  }} {{ $resultDate(+date) }}
+                  {{ (infoToShow as any)?.tour.scores[date][0]['tour'] !== 99 ? (infoToShow as any)?.tour.scores[date][0]['tour']+'-й тур.' : ''  }} {{ $resultDate(+date) }}
                 </th>
             </tr>
             </thead>
@@ -65,7 +65,7 @@
         </template>
 
 
-        <template v-else-if="infoType === 'ecupGroupFullResults'" v-for="(tour, group) in sortObj(infoToShow)">
+        <template v-else-if="infoType === 'ecupGroupFullResults'" v-for="(tour, group) in sortObj(infoToShow as Record<string, any>)">
                 <thead>
                 <tr>
                     <th colspan="6" class="text-center py-3 bg-zinc-800 text-zinc-100">
@@ -113,7 +113,7 @@
 
 
         <tbody v-else-if="infoType === 'scorers'">
-        <template  v-for="(player, i) in infoToShow?.players">
+        <template  v-for="(player, i) in (infoToShow as Record<string, any>)?.players">
             <TheScorers :player="player"/>
         </template>
         </tbody>
@@ -131,7 +131,7 @@
         </tbody>
 
         <tbody v-else-if="infoType === 'ecupStands'">
-        <template v-for="(team, i) in infoToShow?.teams">
+        <template v-for="(team, i) in (infoToShow as Record<string, any>)?.teams">
             <TheShortStands :info="team" :ind="i"/>
         </template>
         </tbody>
@@ -139,6 +139,8 @@
 </template>
 
 <script setup lang="ts">
+import type {ITeam} from "~/types/interfaces";
+
 const {$resultDate} = useNuxtApp();
 import sortObj from "~/helpers/sortObj";
 

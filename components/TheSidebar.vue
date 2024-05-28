@@ -61,17 +61,17 @@
 </template>
 
 <script setup lang="ts">
-import type {IChampDB, IEcupDB} from "~/types/interfaces";
+import type {IChamp, IEcup} from "~/types/interfaces";
 
 const props = defineProps<{
-  chs?: IChampDB[],
-  ecups?: IEcupDB[],
+  chs?: IChamp[],
+  ecups?: IEcup[],
 }>()
 
 
-function toggleMenu(e: { target: { nextElementSibling: { classList: { toggle: (arg0: string) => void; }; }; }; }): void {
-    e.target.nextElementSibling.classList.toggle('hidden');
-    e.target.nextElementSibling.classList.toggle('showMenu');
+function toggleMenu(event: Event): void {
+  (event.target as HTMLElement).nextElementSibling!.classList.toggle('hidden');
+  (event.target as HTMLElement).nextElementSibling!.classList.toggle('showMenu');
 }
 
 </script>

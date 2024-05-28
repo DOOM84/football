@@ -128,13 +128,13 @@
 
 <script setup lang="ts">
 
-import type {ITeamInfo} from "~/types/interfaces";
+import type {ITeam} from "~/types/interfaces";
 
 const props = defineProps<{
-  info: ITeamInfo[]
+  info: ITeam[]
 }>()
 
-const infoStands = ref<ITeamInfo[]>([]);
+const infoStands = ref<ITeam[]>([]);
 
 infoStands.value = [...props.info!];
 

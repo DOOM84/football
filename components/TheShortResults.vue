@@ -52,13 +52,13 @@
              :class="iter === 0 && (i === 0 || i === 1) ? 'top-[100%]' : i === (results.length - 1)  ? 'bottom-[100%]' : 'top-[100%]'"
         >
           <ul class="basis-1/2 flex-grow: 0; overflow-x-hidden m-0 p-0">
-            <li class="m-0 p-0" v-for="(goal, i) in result.info[result.home.api_id]" :key="`home-${i}`">
-              {{goal.player.name}} {{goal.time.elapsed}}' <small v-if="goal.time.extra">(+{{goal.time.extra}}')</small>
+            <li class="m-0 p-0" v-for="(goal, i) in (result as Record<string,any>).info[result.home.api_id]" :key="`home-${i}`">
+              {{htmlDec(goal.player.name)}} {{goal.time.elapsed}}' <small v-if="goal.time.extra">(+{{goal.time.extra}}')</small>
             </li>
           </ul>
           <ul class="basis-1/2 flex-grow: 0; overflow-x-hidden m-0 p-0 text-right">
-            <li class="m-0 p-0" v-for="(goal, i) in result.info[result.away.api_id]" :key="`away-${i}`">
-              {{goal.player.name}} {{goal.time.elapsed}}' <small v-if="goal.time.extra">(+{{goal.time.extra}}')</small>
+            <li class="m-0 p-0" v-for="(goal, i) in (result as Record<string,any>).info[result.away.api_id]" :key="`away-${i}`">
+              {{htmlDec(goal.player.name)}} {{goal.time.elapsed}}' <small v-if="goal.time.extra">(+{{goal.time.extra}}')</small>
             </li>
           </ul>
         </div>
@@ -88,7 +88,8 @@
 
 <script lang="ts" setup>
 
-import type {IScore} from "~/types/interfaces";
+import type {IResult} from "~/types/interfaces";
+import htmlDec from "~/helpers/htmlDec";
 
 const user = useSupabaseUser();
 
@@ -99,7 +100,7 @@ const {$diffDate, $matchTime} = useNuxtApp();
 const season = inject<Ref<string>>('season');
 
 const props = defineProps<{
-  results: IScore[],
+  results: IResult[],
   iter: number,
 }>()
 
@@ -112,7 +113,7 @@ const queryParam = computed(()=>{
   return season!.value ? '?season='+season!.value : ''
 })
 
-async function setResult(res: IScore) {
+async function setResult(res: IResult) {
   const {data} = await auth.getUser();
 
   if (!user.value || !user.value.app_metadata?.admin || !data.user || !data.user.app_metadata?.admin) {
@@ -134,7 +135,7 @@ async function setResult(res: IScore) {
     }
 
     if(info){
-      res.info = info;
+      res.info = info as any;
       res.res1 = Array.isArray(info![+res.home.api_id!]) ? info![+res.home.api_id!].length : 0;
       res.res2 = Array.isArray(info![+res.away.api_id!]) ? info![+res.away.api_id!].length : 0;
     }else if(res.is_info && (Number(res.stamp) < Math.round(Date.now() / 1000))){

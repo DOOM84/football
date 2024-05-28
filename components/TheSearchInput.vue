@@ -10,7 +10,7 @@
 
 <script setup lang="ts">
 
-import type {IPlayer, ISmallPost, ITeam} from "~/types/interfaces";
+import type {IPlayer, IPost, ITeam} from "~/types/interfaces";
 
 const searchTerm = ref<string>('');
 
@@ -27,7 +27,7 @@ const searchLoad = useSearchLoad();
 const setSide: any = inject('setSide');
 
 const icon = computed(()=>{
- return  searchLoad.value ? 'svg-spinners:12-dots-scale-rotate' : 'material-symbols:search'
+ return  searchLoad.value ? 'svg-spinners:12-dots-scale-rotate' : 'material-symbols:search';
 })
 
 async function search(): Promise<void> {
@@ -55,9 +55,9 @@ async function search(): Promise<void> {
   term.value = searchTerm.value;
 
   searchResult.value = await $fetch<{
-    posts: { results: Partial<ISmallPost>[], count: number },
-    players: { results: Partial<IPlayer>[], count: number },
-    teams: { results: Partial<ITeam>[], count: number },
+    posts: { results: IPost[], count: number },
+    players: { results: IPlayer[], count: number },
+    teams: { results: ITeam[], count: number },
   }>
   ('/api/search', {
     params:

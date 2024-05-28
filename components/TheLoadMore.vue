@@ -13,7 +13,7 @@
 </template>
 
 <script setup lang="ts">
-import type {ISmallPost} from "~/types/interfaces";
+import type {IPost} from "~/types/interfaces";
 
 
 const props = withDefaults(defineProps<{count?: number; limit?: number; champId?: number; showLoad?: boolean;
@@ -26,7 +26,7 @@ const props = withDefaults(defineProps<{count?: number; limit?: number; champId?
 })
 
 const emit = defineEmits<{
-  (e: 'addPosts', posts: ISmallPost[]): void,
+  (e: 'addPosts', posts: IPost[]): void,
   (e: 'addSearchResults'): void,
 }>()
 
@@ -48,7 +48,7 @@ async function loadPosts(): Promise<void> {
   loading.value = true;
 
   try {
-    const posts = await $fetch<ISmallPost[]>('/api/loadMore',
+    const posts = await $fetch<IPost[]>('/api/loadMore',
         {
           params: {
             offset: props.count,
@@ -63,7 +63,7 @@ async function loadPosts(): Promise<void> {
     isDisabled.value = false;
 
     if (posts.length) {
-      emit('addPosts', posts as unknown as ISmallPost[]);
+      emit('addPosts', posts as unknown as IPost[]);
       loading.value = false;
       isDisabled.value = posts.length < props.limit //|| props.count >= props.disableWhen;
 

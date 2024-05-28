@@ -27,8 +27,14 @@ const seasons = ref([2022,2023]);
 
 const showLoading = ref<boolean>(false);
 
-const props = defineProps({
+/*const props = defineProps({
   mode: {type: String, default: ''},
+})*/
+
+const props = withDefaults(defineProps<{
+  mode: string;
+}>(), {
+  mode: '',
 })
 
 const emit = defineEmits(['seasonLoaded', 'resetSeason'])

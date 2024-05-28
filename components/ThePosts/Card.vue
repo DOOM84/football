@@ -17,7 +17,7 @@ import type {IPost} from "~/types/interfaces";
 const {$postDate} = useNuxtApp();
 
 const props = withDefaults(defineProps<{
-  post?: IPost;
+  post: IPost;
   mWidth?: number,
 }>(), {
   mWidth: 250,

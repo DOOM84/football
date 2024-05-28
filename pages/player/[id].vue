@@ -7,7 +7,7 @@
           <template v-else>
             <div class="shadow-md shadow-zinc-800/20 ">
                 <div class="text-center flex flex-col items-center justify-center">
-                    <h1 class="text-2xl font-bold">{{ data.player.name }}</h1>
+                    <h1 class="text-2xl font-bold">{{ htmlDec(data.player.name) }}</h1>
                     <img class="max-w-[150px]" @error="imageUrlAlt" :src="data.player.img" alt="">
                     <ul class="list-none text-center my-4">
                         <li class="mb-4">
@@ -92,6 +92,7 @@
 
 <script setup lang="ts">
 import type {IChamp, IPlayer, IPost} from "~/types/interfaces";
+import htmlDec from "../../helpers/htmlDec";
 
 const route = useRoute();
 

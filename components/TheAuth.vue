@@ -65,7 +65,7 @@ const showMode = computed(() =>
 
 const showBtnMode = computed(() => mode.value === 'signup' ? 'Вход' : 'Регистрация');
 
-function toggleMode(reset = null): void {
+function toggleMode(reset: string | null = null): void {
   if (reset) {
     mode.value = reset
   } else {

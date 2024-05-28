@@ -53,11 +53,11 @@
 </template>
 
 <script setup lang="ts">
-import type {IChampDB, IEcupDB} from "~/types/interfaces";
+import type {IChamp, IEcup} from "~/types/interfaces";
 
 const props = defineProps<{
-  chs: IChampDB[];
-  ecups: IEcupDB[];
+  chs: IChamp[];
+  ecups: IEcup[];
 }>()
 
 </script>

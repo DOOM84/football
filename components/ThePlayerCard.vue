@@ -23,7 +23,7 @@
                        :style="`background: url('/teams.png') ${player.team.sprite};`"/>
                 </div>
                 <div v-else>
-                  <img :title="'Нет/другое'" class="w-[30px] h-[30px]"
+                  <img alt="no_team" :title="'Нет/другое'" class="w-[30px] h-[30px]"
                        src="/no_team.png" />
                 </div>
               </template>
@@ -39,6 +39,7 @@
 
 <script setup lang="ts">
 import type {IPlayer} from "~/types/interfaces";
+import htmlDec from "~/helpers/htmlDec";
 
 const props = withDefaults(defineProps<{
   player: IPlayer;
@@ -48,13 +49,9 @@ const props = withDefaults(defineProps<{
 })
 
 function imageUrlAlt(event: Event): void {
- // event.target.src = "/no_player.png"
   (event.target as HTMLImageElement).src = "/no_player.png";
 }
 
-function htmlDec(str: string): string{
-  return  str.replace("&apos;", "'").replace("&quot;", '"').replace("&ndash;", "-").replace("&mdash;", '—')
-}
 </script>
 
 <style scoped>

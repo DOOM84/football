@@ -14,7 +14,7 @@
 </template>
 
 <script lang="ts" setup>
-import type {IError} from "~/types/interfaces";
+import type {IError, IUser} from "~/types/interfaces";
 
 const user = useSupabaseUser();
 const {auth} = useSupabaseClient();
@@ -26,8 +26,8 @@ const props = defineProps({
   postId: {type: Number},
 })
 
-const staticRate =ref<number>(0);
-const readOnly =ref<boolean>(false);
+const staticRate = ref<number>(0);
+const readOnly = ref<boolean>(false);
 
 onMounted(()=>{
   nextTick(()=>{
@@ -40,7 +40,7 @@ async function setRating(rating: number): Promise<void> {
 
   try {
 
-    const {data} = await auth.getUser();
+    const {data} = await auth.getUser() as unknown as { data: {user: IUser}};
 
     if(!data.user){
       const error = new Error() as IError;

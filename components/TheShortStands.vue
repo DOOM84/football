@@ -28,10 +28,10 @@
 
 <script setup lang="ts">
 
-import type {ITeamInfo} from "~/types/interfaces";
+import type {ITeam} from "~/types/interfaces";
 
 const props = defineProps<{
-  info: ITeamInfo,
+  info: ITeam,
   ind: number | string,
 }>()
 </script>

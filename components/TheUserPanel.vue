@@ -38,7 +38,7 @@
 </template>
 
 <script lang="ts" setup>
-import type {IError} from "~/types/interfaces";
+import type {IError, IUser} from "~/types/interfaces";
 const user = useSupabaseUser();
 const { auth } = useSupabaseClient();
 const showSpinner = ref<boolean>(false);
@@ -58,7 +58,7 @@ function openModal(): void {
   showDlg.value = true;
 }
 
-function showLoad(notClose: boolean): void{
+function showLoad(notClose?: boolean): void{
   showLoading.value = !showLoading.value
   if(!showLoading.value && !notClose) closeModal()
 }
@@ -70,15 +70,15 @@ function chooseFiles(): void {
   chosenFile.value?.click();
 }
 
-function handleFileChange(event: { target: { files: (File | undefined)[]; }; }): void {
+function handleFileChange(event: Event): void {
 
   picToLoad.value = '';
 
-  selectedFile.value = event.target.files[0]
+  selectedFile.value = (event.target as HTMLInputElement).files![0];
 
   if(!selectedFile.value){return}
 
-  const file = event.target.files[0]
+  const file = (event.target as HTMLInputElement).files![0];
 
   selectedFile.value = file
 
@@ -104,7 +104,7 @@ const userLogout = async (): Promise<void> => {
 async function changeAvatar(): Promise<void>{
   try {
 
-    const {data} = await auth.getUser();
+    const {data} = await auth.getUser() as unknown as { data: {user: IUser}};
 
     if(!data.user){
      await userLogout();

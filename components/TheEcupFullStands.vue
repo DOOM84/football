@@ -45,11 +45,11 @@
 </template>
 
 <script setup lang="ts">
-import type {ITeamInfo} from "~/types/interfaces";
+import type {ITeam} from "~/types/interfaces";
 
 const props = defineProps<{
   ind: number | string,
-  info: ITeamInfo,
+  info: ITeam,
 }>()
 
 </script>
