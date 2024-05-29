@@ -1,5 +1,6 @@
 import type {IError} from "~/types/interfaces";
 import prisma from "~/helpers/prisma";
+import type {Season} from "~/types/types";
 
 export default defineEventHandler(async (event) => {
 
@@ -9,7 +10,7 @@ export default defineEventHandler(async (event) => {
             return this.toString();
         };
 
-        const year = (parseInt((new Date().getFullYear() + '').slice(-2))-1).toString() as string;
+        const year = parseInt((new Date().getFullYear() + '').slice(-2))-1 as Season;
 
         const ecupStands = await prisma.ecupStand.findMany();
         const ecupResults = await prisma.ecupResult.findMany();
@@ -29,10 +30,10 @@ export default defineEventHandler(async (event) => {
             data: results
         })
         await prisma[`team${year}`].createMany({
-            data: teams
+            data: teams as any
         })
         await prisma[`matchInfo${year}`].createMany({
-            data: matchInfo
+            data: matchInfo as any
         })
 
         await prisma.ecupStand.deleteMany();

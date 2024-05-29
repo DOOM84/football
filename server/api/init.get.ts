@@ -1,4 +1,5 @@
 import prisma from '~/helpers/prisma';
+import type {IChamp, IEcup} from "~/types/interfaces";
 export default defineEventHandler(async (event) => {
 
     try {
@@ -16,7 +17,7 @@ export default defineEventHandler(async (event) => {
             orderBy: {
                 id: 'asc',
             },
-        })
+        }) as unknown as IEcup[];
 
         const champs = await prisma.champ.findMany({
             select: {
@@ -28,7 +29,7 @@ export default defineEventHandler(async (event) => {
                 id: 'asc',
             },
 
-        })
+        }) as unknown as IChamp[];
 
 
         return {ecups, champs};

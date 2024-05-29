@@ -1,6 +1,7 @@
 import prisma from '~/helpers/prisma';
 import {addTeamSquad} from "~/helpers/remoteApi";
 import slugify from "slugify";
+import getPosition from "~/utils/getPosition";
 export default defineEventHandler(async (event) => {
     try {
         // @ts-ignore: Unreachable code error
@@ -67,10 +68,4 @@ async function getPlayerSlug(playerSlug: string, playerApiId: number, flag: numb
         return await getPlayerSlug(newPlayerSlug, playerApiId, flag)
     }
     return playerSlug;
-}
-
-function getPosition(positionId: number) {
-    return positionId === 1
-        ? 'Голкипер' : positionId === 2 ? 'Защитник' :
-            positionId === 3 ? 'Полузащитник' : positionId === 4 ? 'Нападающий' : ''
 }

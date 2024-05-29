@@ -1,6 +1,8 @@
 import prisma from '~/helpers/prisma';
-import {IError} from "~/types/interfaces";
+import type {IError} from "~/types/interfaces";
 import {matchInfo, matchSquads} from "~/helpers/remoteApi";
+import type {Season} from "~/types/types";
+
 
 
 export default defineEventHandler(async (event) => {
@@ -14,12 +16,12 @@ export default defineEventHandler(async (event) => {
 
         if(!updated.season){ return {}}
 
-        const resChamp =  await prisma[`result${updated.season}`].findFirst({
+        const resChamp =  await (prisma[`result${updated.season as Season}`] as any).findFirst({
             where: {
                 api_id: +updated.api_id
             }
         })
-        const ecupChamp =  await prisma[`ecupResult${updated.season}`].findFirst({
+        const ecupChamp =  await (prisma[`ecupResult${updated.season as Season}`] as any).findFirst({
             where: {
                 api_id: +updated.api_id
             }
@@ -38,7 +40,7 @@ export default defineEventHandler(async (event) => {
                     return event;
                 })
 
-            await prisma[`matchInfo${updated.season}`].create({
+            await prisma[`matchInfo${updated.season as Season}`].create({
                 data: {
                     ch_res: resChamp ? resChamp.api_id : null,
                     ecup_res: ecupChamp ? ecupChamp.api_id : null,
@@ -47,7 +49,7 @@ export default defineEventHandler(async (event) => {
                 }
             })
         }else{
-            await prisma[`matchInfo${updated.season}`].delete({
+            await (prisma[`matchInfo${updated.season as Season}`] as any).delete({
                 where: {
                     ...(resChamp ? { ch_res: resChamp.api_id } : {}) as any,
                     ...(ecupChamp ? { ecup_res: ecupChamp.api_id } : {}) as any,
@@ -56,9 +58,9 @@ export default defineEventHandler(async (event) => {
         }
 
         if(resChamp){
-            await prisma[`result${updated.season}`].update({
+            await (prisma[`result${updated.season as Season}`] as any).update({
                 where: {
-                    api_id: resChamp.api_id as any,
+                    api_id: resChamp.api_id,
                 },
                 data: {is_info: updated.is_info} //JSON.parse(JSON.stringify(updated))
             });
@@ -66,9 +68,9 @@ export default defineEventHandler(async (event) => {
 
 
         if(ecupChamp){
-            await prisma[`ecupResult${updated.season}`].update({
+            await (prisma[`ecupResult${updated.season as Season}`] as any).update({
                 where: {
-                    api_id: ecupChamp.api_id as any,
+                    api_id: ecupChamp.api_id,
                 },
                 data: {is_info: updated.is_info} //JSON.parse(JSON.stringify(updated))
             });

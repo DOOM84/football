@@ -1,5 +1,5 @@
 import prisma from '~/helpers/prisma';
-import {IPost, ISmallPost} from "~/types/interfaces";
+import type {IPlayer, IPost, ITag} from "~/types/interfaces";
 import postListTransformer from "~/utils/transformers/postListTransformer";
 
 export default defineEventHandler(async (event) => {
@@ -48,10 +48,10 @@ export default defineEventHandler(async (event) => {
 
                     },
                 }
-            })
+            }) as unknown as ITag;
 
             return postListTransformer(tagDb?.posts.map(post => post.post)
-                .filter(post => post.status) as unknown as IPost[]) as ISmallPost[];
+                .filter(post => post.status));
 
         } else if (Number.isInteger(player)) {
 
@@ -74,10 +74,10 @@ export default defineEventHandler(async (event) => {
 
                     },
                 }
-            })
+            }) as unknown as IPlayer;
 
             return postListTransformer(playerDb?.posts.map(post => post.post)
-                .filter(post => post.status) as unknown as IPost[]) as ISmallPost[];
+                .filter(post => post.status));
 
         } else {
             const postsDb = await prisma.post.findMany({
@@ -95,9 +95,9 @@ export default defineEventHandler(async (event) => {
                 },
                 take: limit,
                 skip: offset
-            })
+            }) as unknown as IPost[]
 
-            return postListTransformer(postsDb as unknown as IPost[])
+            return postListTransformer(postsDb);
         }
 
 

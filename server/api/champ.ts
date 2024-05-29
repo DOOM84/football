@@ -1,8 +1,8 @@
 import prisma from '~/helpers/prisma';
-import {IChamp, IPost, IScorer, ITourResult} from "~/types/interfaces";
+import type {IChamp, IPost, IScorer, ITourResult} from "~/types/interfaces";
 import postListTransformer from "~/utils/transformers/postListTransformer";
 import singleChampTransformer from "~/utils/transformers/singleChampTransformer";
-import singleChampScorersTransformer from "~/utils/transformers/singleChampScorersTransformer";
+import champScorersTransformer from "~/utils/transformers/champScorersTransformer";
 import moment from "moment/moment";
 import champTransformer from "~/utils/transformers/champTransformer";
 
@@ -126,7 +126,7 @@ export default defineEventHandler(async (event) => {
 
         const headLines: Partial<IPost[]>  = postListTransformer(headLinesDb);
 
-        const players: Partial<IScorer> = singleChampScorersTransformer(champ);
+        const players: Partial<IScorer> = champScorersTransformer(champ);
 
         const delayResults: ITourResult[]  = champTransformer([champ], 'delay')
             .filter(champ => Object.keys(champ.tour!.scores).length);

@@ -16,18 +16,18 @@
                     {{ champ.champ.name }}
                 </div>
                 <div v-else-if="infoType === 'scorers'" v-for="(champ, i) in scorers"
-                     :key="infoType + ' ' + champ.champ.name" @click.prevent="showInfo($event, i)"
+                     :key="infoType + ' scorers'+i + ' ' + champ.champ.name" @click.prevent="showInfo($event, i)"
                      class="cursor-pointer underline-offset-4 text-[14px] font-semibold">
                     {{ champ.champ.name }}
                 </div>
-                <div v-else-if="infoType === 'ecupStands'" v-for="(ecup, group) in sortObj(ecupStands.stands)"
-                     :key="infoType + ' ' + ecupStands.slug"
+                <div v-else-if="infoType === 'ecupStands'" v-for="(ecup, group) in sortObj(ecupStands!.stands)"
+                     :key="infoType + ' ecupStands'+ group + ' '  + ecupStands!.slug"
                      @click.prevent="showInfo($event, group)"
                      class="cursor-pointer underline-offset-4 text-[14px] font-semibold whitespace-nowrap">
                    Группа {{ group }}
                 </div>
 
-                <div v-else-if="infoType === 'ecupResults'" v-for="(info, group) in sortObj(ecupResults)"
+                <div v-else-if="infoType === 'ecupResults'" v-for="(info, group) in sortObj(ecupResults!)"
                      :key="infoType + ' ' + group"
                      @click.prevent="showInfo($event, group)"
                      class="cursor-pointer underline-offset-4 text-[14px] font-semibold whitespace-nowrap">
@@ -57,18 +57,28 @@
 </template>
 
 <script setup lang="ts">
-import type {IChampDB, ITour} from "~/types/interfaces";
+import type {IChamp, IEcupResult, IEcupStand, IScorer, ITeam, ITourResult} from "~/types/interfaces";
 import sortObj from "~/helpers/sortObj";
 
 const props = defineProps<{
-    champs?: IChampDB[],
-    tourResults?: ITour[],
-    ecupStands?: {},
-    ecupResults?: {},
-    ecupPoResults?: any[],
-    scorers?: any[],
+    champs?: IChamp[],
+    tourResults?: ITourResult[],
+    ecupStands?: IEcupStand,
+    ecupResults?: {
+      [index: string]: {
+        [index: number]: {
+          [index: number]: Partial<IEcupResult>[]
+        }
+      }
+    },
+    ecupPoResults?: {
+      stage: string;
+      scores: IEcupResult['scores'];
+    }[],
+    scorers?: IScorer[],
     infoType?: string,
 }>()
+
 
 const tabInd = ref<number>(0);
 
@@ -82,12 +92,10 @@ const currentEcupPoResultInd = ref<number | string>(0)
 
 const champsBox = ref<HTMLElement>();
 
-//const IntObserver = ref<IntersectionObserver>()
-
 watch(
     () => props.tourResults,
     () => {
-      infoToShow.value = props.tourResults[currentResultInd.value as number]
+      infoToShow.value = props.tourResults![currentResultInd.value as number]
     },
     { deep: true }
 )
@@ -95,7 +103,7 @@ watch(
 watch(
     () => props.ecupResults,
     () => {
-      infoToShow.value = props.ecupResults[currentEcupResultInd.value as string]
+      infoToShow.value = props.ecupResults![currentEcupResultInd.value as string]
     },
     { deep: true }
 )
@@ -103,7 +111,7 @@ watch(
 watch(
     () => props.ecupPoResults,
     () => {
-      infoToShow.value = props.ecupPoResults[currentEcupPoResultInd.value as number].scores
+      infoToShow.value = props.ecupPoResults![currentEcupPoResultInd.value as number].scores
     },
     { deep: true }
 )
@@ -111,18 +119,18 @@ watch(
 onMounted(() => {
 
     if(props.infoType === 'shortStands'){
-        infoToShow.value = filterTeams(props.champs[0].teams);
+        infoToShow.value = filterTeams(props.champs![0].teams);
     }else if(props.infoType === 'shortResults'){
-      infoToShow.value = props.tourResults[0]
+      infoToShow.value = props.tourResults![0]
     }else if(props.infoType === 'scorers'){
-        infoToShow.value = props.scorers[0]
+        infoToShow.value = props.scorers![0]
     }else if(props.infoType === 'ecupStands'){
-        infoToShow.value = Object.values(sortObj(props.ecupStands.stands))[0]
+        infoToShow.value = Object.values(sortObj(props.ecupStands!.stands))[0]
     }else if(props.infoType === 'ecupResults'){
-      infoToShow.value = Object.values(sortObj(props.ecupResults))[0];
-      currentEcupResultInd.value = Object.keys(sortObj(props.ecupResults))[0];
+      infoToShow.value = Object.values(sortObj(props.ecupResults!))[0];
+      currentEcupResultInd.value = Object.keys(sortObj(props.ecupResults!))[0];
     }else if(props.infoType === 'ecupPoResults'){
-        infoToShow.value = props.ecupPoResults[0].scores
+        infoToShow.value = props.ecupPoResults![0].scores
     }
 
     champsBox.value?.children[0].classList.add('underline');
@@ -143,9 +151,9 @@ function sideScroll(element: any, direction: string, speed: number, distance: nu
     let scrollAmount = 0;
     const slideTimer = setInterval(function () {
         if (direction == 'left') {
-            champsBox.value.scrollLeft -= step;
+            champsBox.value!.scrollLeft -= step;
         } else {
-            champsBox.value.scrollLeft += step;
+            champsBox.value!.scrollLeft += step;
         }
         scrollAmount += step;
         if (scrollAmount >= distance) {
@@ -154,44 +162,40 @@ function sideScroll(element: any, direction: string, speed: number, distance: nu
     }, speed);
 }
 
-function filterTeams(teams) {
-    return teams.length > 4 ? teams.filter(t => t.hasOwnProperty('status') && t.status === true) : teams;
+function filterTeams(teams: ITeam[]) {
+    return teams.length > 4 ? teams.filter(t => t.hasOwnProperty('status') && t.status) : teams;
 }
 
-function showInfo(event: { target: HTMLElement }, i: number | string) {
+function showInfo(event: Event, i: number | string) {
 
     const currentTab: number = (typeof i === 'string') ? i.toLowerCase().charCodeAt(0) - 97 : i;
 
     if(tabInd.value === currentTab){return}
 
     if(props.infoType === 'shortStands'){
-        infoToShow.value = filterTeams(props.champs[i].teams);
+        infoToShow.value = filterTeams(props.champs![i as number].teams);
     }else if(props.infoType === 'shortResults'){
         currentResultInd.value = i as number;
-        infoToShow.value = props.tourResults[i] //JSON.parse(JSON.stringify(props.tourResults[i]))
+        infoToShow.value = props.tourResults![i as number] //JSON.parse(JSON.stringify(props.tourResults[i]))
     }else if(props.infoType === 'scorers'){
-        infoToShow.value = props.scorers[i]
+        infoToShow.value = props.scorers![i as number]
     }else if(props.infoType === 'ecupStands'){
-        infoToShow.value = props.ecupStands.stands[i]
+        infoToShow.value = props.ecupStands!.stands[i]
     }else if(props.infoType === 'ecupResults'){
       currentEcupResultInd.value = i as string;
-      infoToShow.value = props.ecupResults[i];
+      infoToShow.value = props.ecupResults![i];
     }else if(props.infoType === 'ecupPoResults'){
-        currentEcupPoResultInd.value = i as string;
-        infoToShow.value = props.ecupPoResults[i].scores
+        currentEcupPoResultInd.value = i as number;
+        infoToShow.value = props.ecupPoResults![i as number].scores
     }
 
-    //const elemWidth = event.target.offsetWidth;
+    const parentEl = (event.target as HTMLElement).parentElement;
 
-    const parentEl = event.target.parentElement;
-
-    //const parentWidth = parentEl.offsetWidth;
-
-    for (let i = 0; i < parentEl.children.length; i++) {
-        parentEl.children[i].classList.remove('underline')
+    for (let i = 0; i < parentEl!.children.length; i++) {
+        parentEl!.children[i].classList.remove('underline')
     }
 
-    event.target.classList.add('underline');
+  (event.target as HTMLElement).classList.add('underline');
 
     if(currentTab > tabInd.value){
         sideScroll('', 'right', 25, 70, 10);
@@ -200,27 +204,6 @@ function showInfo(event: { target: HTMLElement }, i: number | string) {
     }
 
     tabInd.value = currentTab;
-
-    /*IntObserver.value = new IntersectionObserver(function (entries) {
-        if (!entries[0].isIntersecting) {
-
-            const rect1 = champsBox.value.getBoundingClientRect();
-            const rect2 = event.target.getBoundingClientRect();
-            const leftPos = rect2.left - rect1.left;
-
-            const shiftTo = elemWidth - (elemWidth * entries[0].intersectionRatio)
-            if (leftPos > parentWidth / 2) {
-                sideScroll('', 'right', 25, shiftTo + 50, 10);
-            } else {
-                sideScroll('', 'left', 25, shiftTo + 50, 10);
-            }
-        } else {
-            IntObserver.value?.disconnect()
-        }
-
-    }, {threshold: [1]});
-
-    IntObserver.value.observe(event.target);*/
 }
 </script>
 

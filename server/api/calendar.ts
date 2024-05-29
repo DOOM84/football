@@ -1,5 +1,5 @@
 import prisma from '~/helpers/prisma';
-import {IChamp} from "~/types/interfaces";
+import type {IChamp} from "~/types/interfaces";
 import postListTransformer from "~/utils/transformers/postListTransformer";
 import calendarTransformer from "~/utils/transformers/calendarTransformer";
 

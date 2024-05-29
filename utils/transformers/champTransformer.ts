@@ -13,14 +13,6 @@ export default ((champs: IChamp[], source = 'tour', isRelegation: boolean = fals
            }
        }
 
-       /*if(source === 'results'){
-           if(isRelegation){
-               champ[source] = champ[source].filter((r: IResult) => +r.tour === 99);
-           }else{
-               champ[source] = champ[source].filter((r: IResult) => +r.tour < +champ.current_tour);
-           }
-       }*/
-
        (champ[source as champSrc] as IResult[]).map((tour: IResult) => {
 
            let goalsOnly = null;

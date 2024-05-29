@@ -1,5 +1,5 @@
 import {addEcupResults} from "~/helpers/remoteApi";
-import {IError, IScore} from "~/types/interfaces";
+import type {IError, IScore} from "~/types/interfaces";
 import prisma from "~/helpers/prisma";
 import moment from "moment";
 import singleEcupResultsTransformer from "~/utils/transformers/singleEcupResultsTransformer";

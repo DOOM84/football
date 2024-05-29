@@ -1,5 +1,5 @@
 import prisma from '~/helpers/prisma';
-import {IError} from "~/types/interfaces";
+import type {IError} from "~/types/interfaces";
 
 
 export default defineEventHandler(async (event) => {

@@ -1,5 +1,5 @@
 import prisma from '~/helpers/prisma';
-import {IPost, ISmallPost} from "~/types/interfaces";
+import type {IPost} from "~/types/interfaces";
 import postListTransformer from "~/utils/transformers/postListTransformer";
 
 export default defineEventHandler(async (event) => {
@@ -22,9 +22,9 @@ export default defineEventHandler(async (event) => {
                 champ: true
             },
             take: 36
-        })
+        }) as unknown as IPost[];
 
-        const posts: ISmallPost[]  = postListTransformer(postsDb as unknown as IPost[]);
+        const posts = postListTransformer(postsDb);
 
         return {posts};
 

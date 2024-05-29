@@ -1,6 +1,6 @@
 import prisma from '~/helpers/prisma';
 import { object, string, number, ObjectSchema, } from 'yup';
-import {IError} from "~/types/interfaces";
+import type {IError} from "~/types/interfaces";
 
 const schema: ObjectSchema<{
     name: string,

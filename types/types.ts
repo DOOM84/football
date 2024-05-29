@@ -1,6 +1,8 @@
-import type {IScore} from "~/types/interfaces";
+import {seasons} from "~/utils/archive";
 
 export type adminMode = 'add'|'edit'|null;
 
-export type result = Record<string | number, Record<string | number, IScore[]>>
+export type Season = typeof seasons[number];
+
+
 

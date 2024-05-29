@@ -1,4 +1,5 @@
 import prisma from '~/helpers/prisma';
+import getPosition from "~/utils/getPosition";
 export default defineEventHandler(async (event) => {
     try {
         // @ts-ignore: Unreachable code error
@@ -29,9 +30,3 @@ export default defineEventHandler(async (event) => {
     }
 
 })
-
-function getPosition(positionId: number) {
-    return positionId === 1
-        ? 'Голкипер' : positionId === 2 ? 'Защитник' :
-            positionId === 3 ? 'Полузащитник' : positionId === 4 ? 'Нападающий' : ''
-}

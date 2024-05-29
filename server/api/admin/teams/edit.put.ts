@@ -5,7 +5,7 @@ import {object, string, number, ObjectSchema, lazy, mixed,} from 'yup';
 //import prepareFileInfo from "~/helpers/upload/prepareFileInfo";
 //import sharp from "sharp";
 //import setFilePath from "~/helpers/upload/setFilePath";
-import {IError} from "~/types/interfaces";
+import type {IError} from "~/types/interfaces";
 import {Upload} from "~/classes/upload";
 
 const schema: ObjectSchema<{

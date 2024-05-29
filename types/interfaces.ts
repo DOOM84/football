@@ -190,6 +190,7 @@ export interface IEcupStand {
     group: string;
     team_id: number;
     ecup: IEcup;
+    ecupTeam: IEcupTeam;
     stands: {
         [index: string]: {
             teams: {
@@ -277,6 +278,7 @@ export interface ITag {
 export interface IPlayer {
     id: number;
     api_id: number;
+    player_id?: number | null;
     name: string;
     slug: string;
     img: string;
@@ -284,7 +286,7 @@ export interface IPlayer {
     team_id: number;
     number: number;
     country: ICountry | string;
-    country_id: number;
+    country_id: number | null;
     position: string;
     position_id: number;
     info: Record<string, any>;

@@ -1,9 +1,21 @@
 import prisma from '~/helpers/prisma';
 import matchInfoTransformer from "~/utils/transformers/matchInfoTransformer";
-import {IChampDB, IPost, IScore, ISmallPost, ITour} from "~/types/interfaces";
+import {
+    IChamp,
+    IPost,
+    IMatchInfo,
+    ITourResult,
+    ITeam,
+    IEcupTeam,
+    IResult,
+    IEcup,
+    IEcupResult
+} from "~/types/interfaces";
 import postListTransformer from "~/utils/transformers/postListTransformer";
 import singleEcupResultsTransformer from "~/utils/transformers/singleEcupResultsTransformer";
 import singleChampTransformer from "~/utils/transformers/singleChampTransformer";
+import type {Season} from "~/types/types";
+
 
 export default defineEventHandler(async (event) => {
 
@@ -13,7 +25,11 @@ export default defineEventHandler(async (event) => {
             return this.toString();
         };
 
-        const query = getQuery(event);
+        const query = getQuery(event) as {
+            season: Season;
+            apiId: number;
+            loadPosts: boolean;
+        };
 
         if (!query.season) {
             throw createError({
@@ -22,21 +38,21 @@ export default defineEventHandler(async (event) => {
             })
         }
 
-        const teams = await prisma.team.findMany();
+        const teams = await prisma.team.findMany() as unknown as ITeam[];
 
-        const ecupTeams = await prisma.ecupTeam.findMany();
+        const ecupTeams = await prisma.ecupTeam.findMany() as unknown as IEcupTeam[];
 
-        const champMatch = await prisma[`matchInfo${query.season}`].findFirst({
+        const champMatch = await (prisma[`matchInfo${query.season}`] as any).findFirst({
             where: {
                 ch_res: +query.apiId!,
             },
-        })
+        }) as unknown as IMatchInfo;
 
-        const ecupMatch = await prisma[`matchInfo${query.season}`].findFirst({
+        const ecupMatch = await (prisma[`matchInfo${query.season}`] as any).findFirst({
             where: {
                 ecup_res: +query.apiId!,
             },
-        })
+        }) as unknown as IMatchInfo;
 
         if (!champMatch && !ecupMatch) {
             throw createError({
@@ -47,11 +63,11 @@ export default defineEventHandler(async (event) => {
 
         if(champMatch){
 
-            champMatch.champResult = await prisma[`result${query.season}`].findFirst({
+            champMatch.champResult = await (prisma[`result${query.season}`] as any).findFirst({
                 where: {
                     api_id: +query.apiId!,
                 },
-            });
+            }) as unknown as IResult;
 
             champMatch.champResult.home = teams.filter(team =>
                 team.id === +champMatch.champResult.team1)[0];
@@ -62,30 +78,30 @@ export default defineEventHandler(async (event) => {
 
         if(ecupMatch){
 
-            ecupMatch.ecupResult = await prisma[`ecupResult${query.season}`].findFirst({
+            ecupMatch.ecupResult = await (prisma[`ecupResult${query.season}`] as any).findFirst({
                 where: {
                     api_id: +query.apiId!,
                 },
-            });
+            }) as unknown as IEcupResult;
 
             ecupMatch.ecupResult.home = ecupTeams.filter(team =>
                 team.id === +ecupMatch.ecupResult.team1)[0];
 
             ecupMatch.ecupResult.home.team = teams.filter(team =>
-                team.id === +ecupMatch.ecupResult.home.team_id )[0];
+                team.id === +ecupMatch.ecupResult.home.team_id! )[0];
 
             ecupMatch.ecupResult.away = ecupTeams.filter(team =>
                 team.id === +ecupMatch.ecupResult.team2)[0];
 
             ecupMatch.ecupResult.away.team = teams.filter(team =>
-                team.id === +ecupMatch.ecupResult.away.team_id )[0]
+                team.id === +ecupMatch.ecupResult.away.team_id! )[0]
         }
 
         const res = champMatch || ecupMatch;
 
-        let posts: ISmallPost[] = [];
+        let posts: IPost[] = [];
         let ecupResults: Record<string, any> = {}
-        let tourResults: ITour | {} = {};
+        let tourResults: ITourResult | {} = {};
 
         if (ecupMatch?.ecupResult?.ecup_id) {
             const ecup = await prisma.ecup.findFirst({
@@ -132,12 +148,12 @@ export default defineEventHandler(async (event) => {
                     } : false,
                 },
 
-            })
+            }) as unknown as IEcup;
 
-            posts = postListTransformer(ecup!.posts as unknown as IPost[]);
+            posts = postListTransformer(ecup!.posts);
 
             const {groupResults, poResults} =
-                singleEcupResultsTransformer(ecup!.results as unknown as IScore[]);
+                singleEcupResultsTransformer(ecup!.results);
 
             ecupResults = {groupResults, poResults}
         }
@@ -175,11 +191,11 @@ export default defineEventHandler(async (event) => {
                         }
                     },
                 },
-            })
+            }) as unknown as IChamp;
 
-            posts = postListTransformer(champ!.posts as unknown as IPost[]);
+            posts = postListTransformer(champ!.posts);
 
-            tourResults = singleChampTransformer(champ as unknown as IChampDB);
+            tourResults = singleChampTransformer(champ);
         }
 
         const mixedSquads = [];

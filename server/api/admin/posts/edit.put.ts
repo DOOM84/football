@@ -4,7 +4,7 @@ import prisma from '~/helpers/prisma';
 import { object, string, mixed, ObjectSchema, lazy } from 'yup';
 //import prepareFileInfo from "~/helpers/upload/prepareFileInfo";
 //import sharp from "sharp";
-import {IError, IPost, ITag} from "~/types/interfaces";
+import type {IError, IPost, ITag} from "~/types/interfaces";
 const runtimeConfig = useRuntimeConfig();
 import algoliasearch from "algoliasearch";
 import {Upload} from "~/classes/upload";

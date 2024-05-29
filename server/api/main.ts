@@ -1,10 +1,10 @@
 import prisma from '~/helpers/prisma';
 import ecupTransformer from "~/utils/transformers/ecupTransformer";
 import champTransformer from "~/utils/transformers/champTransformer";
-import {IChamp, IEcup, IEcupStand, IPost, IScorer, type ITourResult} from "~/types/interfaces";
+import type {IChamp, IEcup, IPost, IScorer, ITourResult} from "~/types/interfaces";
 import postListTransformer from "~/utils/transformers/postListTransformer";
 import moment from "moment";
-import singleChampScorersTransformer from "~/utils/transformers/singleChampScorersTransformer";
+import champScorersTransformer from "~/utils/transformers/champScorersTransformer";
 
 export default defineEventHandler(async (event) => {
 
@@ -153,7 +153,7 @@ export default defineEventHandler(async (event) => {
         const relegationResults: ITourResult[]  = champTransformer(champs, 'relegation', true)
             .filter(champ => Object.keys(champ.tour!.scores).length);
 
-        const players: IScorer[] | Partial<IScorer>[]  = champs.map(champ => singleChampScorersTransformer(champ));
+        const players: IScorer[] | Partial<IScorer>[]  = champs.map(champ => champScorersTransformer(champ));
 
         const posts: Partial<IPost[]> = postListTransformer(postsDb);
 

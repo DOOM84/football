@@ -1,32 +1,31 @@
-import type {IChampDB, IPlayer, IScorer} from "~/types/interfaces";
+import type {IChamp, IScorer} from "~/types/interfaces";
 
-export default ((champs: IChampDB[]): IScorer[] => {
-   return  champs.map(champ => {
+export default ((champ: Partial<IChamp>): IScorer | Partial<IScorer> => {
 
-       const res = {
-           "champ": {
-               "name": champ.name,
-               "slug": champ.slug
-           },
+    if(!champ){return {players: []}}
 
-           "players": champ.scorers?.map((scorer: IPlayer) => {
-               return {
-                   name: scorer.name,
-                   slug: scorer.player?.slug,
-                   img: scorer.player?.img,
-                   goals: scorer.goals,
-                   team: {
-                       name: scorer.player?.team?.name || null,
-                       sprite: scorer.player?.team?.sprite || null,
-                       slug: scorer.player?.team?.slug || null,
-                   }
-               }
-           })
-       }
-       delete champ.scorers;
+    const res = {
+        champ: {
+            name: champ.name,
+            slug: champ.slug
+        },
 
-       return res as IScorer
+        players: champ.scorers?.map((scorer) => {
+            return {
+                name: scorer.name,
+                slug: scorer.player?.slug,
+                img: scorer.player?.img,
+                goals: scorer.goals,
+                team: {
+                    name: scorer.player.team.name,
+                    sprite: scorer.player.team.sprite,
+                    slug: scorer.player.team.slug,
+                }
+            }
+        })
+    }
+    delete champ.scorers;
 
-   })
+    return res as unknown as IScorer
 
 })

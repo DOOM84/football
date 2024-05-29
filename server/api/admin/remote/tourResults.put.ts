@@ -1,6 +1,6 @@
 import {addChampTourResults} from "~/helpers/remoteApi";
 import prisma from '~/helpers/prisma';
-import {IError, IScore} from "~/types/interfaces";
+import type {IError, ITourResult} from "~/types/interfaces";
 import groupBy from "~/helpers/groupBy";
 
 export default defineEventHandler(async (event) => {
@@ -20,13 +20,6 @@ export default defineEventHandler(async (event) => {
         });
 
         for (let i = 0; i < results.length; i++) {
-
-            /*const team1 = await prisma.team.findFirst({
-                where: {api_id: +results[i].team1},
-            })
-            const team2 = await prisma.team.findFirst({
-                where: {api_id: +results[i].team2},
-            })*/
 
             const team1 = teams.filter(team => team.api_id === +results[i].team1)[0]
             const team2 = teams.filter(team => team.api_id === +results[i].team2)[0]
@@ -53,20 +46,6 @@ export default defineEventHandler(async (event) => {
             })
         }
 
-       /* await prisma.tour.createMany({
-            data: results
-        })*/
-
-       /* for (let i = 0; i < results.length; i++) {
-            await prisma.tour.upsert({
-                where: { api_id: +results[i].api_id },
-                update: results[i],
-                create: results[i],
-            })
-        }
-*/
-
-
        const scores =  await prisma.tour.findMany({
             where: {tour: +current_tour, champ_id: +id},
            orderBy: {
@@ -77,7 +56,7 @@ export default defineEventHandler(async (event) => {
                away: {select: {slug: true, sprite: true, name: true}},
                champ: {select: {name: true, slug: true}}
            }
-        })
+        })as unknown as ITourResult[];
 
         const res =  {
             champ: {
@@ -85,7 +64,7 @@ export default defineEventHandler(async (event) => {
                 slug
             },
             tour: {
-                scores: groupBy(scores as unknown as IScore[], 'date'),
+                scores: groupBy(scores, 'date'),
                 num: +current_tour
             }
         }

@@ -1,5 +1,5 @@
 import prisma from '~/helpers/prisma';
-import {IEcup} from "~/types/interfaces";
+import type {IEcup} from "~/types/interfaces";
 import ecupTransformer from '~/utils/transformers/ecupTransformer';
 import postListTransformer from "~/utils/transformers/postListTransformer";
 

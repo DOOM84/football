@@ -1,5 +1,5 @@
 import prisma from '~/helpers/prisma';
-import {IChamp, IPost} from "~/types/interfaces";
+import type {IChamp, IPost} from "~/types/interfaces";
 import postListTransformer from "~/utils/transformers/postListTransformer";
 
 export default defineEventHandler(async (event) => {
@@ -54,7 +54,7 @@ export default defineEventHandler(async (event) => {
             })
         }
 
-        const posts: IPost[]  = postListTransformer(champ.posts);
+        const posts  = postListTransformer(champ.posts);
 
         return {posts, teams: champ.teams, champ: champ.name};
 

@@ -1,5 +1,5 @@
 import prisma from '~/helpers/prisma';
-import {IEcup, IEcupStand, IPlayer, IPost,} from "~/types/interfaces";
+import type {IEcup, IEcupStand, IPlayer, IPost,} from "~/types/interfaces";
 import postTransformer from "~/utils/transformers/postTransformer";
 import postListTransformer from "~/utils/transformers/postListTransformer";
 import singleEcupResultsTransformer from "~/utils/transformers/singleEcupResultsTransformer";

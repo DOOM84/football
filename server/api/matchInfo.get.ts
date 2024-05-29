@@ -1,6 +1,6 @@
 import prisma from '~/helpers/prisma';
 import matchInfoTransformer from "~/utils/transformers/matchInfoTransformer";
-import {IChamp, IEcup, IEcupResult, IMatchInfo, IPost, ITourResult} from "~/types/interfaces";
+import type {IChamp, IEcup, IEcupResult, IMatchInfo, IPost, ITourResult} from "~/types/interfaces";
 import postListTransformer from "~/utils/transformers/postListTransformer";
 import singleEcupResultsTransformer from "~/utils/transformers/singleEcupResultsTransformer";
 import singleChampTransformer from "~/utils/transformers/singleChampTransformer";

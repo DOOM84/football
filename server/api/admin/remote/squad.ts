@@ -1,7 +1,7 @@
 import prisma from '~/helpers/prisma';
 import {addChampSquad} from "~/helpers/remoteApi";
 import slugify from "slugify";
-import {IPlayer} from "~/types/interfaces";
+import type {IPlayer} from "~/types/interfaces";
 
 const res: Partial<IPlayer>[] = []
 export default defineEventHandler(async (event) => {

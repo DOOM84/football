@@ -2,7 +2,7 @@ import algoliasearch from "algoliasearch";
 const runtimeConfig = useRuntimeConfig();
 import prisma from '~/helpers/prisma';
 import teamPlayersTransformer from "~/utils/transformers/teamPlayersTransformer";
-import {IPlayer} from "~/types/interfaces";
+import type {IPlayer, ITeam} from "~/types/interfaces";
 
 export default defineEventHandler(async (event) => {
     try {
@@ -39,7 +39,7 @@ export default defineEventHandler(async (event) => {
                             }
                         ]
                     },
-                });
+                }) as ITeam[];
             }
 
             const index = client.initIndex(category as string);
@@ -77,7 +77,7 @@ export default defineEventHandler(async (event) => {
                     }
                     ]
             },
-        });
+        }) as unknown as ITeam[];
 
 
         const queries = [{

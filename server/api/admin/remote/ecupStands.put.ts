@@ -1,6 +1,6 @@
 import {addEcupStands} from "~/helpers/remoteApi";
 import prisma from '~/helpers/prisma';
-import {IError, ITeamInfo} from "~/types/interfaces";
+import type {IEcupTeam, IError} from "~/types/interfaces";
 
 export default defineEventHandler(async (event) => {
 
@@ -16,7 +16,7 @@ export default defineEventHandler(async (event) => {
             include: {
                 team: {select: {slug: true, id: true}}
             }
-        }) as unknown as ITeamInfo[];
+        }) as unknown as IEcupTeam[];
 
         if(slug && api_id){
           const stands =  await addEcupStands(api_id, ecup_teams, id)

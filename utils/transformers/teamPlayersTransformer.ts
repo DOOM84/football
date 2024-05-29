@@ -1,4 +1,5 @@
 import type {IPlayer} from "~/types/interfaces";
+import getPosition from "~/utils/getPosition";
 
 export default ((players: IPlayer[]): Partial<IPlayer>[] => {
 
@@ -15,9 +16,3 @@ export default ((players: IPlayer[]): Partial<IPlayer>[] => {
    }) as Partial<IPlayer>[]
 
 })
-
-function getPosition(positionId: number) {
-    return positionId === 1
-        ? 'Голкипер' : positionId === 2 ? 'Защитник' :
-            positionId === 3 ? 'Полузащитник' : positionId === 4 ? 'Нападающий' : ''
-}

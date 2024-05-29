@@ -1,8 +1,8 @@
 import moment from "moment";
-import type {IChamp, IPlayer, IResult, IScorer, ITeam} from "~/types/interfaces";
+import type {IChamp, IEcupTeam, IPlayer, IResult, IScorer, ITeam} from "~/types/interfaces";
 
 const runtimeConfig = useRuntimeConfig();
-const season = 2023;
+import {season} from "~/utils/archive";
 
 export async function addPlayerInfo(teamApiId: number, playerApiId: number): Promise<Partial<IPlayer> | undefined> {
 
@@ -180,7 +180,7 @@ export async function addChampTourResults(champId: string | number, champApiId: 
     })
 }
 
-export async function addChampsScorers(champs: IChamp[]): Promise<Partial<IScorer>[]> {
+export async function addChampsScorers(champs: IChamp[]): Promise<Partial<IPlayer>[]> {
 
     const players = []
 
@@ -224,7 +224,7 @@ export async function addEcupResults(ecupApiId: string | number): Promise<Partia
     return response;
 }
 
-export async function addEcupStands(ecupApiId: string | number, ecup_teams: ITeam[], ecupId: string | number): Promise<any> {
+export async function addEcupStands(ecupApiId: string | number, ecup_teams: IEcupTeam[], ecupId: string | number): Promise<any> {
 
     const {response} = await $fetch<Record<string, any>>(
         `https://v3.football.api-sports.io/standings?league=${ecupApiId}&season=${season}`, {

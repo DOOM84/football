@@ -1,6 +1,6 @@
 import type {IError, IUser} from "~/types/interfaces";
 import { object, string, ObjectSchema, ref } from 'yup';
-type AdminUser = Omit<IUser, 'id' | 'admin' | 'avatar' | 'user_id'>;
+type AdminUser = Pick<IUser, 'login' | 'email' | 'password' | 'passwordConfirmation'>;
 
 const schema: ObjectSchema<AdminUser> = object({
 

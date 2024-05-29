@@ -1,4 +1,4 @@
-import {IError} from "~/types/interfaces";
+import type {IError} from "~/types/interfaces";
 import {serverSupabaseServiceRole} from '#supabase/server';
 
 

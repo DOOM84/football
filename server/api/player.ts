@@ -1,5 +1,5 @@
 import prisma from '~/helpers/prisma';
-import {IChamp, IPlayer} from "~/types/interfaces";
+import type {IChamp, IPlayer} from "~/types/interfaces";
 import postListTransformer from "~/utils/transformers/postListTransformer";
 import singlePlayerTransformer from "~/utils/transformers/singlePlayerTransformer";
 

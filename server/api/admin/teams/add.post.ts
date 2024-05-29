@@ -2,9 +2,7 @@ import formidable, {Fields, Files} from "formidable";
 import prisma from '~/helpers/prisma';
 //import fs from "fs";
 import {object, string, mixed, ObjectSchema, number,} from 'yup';
-//import prepareFileInfo from "~/helpers/upload/prepareFileInfo";
-//import sharp from "sharp";
-import {IError} from "~/types/interfaces";
+import type {IError} from "~/types/interfaces";
 import {Upload} from "~/classes/upload";
 
 const schema: ObjectSchema<{
