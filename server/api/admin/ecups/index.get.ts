@@ -1,4 +1,5 @@
 import prisma from '~/helpers/prisma';
+import type {IEcup} from "~/types/interfaces";
 
 export default defineEventHandler(async (event) => {
     try {
@@ -11,7 +12,7 @@ export default defineEventHandler(async (event) => {
             orderBy: {
                 name: 'asc',
             },
-        })
+        }) as unknown as IEcup[];
 
         return {ecups};
 

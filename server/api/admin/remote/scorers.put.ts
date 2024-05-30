@@ -1,12 +1,12 @@
 import {addChampsScorers} from "~/helpers/remoteApi";
 import prisma from '~/helpers/prisma';
-import type {IChamp, IError} from "~/types/interfaces";
+import type {IChamp, IError, IPlayer} from "~/types/interfaces";
 
 export default defineEventHandler(async (event) => {
 
     try {
 
-        const champs = await prisma.champ.findMany()as unknown as IChamp[]
+        const champs = await prisma.champ.findMany() as unknown as IChamp[]
 
       const players =  await addChampsScorers(champs);
 
@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
 
            const player = await prisma.player.findFirst({
                 where: {api_id: players[i].api_id}
-            })
+            }) as unknown as IPlayer;
 
             players[i].player_id = player?.id || null
 

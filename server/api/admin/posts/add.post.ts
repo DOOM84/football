@@ -1,6 +1,5 @@
 import formidable, {Fields, Files} from "formidable";
 import prisma from '~/helpers/prisma';
-//import fs from "fs";
 import { object, string, mixed, ObjectSchema, } from 'yup';
 import type {IError} from "~/types/interfaces";
 const runtimeConfig = useRuntimeConfig();

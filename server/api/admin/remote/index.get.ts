@@ -1,4 +1,5 @@
 import prisma from '~/helpers/prisma';
+import type {IChamp, IEcup} from "~/types/interfaces";
 export default defineEventHandler(async (event) => {
     try {
         // @ts-ignore: Unreachable code error
@@ -10,13 +11,13 @@ export default defineEventHandler(async (event) => {
             orderBy: {
                 name: 'asc',
             },
-        })
+        }) as unknown as IChamp[];
 
         const ecups = await prisma.ecup.findMany({
             orderBy: {
                 id: 'asc',
             },
-        })
+        }) as unknown as IEcup[];
 
         return {champs, ecups}
 

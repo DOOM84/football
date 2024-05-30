@@ -1,5 +1,6 @@
 import prisma from '~/helpers/prisma';
 import {addPlayerInfo} from "~/helpers/remoteApi";
+import type {ICountry} from "~/types/interfaces";
 export default defineEventHandler(async (event) => {
     try {
         // @ts-ignore: Unreachable code error
@@ -17,7 +18,7 @@ export default defineEventHandler(async (event) => {
             where: {
                 parse_name: player.nationality,
             },
-        })
+        }) as unknown as ICountry;
 
         const info = {
                 name: player.name,

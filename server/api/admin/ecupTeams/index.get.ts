@@ -1,4 +1,5 @@
 import prisma from '~/helpers/prisma';
+import type {IEcupTeam, ITeam} from "~/types/interfaces";
 
 export default defineEventHandler(async (event) => {
     try {
@@ -14,14 +15,14 @@ export default defineEventHandler(async (event) => {
             include: {
                 team: true
             }
-        })
+        }) as unknown as IEcupTeam[];
 
         const teams  = await prisma.team.findMany({
           //  select: {slug: true, name: true, id: true},
             orderBy: {
                 name: 'asc',
             },
-        });
+        }) as unknown as ITeam[];
 
         return {ecupTeams, teams};
 

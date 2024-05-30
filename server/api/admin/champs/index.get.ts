@@ -1,4 +1,5 @@
 import prisma from '~/helpers/prisma';
+import type {IChamp} from "~/types/interfaces";
 
 export default defineEventHandler(async (event) => {
     try {
@@ -12,7 +13,7 @@ export default defineEventHandler(async (event) => {
                 name: 'asc',
             },
             //take: 5
-        })
+        }) as unknown as IChamp[]
 
         return {champs};
 

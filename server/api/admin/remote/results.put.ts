@@ -1,6 +1,6 @@
-import {addChampResults, addChampsStands} from "~/helpers/remoteApi";
+import {addChampResults} from "~/helpers/remoteApi";
 import prisma from '~/helpers/prisma';
-import type {IError} from "~/types/interfaces";
+import type {IError, ITeam} from "~/types/interfaces";
 
 export default defineEventHandler(async (event) => {
 
@@ -10,28 +10,9 @@ export default defineEventHandler(async (event) => {
 
         const results =  await addChampResults(id, api_id) as any[];
 
-        /*if(results.length) {
-            await prisma.result.deleteMany({where: {champ_id: +id}})
-        }*/
-
         const teams = await prisma.team.findMany({
             select: {id: true, api_id: true}
-        });
-
-        /*for (let i = 0; i < results.length; i++) {
-
-            const team1 = await prisma.team.findFirst({
-                where: {api_id: +results[i].team1},
-            })
-            const team2 = await prisma.team.findFirst({
-                where: {api_id: +results[i].team2},
-            })
-
-            results[i].team1 = +team1!.id;
-            results[i].team2 = +team2!.id;
-
-            results[i].tour = !parseInt(results[i].tour) ? results[i-1].tour : results[i].tour;
-        }*/
+        }) as unknown as ITeam[];
 
         for (let i = 0; i < results.length; i++) {
 
@@ -49,10 +30,6 @@ export default defineEventHandler(async (event) => {
                 create: results[i],
             })
         }
-
-        /*await prisma.result.createMany({
-            data: results
-        })*/
 
         return results
 

@@ -1,4 +1,5 @@
 import prisma from '~/helpers/prisma';
+import type {ITeam} from "~/types/interfaces";
 
 export default defineEventHandler(async (event) => {
     try {
@@ -24,7 +25,7 @@ export default defineEventHandler(async (event) => {
                 }
             }
 
-        })
+        }) as unknown as ITeam[];
 
         return [].concat(...teamsWithPlayers.map(team => team.players) as any[])
 

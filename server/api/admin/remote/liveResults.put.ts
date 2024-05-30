@@ -1,6 +1,6 @@
 import {liveScores, matchSquads} from "~/helpers/remoteApi";
 import prisma from '~/helpers/prisma';
-import type {IError} from "~/types/interfaces";
+import type {IEcupResult, IError, IMatchInfo, IResult} from "~/types/interfaces";
 
 export default defineEventHandler(async (event) => {
 
@@ -16,7 +16,7 @@ export default defineEventHandler(async (event) => {
                 where: {
                     api_id: +results[i].api_id
                 }
-            })
+            }) as unknown as IResult;
 
             if(tourRes?.id){
                 await prisma.tour.update({
@@ -36,7 +36,7 @@ export default defineEventHandler(async (event) => {
                 where: {
                     api_id: +results[i].api_id
                 }
-            })
+            }) as unknown as IResult;
 
             if(champRes?.id){
                 await prisma.result.update({
@@ -56,7 +56,7 @@ export default defineEventHandler(async (event) => {
                 where: {
                     api_id: +results[i].api_id
                 }
-            })
+            }) as unknown as IEcupResult;
 
             if(ecupRes?.id){
                 await prisma.ecupResult.update({
@@ -76,7 +76,7 @@ export default defineEventHandler(async (event) => {
                     where: {
                         OR: [{ch_res: results[i].api_id}, {ecup_res: results[i].api_id}],
                     },
-                })
+                }) as unknown as IMatchInfo;
 
                 if (match && (!match.lineups || (Array.isArray(match.lineups) && !match.lineups.length))) {
 

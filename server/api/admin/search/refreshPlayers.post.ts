@@ -1,4 +1,4 @@
-import type {IError, IUser} from "~/types/interfaces";
+import type {IError, IPlayer} from "~/types/interfaces";
 import prisma from "~/helpers/prisma";
 import algoliasearch from "algoliasearch";
 const runtimeConfig = useRuntimeConfig();
@@ -18,7 +18,7 @@ export default defineEventHandler(async (event) => {
                 include: {
                     team: {select: {name: true, sprite: true, slug: true}}
                 }
-            });
+            }) as unknown as IPlayer[];
 
             for (let i = 0; i < players.length; i++) {
                 players[i] = {
@@ -28,7 +28,7 @@ export default defineEventHandler(async (event) => {
                     team: players[i].team,
                     objectID: players[i].slug,
                     position_id: players[i].position_id,
-                } as any
+                } as any;
             }
 
             await index.saveObjects(players);

@@ -100,7 +100,7 @@ async function getPlayerSlug(playerSlug: string, playerApiId: number, flag: numb
                 api_id: +playerApiId,
             },
         },
-    })
+    }) as unknown as IPlayer;
 
     if(player?.id){
         flag += 1;

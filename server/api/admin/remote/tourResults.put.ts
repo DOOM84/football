@@ -1,6 +1,6 @@
 import {addChampTourResults} from "~/helpers/remoteApi";
 import prisma from '~/helpers/prisma';
-import type {IError, ITourResult} from "~/types/interfaces";
+import type {IError, ITeam, ITourResult} from "~/types/interfaces";
 import groupBy from "~/helpers/groupBy";
 
 export default defineEventHandler(async (event) => {
@@ -17,7 +17,7 @@ export default defineEventHandler(async (event) => {
 
         const teams = await prisma.team.findMany({
             select: {id: true, api_id: true}
-        });
+        }) as unknown as ITeam[];
 
         for (let i = 0; i < results.length; i++) {
 
@@ -56,7 +56,7 @@ export default defineEventHandler(async (event) => {
                away: {select: {slug: true, sprite: true, name: true}},
                champ: {select: {name: true, slug: true}}
            }
-        })as unknown as ITourResult[];
+        }) as unknown as ITourResult[];
 
         const res =  {
             champ: {

@@ -1,6 +1,6 @@
 import {addChampsStands} from "~/helpers/remoteApi";
 import prisma from '~/helpers/prisma';
-import type {IError} from "~/types/interfaces";
+import type {IChamp, IError} from "~/types/interfaces";
 
 export default defineEventHandler(async (event) => {
 
@@ -13,7 +13,7 @@ export default defineEventHandler(async (event) => {
                     select: {api_id: true}
                 }
         }
-        })
+        }) as unknown as IChamp[];
 
       const teams =  await addChampsStands(champs) as Record<string, any>[];
 

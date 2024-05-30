@@ -1,5 +1,5 @@
 import {addEcupResults} from "~/helpers/remoteApi";
-import type {IError, IScore} from "~/types/interfaces";
+import type {IEcupResult, IEcupStand, IEcupTeam, IError} from "~/types/interfaces";
 import prisma from "~/helpers/prisma";
 import moment from "moment";
 import singleEcupResultsTransformer from "~/utils/transformers/singleEcupResultsTransformer";
@@ -17,7 +17,7 @@ export default defineEventHandler(async (event) => {
                 include: {
                     team: {select: {slug: true, id: true, api_id: true, name: true, sprite: true}}
                 }
-            });
+            }) as unknown as IEcupTeam[];
 
             const results = await addEcupResults(+api_id) as Record<string, any>[];
 
@@ -46,7 +46,7 @@ export default defineEventHandler(async (event) => {
                         ],
                     },
 
-                })
+                }) as unknown as IEcupStand;
 
                 return {
                     date: moment(res.fixture.timestamp * 1000).startOf('day').valueOf(),
@@ -129,14 +129,14 @@ export default defineEventHandler(async (event) => {
                 orderBy: {
                     stamp: 'asc',
                 },
-            }) as Record<string, any>[]
+            }) as unknown as IEcupResult[]
 
             for (let i = 0; i < dbRes.length; i++) {
                 dbRes[i].home = ecup_teams.filter(team => team.id === +dbRes[i].team1)[0];
                 dbRes[i].away = ecup_teams.filter(team => team.id === +dbRes[i].team2)[0];
             }
             const {groupResults, poResults} =
-                singleEcupResultsTransformer(dbRes as unknown as IScore[]);
+                singleEcupResultsTransformer(dbRes);
 
             return {results: {groupResults, poResults, ecup: slug}}
 

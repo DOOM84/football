@@ -1,4 +1,5 @@
 import prisma from '~/helpers/prisma';
+import type {IChamp, IEcup, IPost, ITag, ITeam} from "~/types/interfaces";
 
 export default defineEventHandler(async (event) => {
     try {
@@ -25,27 +26,28 @@ export default defineEventHandler(async (event) => {
                     }},
             },
             //take: 5
-        })
+        }) as unknown as IPost[];
 
         const champs = await prisma.champ.findMany({
             select: {slug: true, name: true, id: true},
             orderBy: {
                 id: 'asc',
             },
-        });
+        }) as unknown as IChamp[];
+
         const tags = await prisma.tag.findMany({
             select: {slug: true, name: true, id: true},
             orderBy: {
                 name: 'asc',
             },
-        });
+        }) as unknown as ITag[];
 
         const teams = await prisma.team.findMany({
             orderBy: {
                 champ_id: 'asc',
             },
             select: {name: true, slug: true, sprite: true, img: true, id: true}
-        });
+        }) as unknown as ITeam[];
 
         const ecups = await prisma.ecup.findMany({
             select: {slug: true, name: true, id: true},
@@ -55,7 +57,7 @@ export default defineEventHandler(async (event) => {
             orderBy: {
                 id: 'asc',
             },
-        });
+        }) as unknown as IEcup[];
 
         return {posts: posts.map(post => ({...post,
                 tags: post.tags.map(t => t.tag),

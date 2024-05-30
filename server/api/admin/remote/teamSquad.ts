@@ -2,6 +2,7 @@ import prisma from '~/helpers/prisma';
 import {addTeamSquad} from "~/helpers/remoteApi";
 import slugify from "slugify";
 import getPosition from "~/utils/getPosition";
+import type {IPlayer} from "~/types/interfaces";
 export default defineEventHandler(async (event) => {
     try {
         // @ts-ignore: Unreachable code error
@@ -14,7 +15,7 @@ export default defineEventHandler(async (event) => {
         const existingPlayers = await prisma.player.findMany({
             where: {team_id: +query.teamId!},
             select: {api_id: true}
-        })
+        }) as unknown as IPlayer[]
 
         const players = await addTeamSquad(+query.teamApiId!, +query.teamId!) as any[];
 

@@ -1,4 +1,4 @@
-import type {IError, IPost, IUser} from "~/types/interfaces";
+import type {IError, IPost} from "~/types/interfaces";
 import prisma from "~/helpers/prisma";
 import algoliasearch from "algoliasearch";
 const runtimeConfig = useRuntimeConfig();
@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
             const client = algoliasearch(runtimeConfig.algoliaAppId, runtimeConfig.algoliaKey);
             const index = client.initIndex('posts');
             await index.clearObjects();
-            const posts = await prisma.post.findMany();
+            const posts = await prisma.post.findMany() as unknown as IPost[];
 
             for (let i = 0; i < posts.length; i++) {
                 const champ = await prisma.champ.findFirst({
