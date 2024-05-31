@@ -224,6 +224,20 @@ export async function addEcupResults(ecupApiId: string | number): Promise<Partia
     return response;
 }
 
+
+export async function addCupResults(cupApiId: string | number): Promise<Partial<IResult>[]> {
+
+    const {response} = await $fetch<Record<string, any>>(
+        `https://v3.football.api-sports.io/fixtures?league=${cupApiId}&season=${season}`, {
+            headers: {
+                'x-rapidapi-key': runtimeConfig.apiKey,
+                'x-rapidapi-host': runtimeConfig.apiHost,
+            },
+        })
+
+    return response;
+}
+
 export async function addEcupStands(ecupApiId: string | number, ecup_teams: IEcupTeam[], ecupId: string | number): Promise<any> {
 
     const {response} = await $fetch<Record<string, any>>(

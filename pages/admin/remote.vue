@@ -1,5 +1,5 @@
 <template>
-  <main class="withFooter text-center">
+  <main class="withFooter text-center px-3">
     <ClientOnly>
       <TheLoading :show-load="showLoading"/>
     </ClientOnly>
@@ -83,6 +83,35 @@
       </div>
 
       <h1 class="text-2xl font-bold mt-10 text-zinc-800">
+        Кубки
+      </h1>
+
+      <div class="flex flex-wrap g-1 justify-end gap-3">
+        <button
+            class="btn font-bold"
+            type="button"
+
+            @click.prevent="cupResults">
+          Результаты кубка
+        </button>
+      </div>
+
+      <div class="form-group mt-2">
+        <label>Кубок</label>
+        <ClientOnly>
+          <Multiselect
+              v-model="cup"
+              :options="data.cups"
+              :searchable="true"
+              valueProp="slug"
+              label="name"
+              :object="true"
+              @change="cupChanged"
+              placeholder="Выберите кубок"></Multiselect>
+        </ClientOnly>
+      </div>
+
+      <h1 class="text-2xl font-bold mt-10 text-zinc-800">
         Еврокубки
       </h1>
 
@@ -153,6 +182,8 @@ const showLoading = ref<boolean>(false);
 
 const ecup = ref<IEcup>();
 
+const cup = ref<ICup>();
+
 const tUpdate = ref<ReturnType<typeof setInterval>>();
 
 const ecupUpdate = ref<ReturnType<typeof setInterval>>();
@@ -166,6 +197,7 @@ const prevTourDelete = ref<boolean>(false);
 const {data, pending} = useLazyFetch<{
   ecups: IEcup[];
   champs: IChamp[];
+  cups: ICup[];
 }>('/api/admin/remote')
 
 
@@ -211,6 +243,10 @@ function champChanged(chmp: IChamp): void{
 
 function ecupChanged(ecp: IEcup): void{
   ecup.value = {...ecp}
+}
+
+function cupChanged(cp: IСup): void{
+  cup.value = {...cp}
 }
 
 
@@ -457,6 +493,42 @@ async function ecupResults(): Promise<void> {
     });
 
     socket.value?.emit( 'ecup-updated', results);
+
+    useNuxtApp().$toast.success('Результаты были успешно обновлены');
+
+
+  }catch (e) {
+    const typedError = e as IError;
+
+    if(typedError.status === 403){
+      throw createError({
+        fatal: true,
+        statusCode: 404,
+        message: 'Страница не найдена'
+      })
+    }
+    useNuxtApp().$toast.error('Ошибка');
+  }finally {
+    showLoading.value = false;
+  }
+}
+
+
+async function cupResults(): Promise<void> {
+
+  if(!cup.value || !cup.value.slug || !cup.value.api_id){
+    useNuxtApp().$toast.error('Выберите кубок');
+    return;
+  }
+
+  try {
+    showLoading.value = true;
+    const {results} = await $fetch<Record<string, any>>('/api/admin/remote/cupResults', {
+      method: 'PUT',
+      body: cup.value,
+    });
+
+   // socket.value?.emit( 'ecup-updated', results);
 
     useNuxtApp().$toast.success('Результаты были успешно обновлены');
 

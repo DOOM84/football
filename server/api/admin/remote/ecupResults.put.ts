@@ -82,7 +82,7 @@ export default defineEventHandler(async (event) => {
                     api_id: +res.fixture.id,
                     tour: +res.league.round.slice(-1),
                     group: null,
-                    stage: getStage(res.league.round)
+                    stage: getStage(res.league.round.toLowerCase())
                 }
             }));
 
@@ -169,15 +169,17 @@ export default defineEventHandler(async (event) => {
 
 function getStage(round: string) {
     switch (round) {
-        case 'Knockout Round Play-offs':
+        case 'knockout round play-offs':
             return '1/16 финала';
-        case 'Round of 16':
+        case 'round of 16':
             return '1/8 финала';
-        case 'Quarter-finals':
+        case 'quarter-finals':
             return '1/4 финала';
-        case 'Semi-finals':
+        case 'semi-finals':
             return '1/2 финала';
-        default:
+        case 'final':
             return 'Финал';
+        default:
+            return round;
     }
 }

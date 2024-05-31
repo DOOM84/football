@@ -17,6 +17,7 @@ model Champ {
   all_tours    Int
   current_tour Int?
   posts        Post[]
+  cups         Cup[]
   teams        Team[]
   scorers      Scorer[]
   results      Result[]
@@ -38,6 +39,52 @@ model Ecup {
   status    Boolean      @default(true)
   createdAt DateTime     @default(now())
   updatedAt DateTime     @updatedAt
+}
+
+model Cup {
+  id       Int         @id @default(autoincrement())
+  api_id   Int?
+  name     String
+  slug     String      @unique
+  stage    String?
+  champ    Champ       @relation(fields: [champ_id], references: [id])
+  champ_id Int
+  results  CupResult[]
+  status   Boolean     @default(true)
+}
+
+model CupResult {
+  id      Int        @id @default(autoincrement())
+  date    BigInt?
+  res1    Int?
+  res2    Int?
+  cup     Cup        @relation(fields: [cup_id], references: [id])
+  cup_id  Int
+  home    CupTeam    @relation(fields: [team1], references: [id], name: "home")
+  team1   Int
+  away    CupTeam    @relation(fields: [team2], references: [id], name: "away")
+  team2   Int
+  stamp   BigInt?
+  api_id  BigInt?    @unique
+  is_info Boolean    @default(false)
+  time    String?
+  tour    Int?
+  group   String?
+  stage   String?
+  order   Int?
+  info    MatchInfo?
+}
+
+model CupTeam {
+  id       Int         @id @default(autoincrement())
+  api_id   Int         @unique
+  name     String
+  sprite   String?
+  team     Team?       @relation(fields: [team_id], references: [id])
+  results1 CupResult[] @relation("home")
+  results2 CupResult[] @relation("away")
+  team_id  Int?        @unique
+  status   Boolean     @default(true)
 }
 
 model Team {
@@ -69,6 +116,7 @@ model Team {
   resultsTour1 Tour[]         @relation("tourHome")
   resultsTour2 Tour[]         @relation("tourAway")
   ecupTeam     EcupTeam?
+  cupTeam      CupTeam?
 }
 
 model Team23 {
@@ -143,6 +191,8 @@ model MatchInfo {
   id          Int         @id @default(autoincrement())
   info        Json?
   lineups     Json?
+  cupResult   CupResult?  @relation(fields: [c_res], references: [api_id])
+  c_res       BigInt?     @unique
   champResult Result?     @relation(fields: [ch_res], references: [api_id])
   ch_res      BigInt?     @unique
   ecupResult  EcupResult? @relation(fields: [ecup_res], references: [api_id])

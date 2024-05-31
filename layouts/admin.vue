@@ -51,6 +51,12 @@
           </div>
 
           <div class="pt-5">
+            <nuxt-link class="hover:opacity-40 transition duration-500" to="/admin/cups">
+              Ккбки
+            </nuxt-link>
+          </div>
+
+          <div class="pt-5">
             <nuxt-link class="hover:opacity-40 transition duration-500" to="/admin/ecups">
               Еврокубки
             </nuxt-link>

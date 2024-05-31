@@ -16,9 +16,10 @@
         </td>
         <td class="text-center res-logo">
             <div class="flex justify-center">
-            <img class="w-[30px] h-[30px]" :alt="result.home.name"
+            <img v-if="result.home.sprite" class="w-[30px] h-[30px]" :alt="result.home.name"
                  src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVQYV2NgYAAAAAMAAWgmWQ0AAAAASUVORK5CYII="
                  :style="`background: url('/teams.png') ${result.home.sprite};`"/>
+              <img v-else class="w-[30px] h-[30px]" :alt="result.home.name" src="/no_team.png"/>
             </div>
             <div class="text-center py-1">
                 <nuxt-link class="res-team hover:underline" v-if="result.home.slug" :to="'/team/'+result.home.slug">
@@ -67,9 +68,10 @@
 
         <td class="text-center res-logo py-1">
             <div class="flex justify-center ">
-                <img class="w-[30px] h-[30px] text-center" :alt="result.away.name"
+                <img v-if="result.away.sprite" class="w-[30px] h-[30px] text-center" :alt="result.away.name"
                      src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVQYV2NgYAAAAAMAAWgmWQ0AAAAASUVORK5CYII="
                      :style="`background: url('/teams.png') ${result.away.sprite};`"/>
+              <img v-else :alt="result.away.name" src="/no_team.png"/>
             </div>
 
             <div class="text-center">
