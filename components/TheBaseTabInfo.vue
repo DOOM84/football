@@ -101,7 +101,7 @@
             </template>
 
 
-        <template v-else-if="infoType === 'ecupPoFullResults'" v-for="source in infoToShow" :key="'source'+i">
+        <template v-else-if="infoType === 'ecupPoFullResults'" v-for="(source, i) in infoToShow" :key="'source'+i">
             <thead>
             <tr>
                 <th colspan="6" class="text-center py-3 bg-zinc-800 text-zinc-100">

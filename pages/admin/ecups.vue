@@ -1,6 +1,6 @@
 <template>
   <div class="withFooter max-w-[1300px] px-3 md:px-10 text-white m-auto">
-    <div class="text-3xl font-bold border-solid border-b border-zinc-50/50 p-7 mb-7">
+    <div class="text-3xl font-bold border-solid border-b border-zinc-50/50 p-7 mb-7 text-zinc-800">
       Еврокубки
     </div>
     <div v-if="pending || !data">
@@ -104,22 +104,22 @@
           </template>
 
           <template #rows="{row}">
-            <table-body>
+            <table-body class="text-center">
               {{ row.name }}
             </table-body>
 
-            <table-body>
+            <table-body class="text-center">
               {{ row.api_id }}
             </table-body>
 
-            <table-body>
+            <table-body class="text-center">
               {{ row.stage }}
             </table-body>
 
-            <table-body>
+            <table-body class="text-center">
               {{ row.status ? 'Да' : 'Нет' }}
             </table-body>
-            <table-body>
+            <table-body class="text-center">
               <div class="flex justify-center items-center gap-1">
                 <button @click.prevent="updateItem(row)" class="p-1 border-none btn m-0">
                   <Icon name="material-symbols:edit-square-outline" size="20"/>

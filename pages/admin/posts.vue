@@ -1,6 +1,6 @@
 <template>
   <div class="withFooter max-w-[1300px] px-3 md:px-10 text-white m-auto">
-    <div class="text-3xl font-bold border-solid border-b border-zinc-50/50 p-7 mb-7">
+    <div class="text-3xl font-bold border-solid border-b border-zinc-50/50 p-7 mb-7 text-zinc-800">
       Новости
     </div>
     <div v-if="pending || !data">

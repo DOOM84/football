@@ -19,7 +19,7 @@ export default defineEventHandler(async (event) => {
 
         if (slug && api_id) {
 
-           /* const teams = await prisma.team.findMany({
+            /*const teams = await prisma.team.findMany({
             select: {
                 id: true,
                 api_id: true,
@@ -58,13 +58,13 @@ export default defineEventHandler(async (event) => {
                 const team1 = cup_teams.filter(team => team.api_id === +res.teams.home.id)[0];
                 const team2 = cup_teams.filter(team => team.api_id === +res.teams.away.id)[0];
 
-                let homeId: number;
-                let awayId: number;
+                let homeId = undefined;
+                let awayId = undefined;
 
                 if (!team1) {
                     const {id} = await prisma.cupTeam.upsert({
                         where: {api_id: +res.teams.home.id},
-                        update: {},
+                        update: {api_id: +res.teams.home.id},
                         create: {
                             api_id: +res.teams.home.id,
                             name: res.teams.home.name,
@@ -77,13 +77,12 @@ export default defineEventHandler(async (event) => {
                 if (!team2) {
                     const {id} = await prisma.cupTeam.upsert({
                         where: {api_id: +res.teams.away.id},
-                        update: {},
+                        update: {api_id: +res.teams.away.id},
                         create: {
                             api_id: +res.teams.away.id,
                             name: res.teams.away.name,
                         },
                     })
-
                     awayId = id;
                 }
 

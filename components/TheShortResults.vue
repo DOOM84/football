@@ -101,10 +101,17 @@ const {$diffDate, $matchTime} = useNuxtApp();
 
 const season = inject<Ref<string>>('season');
 
-const props = defineProps<{
+/*const props = defineProps<{
   results: IResult[],
   iter: number,
-}>()
+}>()*/
+
+const props = withDefaults(defineProps<{
+  results: IResult[];
+  iter: number,
+}>(), {
+  iter: 0,
+})
 
 function isLive(stamp: number): string {
     const minutes = $diffDate(stamp);

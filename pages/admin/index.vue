@@ -3,7 +3,7 @@
     <ClientOnly>
       <TheLoading :show-load="showLoading"/>
     </ClientOnly>
-    <h1 class="mt-2 text-center">Панель управления</h1>
+    <h1 class="mt-2 text-center text-3xl mb-5">Панель управления</h1>
     <h3 class="text-center">Добро пожаловать в систему управления сайтом. Выберите необходимое действие из меню слева.</h3>
     <div class="flex justify-end flex-wrap my-10 gap-5">
       <button
