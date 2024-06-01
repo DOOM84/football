@@ -31,24 +31,33 @@ export default defineEventHandler(async (event) => {
             }
         })
 
+        const cupRes =  await prisma.cupResult.findFirst({
+            where: {
+                api_id: +updated.api_id
+            }
+        })
 
-        if(!isFinishedOrLive((tourChamp?.stamp || resChamp?.stamp || ecupChamp?.stamp) as unknown as number)){
+
+        if(!isFinishedOrLive((tourChamp?.stamp || resChamp?.stamp || ecupChamp?.stamp || cupRes?.stamp) as unknown as number)){
 
             if(updated.is_info){
                 await prisma.matchInfo.upsert({
                     where: {
                         ...(resChamp ? { ch_res: resChamp.api_id } : {}) as any,
                         ...(ecupChamp ? { ecup_res: ecupChamp.api_id } : {}) as any,
+                        ...(cupRes ? { c_res: cupRes.api_id } : {}) as any,
                     },
                     update: {
                         ch_res: resChamp ? resChamp.api_id : null,
                         ecup_res: ecupChamp ? ecupChamp.api_id : null,
+                        c_res: cupRes ? cupRes.api_id : null,
                         info: [],
                         lineups: []
                     },
                     create: {
                         ch_res: resChamp ? resChamp.api_id : null,
                         ecup_res: ecupChamp ? ecupChamp.api_id : null,
+                        c_res: cupRes ? cupRes.api_id : null,
                         info: [],
                         lineups: []
                     },
@@ -58,6 +67,7 @@ export default defineEventHandler(async (event) => {
                     where: {
                         ...(resChamp ? { ch_res: resChamp.api_id } : {}) as any,
                         ...(ecupChamp ? { ecup_res: ecupChamp.api_id } : {}) as any,
+                        ...(cupRes ? { c_res: cupRes.api_id } : {}) as any,
                     }
                 })
             }
@@ -97,6 +107,15 @@ export default defineEventHandler(async (event) => {
                     data: {is_info: updated.is_info} //JSON.parse(JSON.stringify(updated))
                 });
             }
+
+            if(cupRes){
+                await prisma.cupResult.update({
+                    where: {
+                        api_id: cupRes.api_id as any,
+                    },
+                    data: {is_info: updated.is_info} //JSON.parse(JSON.stringify(updated))
+                });
+            }
             return {result: true}
         }
 
@@ -111,7 +130,7 @@ export default defineEventHandler(async (event) => {
 
             const squads = await matchSquads(updated.api_id);
 
-            if(getPeriod((resChamp?.stamp || ecupChamp?.stamp) as unknown as number)){
+            if(getPeriod((resChamp?.stamp || ecupChamp?.stamp || cupRes?.stamp) as unknown as number)){
                 events.map(event =>{
                     if(event.type.toLowerCase() === 'subst'){
                         const assist = {...event.assist}
@@ -126,6 +145,7 @@ export default defineEventHandler(async (event) => {
                 data: {
                     ch_res: resChamp ? resChamp.api_id : null,
                     ecup_res: ecupChamp ? ecupChamp.api_id : null,
+                    c_res: cupRes ? cupRes.api_id : null,
                     info: events,
                     lineups: squads,
                 }
@@ -135,6 +155,7 @@ export default defineEventHandler(async (event) => {
                 where: {
                     ...(resChamp ? { ch_res: resChamp.api_id } : {}) as any,
                     ...(ecupChamp ? { ecup_res: ecupChamp.api_id } : {}) as any,
+                    ...(cupRes ? { c_res: cupRes.api_id } : {}) as any,
                 }
             })
         }
@@ -255,6 +276,42 @@ export default defineEventHandler(async (event) => {
                 await prisma.ecupResult.update({
                     where: {
                         api_id: ecupChamp.api_id as unknown as number,
+                    },
+                    data: {is_info: updated.is_info} //JSON.parse(JSON.stringify(updated))
+                });
+            }
+        }
+
+        if(cupRes){
+            if(updated.is_info){
+                const homeTeam = await prisma.cupTeam.findFirst({
+                    where: {
+                        id: cupRes.team1 as unknown as number,
+                    },
+                    select: {api_id: true}
+                })  as unknown as ICupTeam
+
+                const awayTeam = await prisma.cupTeam.findFirst({
+                    where: {
+                        id: cupRes.team2 as unknown as number,
+                    },
+                    select: {api_id: true}
+                }) as unknown as ICupTeam;
+
+                await prisma.cupResult.update({
+                    where: {
+                        api_id: cupRes.api_id as unknown as number,
+                    },
+                    data: {
+                        is_info: updated.is_info,
+                        res1: goals && updated.is_info ? (homeTeam?.api_id && Array.isArray(goals![homeTeam.api_id]) ? goals![homeTeam.api_id].length : 0) : 0,
+                        res2: goals && updated.is_info ? (awayTeam?.api_id && Array.isArray(goals![awayTeam.api_id]) ? goals![awayTeam.api_id].length : 0) : 0,
+                    } //JSON.parse(JSON.stringify(updated))
+                });
+            }else {
+                await prisma.cupResult.update({
+                    where: {
+                        api_id: cupRes.api_id as unknown as number,
                     },
                     data: {is_info: updated.is_info} //JSON.parse(JSON.stringify(updated))
                 });

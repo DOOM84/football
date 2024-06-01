@@ -12,7 +12,7 @@
     <div class="flex items-center" v-else>
       <span :class="fontSz" v-if="props.number">{{ props.number }}.</span>
       <small v-if="props.pos" class="text-gray-500 mx-1">{{ getPos(props.pos) }}</small>
-      <span :class="fontSz">{{htmlDec(props.name)}}</span>
+      <span v-if="props.name" :class="fontSz">{{htmlDec(props.name)}}</span>
     </div>
   </div>
 

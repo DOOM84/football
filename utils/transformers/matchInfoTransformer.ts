@@ -15,7 +15,7 @@ export default (match: Record<string, any>) => {
         }
     ), 'teamId') as Record<string, any>;
 
-    const cards = {home: {cards: 0, teamId: null}, away: {cards: 0, teamId: null}} as Record<string, any>
+    /*const cards = {home: {cards: 0, teamId: null}, away: {cards: 0, teamId: null}} as Record<string, any>
 
     for (const [key, value] of Object.entries(grouppedCards)) {
         if (match.ecupResult) {
@@ -57,7 +57,7 @@ export default (match: Record<string, any>) => {
                 goals.away.teamId = +match.champResult.away.api_id;
             }
         }
-    }
+    }*/
 
     match.lineups.map((lineup: { squads: any[]; }) => {
         if(!lineup.squads || !Array.isArray(lineup.squads)){
@@ -94,8 +94,8 @@ export default (match: Record<string, any>) => {
     return {
         grouppedGoals,
         grouppedCards,
-        cards,
-        goals,
+       // cards,
+       // goals,
     }
 
 }

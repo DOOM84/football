@@ -150,6 +150,8 @@ export default defineEventHandler(async (event) => {
 
             }) as unknown as IEcup;
 
+            res.ecupResult.ecup = {name: ecup.name};
+
             posts = postListTransformer(ecup!.posts);
 
             const {groupResults, poResults} =
@@ -192,6 +194,8 @@ export default defineEventHandler(async (event) => {
                     },
                 },
             }) as unknown as IChamp;
+
+            res.champ = {name: champ.name}
 
             posts = postListTransformer(champ!.posts);
 

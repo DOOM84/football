@@ -22,12 +22,15 @@ export default defineEventHandler(async (event) => {
             include: {
                 champResult: {
                     include: {
+                        champ: {
+                            select: {name: true}
+                        },
                         home: {select: {slug: true, sprite: true, name: true, api_id: true}},
                         away: {select: {slug: true, sprite: true, name: true, api_id: true}},
-                        },
-                    }
+                    },
                 }
-            }) as unknown as IMatchInfo;
+            }
+        }) as unknown as IMatchInfo;
 
         const ecupMatch = await prisma.matchInfo.findFirst({
             where: {
@@ -36,6 +39,9 @@ export default defineEventHandler(async (event) => {
             include: {
                 ecupResult: {
                     include: {
+                        ecup: {
+                            select: {name: true}
+                        },
                         home: {
                             include: {
                                 team: true
@@ -51,20 +57,50 @@ export default defineEventHandler(async (event) => {
             }
         }) as unknown as IMatchInfo;
 
-        if(!champMatch && !ecupMatch){
+
+        const cupMatch = await prisma.matchInfo.findFirst({
+            where: {
+                c_res: +query.apiId!,
+            },
+            include: {
+                cupResult: {
+                    include: {
+                        cup: {
+                            include: {
+                                champ: {
+                                    select: {id: true}
+                                }
+                            }
+                        },
+                        home: {
+                            include: {
+                                team: true
+                            }
+                        },
+                        away: {
+                            include: {
+                                team: true
+                            }
+                        },
+                    }
+                }
+            }
+        }) as unknown as IMatchInfo;
+
+        if (!champMatch && !ecupMatch && !cupMatch) {
             throw createError({
                 statusCode: 404,
                 message: 'Страница не найдена',
             })
         }
 
-        const res = champMatch || ecupMatch;
+        const res = champMatch || ecupMatch || cupMatch;
 
         let posts: IPost[] = [];
         let ecupResults: IEcupResult | {} = {}
         let tourResults: ITourResult | {} = {};
 
-        if(ecupMatch?.ecupResult?.ecup_id){
+        if (ecupMatch?.ecupResult?.ecup_id) {
             const ecup = await prisma.ecup.findFirst({
                 where: {
                     id: ecupMatch.ecupResult.ecup_id,
@@ -77,7 +113,7 @@ export default defineEventHandler(async (event) => {
                         include: {
                             info: {
                                 select: {
-                                    info:true
+                                    info: true
                                 }
                             },
                             ecup: {
@@ -119,7 +155,24 @@ export default defineEventHandler(async (event) => {
             ecupResults = {groupResults, poResults}
         }
 
-        if(champMatch?.champResult?.champ_id){
+        if (cupMatch) {
+            posts = await prisma.post.findMany({
+                where: {
+                    champ_id: cupMatch.cupResult.cup.champ.id,
+                    status: true,
+                },
+                include: {
+                    ecup: true,
+                    champ: true
+                },
+                orderBy: {
+                    date: 'desc',
+                },
+                take: 10
+            }) as unknown as IPost[];
+        }
+
+        if (champMatch?.champResult?.champ_id) {
             const champ = await prisma.champ.findFirst({
                 where: {
                     id: champMatch.champResult.champ_id
@@ -144,7 +197,7 @@ export default defineEventHandler(async (event) => {
                         },
                         include: {
                             info: {
-                                include: {info: {select: {info:true}}}
+                                include: {info: {select: {info: true}}}
                             },
                             home: {select: {slug: true, sprite: true, name: true, api_id: true}},
                             away: {select: {slug: true, sprite: true, name: true, api_id: true}},
@@ -154,28 +207,28 @@ export default defineEventHandler(async (event) => {
                 },
             }) as unknown as IChamp;
 
-            posts  = postListTransformer(champ!.posts);
+            posts = postListTransformer(champ!.posts);
 
-            tourResults  = singleChampTransformer(champ);
+            tourResults = singleChampTransformer(champ);
         }
 
         const mixedSquads = [];
 
-        if(Array.isArray(res!.lineups)){
+        if (Array.isArray(res!.lineups)) {
             for (let i = 0; i < res!.lineups!.length; i++) {
-                if(Array.isArray(res!.lineups[i].squads)){
-                for (let j = 0; j < res!.lineups[i].squads.length; j++) {
-                    const playerSquad = await prisma.player.findFirst({
-                        where: {
-                            api_id: +res!.lineups[i].squads[j].player.id
-                        }
-                    })
-                    res!.lineups[i].squads[j].player.slug = playerSquad?.slug || null;
-                    res!.lineups[i].squads[j].player.img = playerSquad?.img || null;
-                    mixedSquads.push(res!.lineups[i].squads[j].player)
+                if (Array.isArray(res!.lineups[i].squads)) {
+                    for (let j = 0; j < res!.lineups[i].squads.length; j++) {
+                        const playerSquad = await prisma.player.findFirst({
+                            where: {
+                                api_id: +res!.lineups[i].squads[j].player.id
+                            }
+                        })
+                        res!.lineups[i].squads[j].player.slug = playerSquad?.slug || null;
+                        res!.lineups[i].squads[j].player.img = playerSquad?.img || null;
+                        mixedSquads.push(res!.lineups[i].squads[j].player)
+                    }
                 }
-                }
-                if(Array.isArray(res!.lineups[i].substitutes)) {
+                if (Array.isArray(res!.lineups[i].substitutes)) {
                     for (let k = 0; k < res!.lineups[i].substitutes.length; k++) {
                         const playerSub = await prisma.player.findFirst({
                             where: {
@@ -190,24 +243,24 @@ export default defineEventHandler(async (event) => {
             }
         }
 
-        if(Array.isArray(res!.info)){
+        if (Array.isArray(res!.info)) {
 
             for (let i = 0; i < res!.info!.length; i++) {
 
-                if(res!.info[i]!.assist?.id){
+                if (res!.info[i]!.assist?.id) {
 
                     const assist = mixedSquads.length ?
                         mixedSquads.filter(pl => pl.id === +res!.info[i]!.assist.id)[0] :
                         await prisma.player.findFirst({
-                        where: {
-                            api_id: +res!.info[i]!.assist.id
-                        }
-                    })
+                            where: {
+                                api_id: +res!.info[i]!.assist.id
+                            }
+                        })
                     res!.info[i]!.assist.slug = assist?.slug || null;
                     res!.info[i]!.assist.img = assist?.img || null;
                 }
 
-                if(res!.info[i]!.player?.id){
+                if (res!.info[i]!.player?.id) {
                     const player = mixedSquads.length ?
                         mixedSquads.filter(pl => pl.id === +res!.info[i]!.player.id)[0] :
                         await prisma.player.findFirst({
@@ -223,9 +276,9 @@ export default defineEventHandler(async (event) => {
 
         const details = matchInfoTransformer(res as Record<string, any>)
 
-        return {match: res, ...details, posts, mixedSquads, ecupResults, tourResults };
+        return {match: res, ...details, posts, mixedSquads, ecupResults, tourResults};
 
-    }catch (e) {
+    } catch (e) {
         console.log(e);
         throw createError({
             statusCode: 404,
