@@ -148,10 +148,13 @@ export interface IMatchInfo {
     id: number;
     lineups: Record<string, any>;
     info: Record<string, any>;
-    champResult: IResult;
     ch_res: number;
-    ecupResult: IEcupResult;
+    c_res: number;
     ecup_res: number;
+    champResult: IResult;
+    ecupResult: IEcupResult;
+    cupResult: ICupResult;
+
 }
 
 export interface IEcupTeam {

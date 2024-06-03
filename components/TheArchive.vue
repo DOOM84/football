@@ -6,7 +6,7 @@
     <ClientOnly>
       <Multiselect
           v-model="season"
-          :options="seasons"
+          :options="fullSeasons"
           @select="loadSeason"
           @clear="loadActualSeason"
           placeholder="Выберите сезон"></Multiselect>
@@ -19,11 +19,13 @@
 <script lang="ts" setup>
 import Multiselect from '@vueform/multiselect';
 
+import {fullSeasons} from "~/utils/archive";
+
 const route = useRoute();
 
 const season = ref('');
 
-const seasons = ref([2022,2023]);
+//const seasons = ref([2022,2023]);
 
 const showLoading = ref<boolean>(false);
 
@@ -48,7 +50,8 @@ async function loadSeason(): Promise<void> {
 
     const res = await $fetch('/api/loadSeason', {
       params: {
-        season: season.value.toString().slice(-2), mode: props.mode, champ: route.params.champ, ecup: route.params.ecup
+        season: season.value.toString().slice(-2), mode: props.mode,
+        champ: route.params.champ, ecup: route.params.ecup, cup: route.params.cup
       }
     });
 

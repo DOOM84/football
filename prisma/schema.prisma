@@ -75,6 +75,42 @@ model CupResult {
   info    MatchInfo?
 }
 
+model CupResult22 {
+  id      Int     @id @default(autoincrement())
+  date    BigInt?
+  res1    Int?
+  res2    Int?
+  cup_id  Int
+  team1   Int
+  team2   Int
+  stamp   BigInt?
+  time    String?
+  tour    Int?
+  group   String?
+  stage   String?
+  order   Int?
+  api_id  BigInt? @unique
+  is_info Boolean @default(false)
+}
+
+model CupResult23 {
+  id      Int     @id @default(autoincrement())
+  date    BigInt?
+  res1    Int?
+  res2    Int?
+  cup_id  Int
+  team1   Int
+  team2   Int
+  stamp   BigInt?
+  time    String?
+  tour    Int?
+  group   String?
+  stage   String?
+  order   Int?
+  api_id  BigInt? @unique
+  is_info Boolean @default(false)
+}
+
 model CupTeam {
   id       Int         @id @default(autoincrement())
   api_id   Int         @unique
@@ -205,6 +241,7 @@ model MatchInfo22 {
   lineups  Json?
   ch_res   BigInt? @unique
   ecup_res BigInt? @unique
+  c_res    BigInt? @unique
 }
 
 model MatchInfo23 {
@@ -213,6 +250,7 @@ model MatchInfo23 {
   lineups  Json?
   ch_res   BigInt? @unique
   ecup_res BigInt? @unique
+  c_res    BigInt? @unique
 }
 
 model Result23 {

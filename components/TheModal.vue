@@ -62,6 +62,16 @@ const props = withDefaults(defineProps<{
 const emit = defineEmits<{
   (e: 'close'): void
 }>()
+
+watch(() => props.show,(val,oldVal)=>{
+  if(val){
+    document.body.classList.add('overflow-hidden')
+  }else{
+    document.body.classList.remove('overflow-hidden')
+  }
+})
+
+
 function close(): void {
   if(props.closeByOutClick){
     emit('close')
@@ -80,7 +90,7 @@ function close(): void {
   background-color: rgba(0, 0, 0, 0.7);
   display: flex;
   transition: opacity 0.3s ease;
-  overflow-y: scroll;
+  overflow-y: auto;
  /* overflow-y: auto;*/
 
   .modal-container {

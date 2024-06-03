@@ -3,7 +3,8 @@ import prisma from '~/helpers/prisma';
 import calendarTransformer from "~/utils/transformers/calendarTransformer";
 import singleEcupResultsTransformer from "~/utils/transformers/singleEcupResultsTransformer";
 import ecupTransformer from "~/utils/transformers/ecupTransformer";
-import type {IChamp, IEcup, IEcupResult, IEcupStand, IEcupTeam, IResult, ITeam} from "~/types/interfaces";
+import cupResultsTransformer from "~/utils/transformers/cupResultsTransformer";
+import type {IChamp, IEcup, IEcupResult, IEcupStand, IEcupTeam, IResult, ITeam, ICup} from "~/types/interfaces";
 import type {Season} from "~/types/types";
 
 export default defineEventHandler(async (event) => {
@@ -15,7 +16,8 @@ export default defineEventHandler(async (event) => {
             return this.toString();
         };
 
-        const {season, mode, champ, ecup} = getQuery(event);
+        const {season, mode,
+            champ, ecup, cup} = getQuery(event);
 
         if(mode === 'champResults'){
 
@@ -55,6 +57,34 @@ export default defineEventHandler(async (event) => {
                     order: 'asc',
                 },
             }) as unknown as ITeam[];
+        }
+
+        if(mode === 'cupResults'){
+
+            const DBcup = await prisma.cup.findFirst({
+                where: {slug: cup!.toString()}
+            }) as unknown as ICup;
+
+            const teams = await prisma.cupTeam.findMany({
+                include: {
+                    team: true
+                }
+            }) as unknown as ICupTeam[];
+
+            const DBresults = await (prisma[`cupResult${season as Season}`] as any).findMany({
+                where: {cup_id: +DBcup!.id},
+                orderBy: {
+                    stamp: 'asc',
+                },
+            }) as unknown as ICupResult[];
+
+            for (let i = 0; i < DBresults.length; i++) {
+                DBresults[i].home = teams.filter(team => team.id === DBresults[i].team1)[0]
+                DBresults[i].away = teams.filter(team => team.id === DBresults[i].team2)[0]
+
+            }
+
+            return cupResultsTransformer(DBresults);
         }
 
         if(mode === 'ecupResults'){

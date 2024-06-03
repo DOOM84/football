@@ -38,9 +38,9 @@ export default defineEventHandler(async (event) => {
             })
         }
 
-        const teams = await prisma.team.findMany() as unknown as ITeam[];
+        let cupTeams: ICupTeam[] = [];
 
-        const ecupTeams = await prisma.ecupTeam.findMany() as unknown as IEcupTeam[];
+        let ecupTeams: IEcupTeam[] = [];
 
         const champMatch = await (prisma[`matchInfo${query.season}`] as any).findFirst({
             where: {
@@ -54,12 +54,20 @@ export default defineEventHandler(async (event) => {
             },
         }) as unknown as IMatchInfo;
 
-        if (!champMatch && !ecupMatch) {
+        const cupMatch = await (prisma[`matchInfo${query.season}`] as any).findFirst({
+            where: {
+                c_res: +query.apiId!,
+            },
+        }) as unknown as IMatchInfo;
+
+        if (!champMatch && !ecupMatch && !cupMatch) {
             throw createError({
                 statusCode: 404,
                 message: 'Страница не найдена',
             })
         }
+
+        const teams = await prisma.team.findMany() as unknown as ITeam[];
 
         if(champMatch){
 
@@ -77,6 +85,8 @@ export default defineEventHandler(async (event) => {
         }
 
         if(ecupMatch){
+
+            ecupTeams = await prisma.ecupTeam.findMany() as unknown as IEcupTeam[];
 
             ecupMatch.ecupResult = await (prisma[`ecupResult${query.season}`] as any).findFirst({
                 where: {
@@ -97,11 +107,64 @@ export default defineEventHandler(async (event) => {
                 team.id === +ecupMatch.ecupResult.away.team_id! )[0]
         }
 
-        const res = champMatch || ecupMatch;
+        if(cupMatch){
+            cupTeams = await prisma.cupTeam.findMany() as unknown as ICupTeam[];
+
+            cupMatch.cupResult = await (prisma[`cupResult${query.season}`] as any).findFirst({
+                where: {
+                    api_id: +query.apiId!,
+                },
+            }) as unknown as ICupResult;
+
+            cupMatch.cupResult.home = cupTeams.filter(team =>
+                team.id === +cupMatch.cupResult.team1)[0];
+
+            cupMatch.cupResult.home.team = teams.filter(team =>
+                team.id === +cupMatch.cupResult.home.team_id! )[0];
+
+            cupMatch.cupResult.away = cupTeams.filter(team =>
+                team.id === +cupMatch.cupResult.team2)[0];
+
+            cupMatch.cupResult.away.team = teams.filter(team =>
+                team.id === +cupMatch.cupResult.away.team_id! )[0]
+        }
+
+        const res = champMatch || ecupMatch  || cupMatch;
 
         let posts: IPost[] = [];
         let ecupResults: Record<string, any> = {}
         let tourResults: ITourResult | {} = {};
+
+        if (cupMatch?.cupResult?.cup_id) {
+            const cup = await prisma.cup.findFirst({
+                where: {
+                    id: cupMatch.cupResult.cup_id,
+                },
+                include: {
+                    champ: {
+                        include: {
+                            posts: query.loadPosts ? {
+                                where: {
+                                    status: true,
+                                },
+                                include: {
+                                    ecup: true,
+                                    champ: true
+                                },
+                                orderBy: {
+                                    date: 'desc',
+                                },
+                                take: 10
+                            } : false,
+                        },
+                    }
+                }
+            })
+
+            res.cupResult.cup = {name: cup!.name}
+            posts = postListTransformer(cup!.champ!.posts as unknown as IPost[]);
+
+        }
 
         if (ecupMatch?.ecupResult?.ecup_id) {
             const ecup = await prisma.ecup.findFirst({
@@ -150,7 +213,7 @@ export default defineEventHandler(async (event) => {
 
             }) as unknown as IEcup;
 
-            res.ecupResult.ecup = {name: ecup.name};
+            res.ecupResult.ecup = {name: ecup.name} as any;
 
             posts = postListTransformer(ecup!.posts);
 
@@ -195,7 +258,7 @@ export default defineEventHandler(async (event) => {
                 },
             }) as unknown as IChamp;
 
-            res.champ = {name: champ.name}
+            res.champResult.champ = {name: champ.name} as any;
 
             posts = postListTransformer(champ!.posts);
 

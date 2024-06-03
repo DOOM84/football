@@ -2,7 +2,6 @@ import {addCupResults} from "~/helpers/remoteApi";
 import type {IError} from "~/types/interfaces";
 import prisma from "~/helpers/prisma";
 import moment from "moment";
-//import groupBy from "~/helpers/groupBy";
 
 const rounds = {
     45: ['5th round', '4th round', '3rd round', 'quarter-finals', 'semi-finals', 'final'],

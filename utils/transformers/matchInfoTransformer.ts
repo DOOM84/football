@@ -105,7 +105,7 @@ function getSquad(mLineups: Record<string, any>, home: boolean): any[]{
     if(!mLineups?.squads){
         return []
     }
-    const allSquad = (mLineups.squads as any[]).map(p  => p.player).filter(p => p.pos && p.grid) as any[];
+    const allSquad = (mLineups.squads as any[]).map(p  => p.player).filter(p => p.grid) as any[];
     allSquad.map(sq => {
         sq.line = parseInt(sq.grid.substring(0, 1));
         sq.place = parseInt(sq.grid.charAt(sq.grid.length-1));

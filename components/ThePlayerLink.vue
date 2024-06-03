@@ -37,7 +37,7 @@ function getPos(pos: string) {
   if(!pos){return ''}
 
   if (pos.toLowerCase() === 'g') {
-    return 'в'
+    return 'г'
   }
 
   if (pos.toLowerCase() === 'd') {

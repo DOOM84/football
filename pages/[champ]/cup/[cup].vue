@@ -9,7 +9,7 @@
     </div>
     <template v-else>
       <div class="md:col-span-2 shadow-md shadow-zinc-800/20">
-<!--        <TheArchive @resetSeason="resetSeason" @seasonLoaded="loadSeason" :mode="'ecupResults'"/>-->
+        <TheArchive @resetSeason="resetSeason" @seasonLoaded="loadSeason" :mode="'cupResults'"/>
         <div class="w-full overflow-x-auto">
           <ClientOnly>
             <TheBaseTabInfo :info-type="'ecupPoFullResults'" :info-to-show="data.results" />
@@ -73,7 +73,7 @@ function loadSeason(res: Record<string, any>, seas: string): void {
 
   try {
     season.value = seas;
-    data.value!.results = res.groupResults;
+    data.value!.results = res.results;
 
   } catch (e) {
 
