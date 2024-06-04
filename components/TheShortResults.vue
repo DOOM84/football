@@ -10,9 +10,7 @@
           </template>
           <template v-if="result.is_info">
             <nuxt-link class="underline hover:no-underline" :to="`/game/${result.api_id}${queryParam}`">
-              live {{(results.length === 1 || i === results.length - 1) &&
-            ((result.info && !Array.isArray(result.info[result.home.api_id]) ? 1 : result.info && result.info[result.home.api_id].length <= 2 ? 1 : -1) === 1
-                && (result.info && !Array.isArray(result.info[result.away.api_id]) ? 1 : result.info && result.info[result.away.api_id].length <= 2 ? 1 : -1) === 1)}}
+              live
             </nuxt-link>
           </template>
         </td>
