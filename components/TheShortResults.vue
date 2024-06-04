@@ -10,7 +10,9 @@
           </template>
           <template v-if="result.is_info">
             <nuxt-link class="underline hover:no-underline" :to="`/game/${result.api_id}${queryParam}`">
-              live
+              live {{(results.length === 1 || i === results.length - 1) &&
+            ((result.info && !Array.isArray(result.info[result.home.api_id]) ? 1 : result.info && result.info[result.home.api_id].length <= 2 ? 1 : -1) === 1
+                && (result.info && !Array.isArray(result.info[result.away.api_id]) ? 1 : result.info && result.info[result.away.api_id].length <= 2 ? 1 : -1) === 1)}}
             </nuxt-link>
           </template>
         </td>
@@ -49,8 +51,12 @@
         </template>
         <transition name="page">
         <div v-if="result.info" class="animate-fade-in-down z-50 bg-gray-800/75 absolute left-[20%]
-        text-white hidden group-hover:flex w-[60%]  group-hover:justify-between p-1 gap-1"
-             :class="iter === 0 && (i === 0 || i === 1) ? 'top-[100%]' : i === (results.length - 1)  ? 'bottom-[100%]' : 'top-[100%]'"
+        text-white hidden group-hover:flex w-[70%]  group-hover:justify-between p-1 gap-1"
+             :class="(results.length === 1 || i === results.length - 1) &&
+            ((result.info && !Array.isArray(result.info[result.home.api_id]) ? 1 : result.info && result.info[result.home.api_id].length <= 2 ? 1 : -1) === 1
+                && (result.info && !Array.isArray(result.info[result.away.api_id]) ? 1 : result.info && result.info[result.away.api_id].length <= 2 ? 1 : -1) === 1)
+
+               ? 'bottom-[100%]' : 'top-[100%]'"
         >
           <ul class="basis-1/2 flex-grow: 0; overflow-x-hidden m-0 p-0">
             <li class="m-0 p-0" v-for="(goal, i) in (result as Record<string,any>).info[result.home.api_id]" :key="`home-${i}`">
@@ -62,6 +68,7 @@
               {{htmlDec(goal.player.name)}} {{goal.time.elapsed}}' <small v-if="goal.time.extra">(+{{goal.time.extra}}')</small>
             </li>
           </ul>
+
         </div>
         </transition>
       </td>
