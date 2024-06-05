@@ -37,6 +37,7 @@ export interface IChamp {
     all_tours: number;
     current_tour: number;
     posts: IPost[];
+    cups: ICup[];
     teams: ITeam[];
     scorers: IPlayer[];
     results?: IResult[];

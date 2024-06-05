@@ -20,10 +20,14 @@ export default defineEventHandler(async (event) => {
         }) as unknown as IEcup[];
 
         const champs = await prisma.champ.findMany({
-            select: {
-                id: true,
-                name: true,
-                slug: true,
+            include: {
+                cups: {
+                    select: {
+                        id: true,
+                        name: true,
+                        slug: true,
+                    }
+                }
             },
             orderBy: {
                 id: 'asc',

@@ -48,22 +48,21 @@
           </div>
         </template>
         <transition name="page">
-        <div v-if="result.info" class="animate-fade-in-down z-50 bg-gray-800/75 absolute left-[20%]
-        text-white hidden group-hover:flex w-[70%]  group-hover:justify-between p-1 gap-1"
+        <div v-if="result.info" class="animate-fade-in-down z-50 bg-gray-800/75 absolute left-[20%] text-[13px] whitespace-nowrap
+        text-white hidden group-hover:flex w-[60%] group-hover:justify-between px-[3px] gap-1"
              :class="(results.length === 1 || i === results.length - 1) &&
             ((result.info && !Array.isArray(result.info[result.home.api_id]) ? 1 : result.info && result.info[result.home.api_id].length <= 2 ? 1 : -1) === 1
                 && (result.info && !Array.isArray(result.info[result.away.api_id]) ? 1 : result.info && result.info[result.away.api_id].length <= 2 ? 1 : -1) === 1)
-
                ? 'bottom-[100%]' : 'top-[100%]'"
         >
-          <ul class="basis-1/2 flex-grow: 0; overflow-x-hidden m-0 p-0">
+          <ul class="basis-auto flex-grow: 0; overflow-x-hidden m-0 p-0">
             <li class="m-0 p-0" v-for="(goal, i) in (result as Record<string,any>).info[result.home.api_id]" :key="`home-${i}`">
-              {{htmlDec(goal.player.name)}} {{goal.time.elapsed}}' <small v-if="goal.time.extra">(+{{goal.time.extra}}')</small>
+              {{htmlDec(goal.player.name)}} <small>{{goal.time.elapsed}}'</small> <small v-if="goal.time.extra">(+{{goal.time.extra}}')</small>
             </li>
           </ul>
-          <ul class="basis-1/2 flex-grow: 0; overflow-x-hidden m-0 p-0 text-right">
-            <li class="m-0 p-0" v-for="(goal, i) in (result as Record<string,any>).info[result.away.api_id]" :key="`away-${i}`">
-              {{htmlDec(goal.player.name)}} {{goal.time.elapsed}}' <small v-if="goal.time.extra">(+{{goal.time.extra}}')</small>
+          <ul class="basis-auto flex-grow: 0; overflow-x-hidden m-0 p-0 text-right">
+            <li class="m-0 p-0 overflow-x-hidden" v-for="(goal, i) in (result as Record<string,any>).info[result.away.api_id]" :key="`away-${i}`">
+              {{htmlDec(goal.player.name)}} <small>{{goal.time.elapsed}}'</small> <small v-if="goal.time.extra">(+{{goal.time.extra}}')</small>
             </li>
           </ul>
 

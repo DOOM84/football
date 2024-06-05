@@ -1,69 +1,78 @@
 <template>
-  <nav
-      class="hidden lg:flex w-full items-center text-zinc-800 font-semibold text-[14px] justify-center bg-gray-100 h-[60px] px-3">
-    <div class="relative group h-full ">
-      <div class="group-hover:bg-gray-200 h-full w-full flex items-center px-7 uppercase cursor-pointer">
-        ЧЕМПИОНАТЫ
+    <nav class="hidden lg:flex w-full items-center text-zinc-800 font-semibold text-[14px] justify-center bg-gray-100 h-[60px] px-3">
+        <div class="relative group h-full ">
+            <div class="group-hover:bg-gray-200 h-full w-full flex items-center px-7 uppercase cursor-pointer">
+                ЧЕМПИОНАТЫ
+            </div>
+            <ul class="hidden absolute z-[101] w-full bg-white  text-gray-800 shadow-xl group-hover:showMenu origin-top-right">
+                <nuxt-link class="z-[101]" v-for="champ in chs" :to="'/'+champ.slug" :key="champ.slug">
+                    <li class="py-3 px-3 hover:bg-zinc-100 z-[101]"> {{ champ.name }}</li>
+                </nuxt-link>
+            </ul>
+        </div>
+      <div class="relative group h-full ">
+        <div class="group-hover:bg-gray-200 h-full w-full flex items-center px-7 uppercase cursor-pointer">
+          КУБКИ
+        </div>
+        <ul class="hidden absolute z-[101] w-full bg-white  text-gray-800 shadow-xl group-hover:showMenu origin-top-right">
+          <div class="z-[101] relative" v-for="champ in chs">
+            <li  class="py-3 px-3 hover:bg-zinc-100 z-[101] group/cup cursor-pointer">
+              {{ champ.name }}
+              <ul class="
+              min-w-[170px]
+              bg-white
+              text-gray-800
+              hidden
+              absolute
+              group-hover/cup:showSubMenu">
+                <nuxt-link class="z-[101]" v-for="cup in champ.cups"  :to="'/'+champ.slug+'/cup/'+cup.slug">
+                  <li class="py-3 px-3 hover:bg-zinc-100 z-[101]">  {{cup.name}}</li>
+                </nuxt-link>
+              </ul>
+            </li>
+          </div>
+        </ul>
       </div>
-      <ul class="hidden absolute z-[101] w-full bg-white  text-gray-800 shadow-xl group-hover:showMenu origin-top-right">
-        <nuxt-link class="z-[101]" v-for="champ in chs" :to="'/'+champ.slug" :key="champ.slug">
-          <li class="py-3 px-3 hover:bg-zinc-100 z-[101]"> {{ champ.name }}</li>
-        </nuxt-link>
-      </ul>
-    </div>
-    <div class="relative group h-full ">
-      <div class="group-hover:bg-gray-200 h-full w-full flex items-center px-7 uppercase cursor-pointer">
-        КУБКИ
-      </div>
-      <ul class="hidden absolute z-[101] w-full bg-white  text-gray-800 shadow-xl group-hover:showMenu origin-top-right">
-        <nuxt-link class="z-[101] relative" v-for="cup in cups" :to="'/'+cup.champ+'/cup/'+cup.slug" :key="cup.slug">
-          <li  class="py-3 px-3 hover:bg-zinc-100 z-[101] group/cup"> {{ cup.name }}
-            <div class="hidden group-hover/cup:showMenu left-1/4"> Lorem ipsum dolor sit amet.</div>
-          </li>
+        <div class="relative group h-full ">
+            <div class="group-hover:bg-zinc-200 h-full w-full flex items-center px-7 uppercase cursor-pointer">
+                ТУРНИРНЫЕ ТАБЛИЦЫ
+            </div>
+            <ul class="hidden absolute z-[101] w-full bg-white   text-gray-800 shadow-xl group-hover:showMenu">
+                <nuxt-link v-for="champ in chs" :to="'/'+champ.slug+'/stands'" :key="champ.slug">
+                    <li class="py-3 px-3 hover:bg-zinc-100 z-[101]"> {{ champ.name }}</li>
+                </nuxt-link>
+            </ul>
+        </div>
+        <div class="relative group h-full ">
+            <div class="group-hover:bg-zinc-200 h-full w-full flex items-center px-7 uppercase cursor-pointer">
+                КАЛЕНДАРЬ
+            </div>
+            <ul class="hidden absolute z-[101] w-full bg-white  text-gray-800 shadow-xl group-hover:showMenu">
 
-        </nuxt-link>
-      </ul>
-    </div>
-    <div class="relative group h-full ">
-      <div class="group-hover:bg-zinc-200 h-full w-full flex items-center px-7 uppercase cursor-pointer">
-        ТУРНИРНЫЕ ТАБЛИЦЫ
-      </div>
-      <ul class="hidden absolute z-[101] w-full bg-white   text-gray-800 shadow-xl group-hover:showMenu">
-        <nuxt-link v-for="champ in chs" :to="'/'+champ.slug+'/stands'" :key="champ.slug">
-          <li class="py-3 px-3 hover:bg-zinc-100 z-[101]"> {{ champ.name }}</li>
-        </nuxt-link>
-      </ul>
-    </div>
-    <div class="relative group h-full ">
-      <div class="group-hover:bg-zinc-200 h-full w-full flex items-center px-7 uppercase cursor-pointer">
-        КАЛЕНДАРЬ
-      </div>
-      <ul class="hidden absolute z-[101] w-full bg-white  text-gray-800 shadow-xl group-hover:showMenu">
+                <nuxt-link v-for="champ in chs" :to="'/'+champ.slug+'/calendar'" :key="champ.slug">
+                    <li class="py-3 px-3 hover:bg-zinc-100 z-[101]"> {{ champ.name }}</li>
+                </nuxt-link>
 
-        <nuxt-link v-for="champ in chs" :to="'/'+champ.slug+'/calendar'" :key="champ.slug">
-          <li class="py-3 px-3 hover:bg-zinc-100 z-[101]"> {{ champ.name }}</li>
-        </nuxt-link>
-
-      </ul>
-    </div>
-    <div class="relative group h-full" v-for="ecup in ecups" :key="ecup.slug">
-      <div class="group-hover:bg-zinc-200 h-full w-full flex items-center px-7 uppercase cursor-pointer">
-        {{ ecup.name }}
-      </div>
-      <ul class="hidden absolute z-[101] w-full bg-white   text-gray-800 shadow-xl
+            </ul>
+        </div>
+        <div class="relative group h-full" v-for="ecup in ecups" :key="ecup.slug">
+            <div class="group-hover:bg-zinc-200 h-full w-full flex items-center px-7 uppercase cursor-pointer">
+                {{ ecup.name }}
+            </div>
+            <ul class="hidden absolute z-[101] w-full bg-white   text-gray-800 shadow-xl
                   group-hover:showMenu">
-        <nuxt-link :to="'/ecup/'+ecup.slug">
-          <li class="py-3 px-3 hover:bg-zinc-100 z-[101]"> Новости</li>
-        </nuxt-link>
-        <nuxt-link :to="'/ecup/'+ecup.slug+'/stands'">
-          <li class="py-3 px-3 hover:bg-zinc-100 z-[101]"> Турнирные таблицы</li>
-        </nuxt-link>
-        <nuxt-link :to="'/ecup/'+ecup.slug+'/calendar'">
-          <li class="py-3 px-3 hover:bg-zinc-100 z-[101]"> Календарь</li>
-        </nuxt-link>
-      </ul>
-    </div>
-  </nav>
+                <nuxt-link :to="'/ecup/'+ecup.slug">
+                    <li class="py-3 px-3 hover:bg-zinc-100 z-[101]"> Новости</li>
+                </nuxt-link>
+                <nuxt-link :to="'/ecup/'+ecup.slug+'/stands'">
+                    <li class="py-3 px-3 hover:bg-zinc-100 z-[101]"> Турнирные таблицы</li>
+                </nuxt-link>
+                <nuxt-link :to="'/ecup/'+ecup.slug+'/calendar'">
+                    <li class="py-3 px-3 hover:bg-zinc-100 z-[101]"> Календарь</li>
+                </nuxt-link>
+            </ul>
+        </div>
+    </nav>
 </template>
 
 <script setup lang="ts">
@@ -73,36 +82,6 @@ const props = defineProps<{
   chs: IChamp[];
   ecups: IEcup[];
 }>()
-
-const cups = [
-  {
-    name: 'Кубок Англии',
-    slug: 'efl-cup',
-    champ: 'england',
-  },
-  {
-    name: 'Кубок лиги',
-    slug: 'fa-cup',
-    champ: 'england',
-  },
-  {
-    name: 'Суперкубок Англии',
-    slug: 'community-shield',
-    champ: 'england',
-  },
-  {
-    name: 'Кубок Германии',
-    slug: 'dfb-pokal',
-    champ: 'germany',
-  },
-  {
-    name: 'Суперкубок Германии',
-    slug: 'germany-supercup',
-    champ: 'germany',
-  }
-]
-
-
 
 </script>
 

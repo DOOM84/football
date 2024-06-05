@@ -48,7 +48,10 @@
     }
 
     .showMenu{
-        @apply block animate-[rotateMenu_400ms_ease-in-out_forwards] origin-top-right
+        @apply block animate-[rotateMenu_400ms_ease-in-out_forwards]  origin-top-right
+    }
+    .showSubMenu{
+        @apply block animate-[rotateMenu_400ms_ease-in-out_forwards] left-[100%] top-0 origin-top-right
     }
     .tag{
         @apply text-xs inline-flex items-center font-bold px-3 py-1 bg-blue-200 text-blue-700 rounded-full cursor-pointer h-9
