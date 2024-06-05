@@ -73,6 +73,12 @@
             Команды (Еврокубки)
             </nuxt-link>
           </div>
+
+          <div class="pt-5">
+            <nuxt-link class="hover:opacity-40 transition duration-500" to="/admin/cup_teams">
+            Команды (кубки)
+            </nuxt-link>
+          </div>
           <div class="pt-5">
             <nuxt-link class="hover:opacity-40 transition duration-500" to="/admin/tags">
               Теги
