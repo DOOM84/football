@@ -94,6 +94,7 @@
     </transition>
 
     <header>
+      <ClientOnly>
       <TheTopNav>
         <div class="cursor-pointer" @click="toggleSideBar(false, true)">
           <Icon name="ic:sharp-menu" class size="30px"/>
@@ -120,6 +121,7 @@
           </template>
         </div>
       </TheTopNav>
+      </ClientOnly>
     </header>
     <div class="max-w-[1200px] m-auto bg-white min-h-[calc(100vh-128px)]">
       <slot/>
