@@ -51,8 +51,8 @@
         <div v-if="result.info" class="animate-fade-in-down z-50 bg-gray-800/75 absolute left-[20%] text-[13px] whitespace-nowrap
         text-white hidden group-hover:flex w-[60%] group-hover:justify-between px-[3px] gap-1"
              :class="(results.length === 1 || i === results.length - 1) &&
-            ((result.info && !Array.isArray(result.info[result.home.api_id]) ? 1 : result.info && result.info[result.home.api_id].length <= 2 ? 1 : -1) === 1
-                && (result.info && !Array.isArray(result.info[result.away.api_id]) ? 1 : result.info && result.info[result.away.api_id].length <= 2 ? 1 : -1) === 1)
+            ((result.info && !Array.isArray((result.info as unknown as Record<number,any>)[result.home.api_id]) ? 1 : result.info && (result.info as unknown as Record<number,any>)[result.home.api_id].length <= 2 ? 1 : -1) === 1
+                && (result.info && !Array.isArray((result.info as unknown as Record<number,any>)[result.away.api_id]) ? 1 : result.info && (result.info as unknown as Record<number,any>)[result.away.api_id].length <= 2 ? 1 : -1) === 1)
                ? 'bottom-[100%]' : 'top-[100%]'"
         >
           <ul class="basis-auto flex-grow: 0; overflow-x-hidden m-0 p-0">

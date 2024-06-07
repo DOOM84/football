@@ -47,6 +47,54 @@ export interface IChamp {
     status: boolean;
 }
 
+export interface ICup {
+    id: number;
+    api_id: number;
+    name: string;
+    slug: string;
+    stage?: string;
+    champ: Partial<IChamp>;
+    champ_id: number | null;
+    results: ICupResult[];
+    status: boolean;
+}
+
+export interface ICupResult {
+    id: number;
+    date: number;
+    res1: number;
+    res2: number;
+    cup: ICup;
+    cup_id: number;
+    home: ICupTeam;
+    team1: number;
+    team2: number;
+    away: ICupTeam;
+    stamp: number;
+    api_id: number;
+    is_info: boolean;
+    time?: string;
+    tour?: number;
+    group?: string;
+    stage?: string;
+    order?: number;
+    info: IMatchInfo;
+    scores: {[index: number]: Partial<ICupResult>[]};
+}
+
+export interface ICupTeam {
+    id: number;
+    api_id: number | null;
+    name: string;
+    sprite: string;
+    team: ITeam;
+    results1: ICupResult[];
+    results2: ICupResult[];
+    team_id: number | null;
+    status: boolean;
+}
+
+
 export interface IEcup {
     id: number;
     api_id: number;

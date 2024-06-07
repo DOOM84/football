@@ -23,7 +23,7 @@ import {fullSeasons} from "~/utils/archive";
 
 const route = useRoute();
 
-const season = ref('');
+const season = ref<string | number>('');
 
 //const seasons = ref([2022,2023]);
 

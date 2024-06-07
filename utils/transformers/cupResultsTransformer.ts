@@ -21,7 +21,7 @@ export default ((cupResults: ICupResult[]) => {
                         time: result.time,
                         api_id: result.api_id,
                         is_info: result.is_info,
-                        ecup: result.ecup,
+                        cup: result.cup,
                         info: getGoals((result.info?.info as any []) || null),
                         home: {
                             sprite: result.home!.sprite,

@@ -1,5 +1,5 @@
 import prisma from '~/helpers/prisma';
-import type {IEcupTeam, IError, ITeam} from "~/types/interfaces";
+import type {ICupTeam, IEcupTeam, IError, ITeam} from "~/types/interfaces";
 import {matchInfo, matchSquads} from "~/helpers/remoteApi";
 import getGoals from "~/utils/getGoals";
 

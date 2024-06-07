@@ -1,6 +1,6 @@
 import prisma from '~/helpers/prisma';
 import matchInfoTransformer from "~/utils/transformers/matchInfoTransformer";
-import {
+import type {
     IChamp,
     IPost,
     IMatchInfo,
@@ -9,7 +9,7 @@ import {
     IEcupTeam,
     IResult,
     IEcup,
-    IEcupResult
+    IEcupResult, ICupTeam, ICupResult, ICup
 } from "~/types/interfaces";
 import postListTransformer from "~/utils/transformers/postListTransformer";
 import singleEcupResultsTransformer from "~/utils/transformers/singleEcupResultsTransformer";
@@ -159,9 +159,9 @@ export default defineEventHandler(async (event) => {
                         },
                     }
                 }
-            })
+            }) as unknown as ICup;
 
-            res.cupResult.cup = {name: cup!.name}
+            (res.cupResult.cup as unknown as Partial<ICup>) = {name: cup!.name}
             posts = postListTransformer(cup!.champ!.posts as unknown as IPost[]);
 
         }

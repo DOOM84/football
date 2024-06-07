@@ -218,7 +218,7 @@ async function storeItem(): Promise<void> {
     if (mode.value === 'edit') {
       const {result} = await $fetch<{ result: ICup }>('/api/admin/cups/edit', {
         method: 'PUT',
-        body: {...cupToUpdate.value, api_id: +cupToUpdate.value.api_id},
+        body: {...cupToUpdate.value, api_id: +cupToUpdate.value.api_id!},
       })
       const ind: number = data.value?.cups.findIndex((cup: Partial<ICup>) => cup.id === cupToUpdate.value.id) as number;
 
@@ -228,7 +228,7 @@ async function storeItem(): Promise<void> {
     } else if (mode.value === 'add') {
       const {result} = await $fetch<{ result: Partial<ICup> }>('/api/admin/cups/add', {
         method: 'POST',
-        body: {...cupToUpdate.value, api_id: +cupToUpdate.value.api_id},
+        body: {...cupToUpdate.value, api_id: +cupToUpdate.value.api_id!},
       })
       if(data.value){
         data.value.cups.unshift({...cupToUpdate.value, id: result.id});
