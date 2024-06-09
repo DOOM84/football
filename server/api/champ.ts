@@ -3,7 +3,7 @@ import type {IChamp, IPost, IScorer, ITourResult} from "~/types/interfaces";
 import postListTransformer from "~/utils/transformers/postListTransformer";
 import singleChampTransformer from "~/utils/transformers/singleChampTransformer";
 import champScorersTransformer from "~/utils/transformers/champScorersTransformer";
-import moment from "moment/moment";
+import moment from "moment";
 import champTransformer from "~/utils/transformers/champTransformer";
 
 export default defineEventHandler(async (event) => {
@@ -138,6 +138,7 @@ export default defineEventHandler(async (event) => {
         return {champ, tourResults, posts, headLines, players, delayResults, relegationResults};
 
     }catch (e) {
+        console.log(e);
         throw createError({
             statusCode: 404,
             message: 'Lesson not found',

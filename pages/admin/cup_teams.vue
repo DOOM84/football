@@ -179,6 +179,7 @@ function teamChanged(team: number) {
     (cupTeamToUpdate.value.team as Partial<ITeam>) = {...initTeamData, slug: ''} as Partial<ITeam>;
     cupTeamToUpdate.value.team_id = null;
     cupTeamToUpdate.value.api_id = null;
+    cupTeamToUpdate.value.sprite = null;
     return
   }
 

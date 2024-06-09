@@ -86,7 +86,7 @@ export interface ICupTeam {
     id: number;
     api_id: number | null;
     name: string;
-    sprite: string;
+    sprite: string | null;
     team: ITeam;
     results1: ICupResult[];
     results2: ICupResult[];

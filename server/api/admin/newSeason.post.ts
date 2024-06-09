@@ -14,6 +14,7 @@ export default defineEventHandler(async (event) => {
 
         const ecupStands = await prisma.ecupStand.findMany();
         const ecupResults = await prisma.ecupResult.findMany();
+        const cupResults = await prisma.cupResult.findMany();
         const results = await prisma.result.findMany();
         const matchInfo = await prisma.matchInfo.findMany();
         const teams = await prisma.team.findMany({
@@ -25,6 +26,9 @@ export default defineEventHandler(async (event) => {
         })
         await prisma[`ecupResult${year}`].createMany({
             data: ecupResults
+        })
+        await prisma[`cupResult${year}`].createMany({
+            data: cupResults
         })
         await prisma[`result${year}`].createMany({
             data: results
@@ -39,6 +43,7 @@ export default defineEventHandler(async (event) => {
         await prisma.ecupStand.deleteMany();
         await prisma.matchInfo.deleteMany();
         await prisma.ecupResult.deleteMany();
+        await prisma.cupResult.deleteMany();
         await prisma.result.deleteMany();
         await prisma.team.updateMany({
             data: {
