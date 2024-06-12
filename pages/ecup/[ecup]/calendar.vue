@@ -9,6 +9,9 @@
       </div>
       <template v-else>
         <div class="md:col-span-2 shadow-md shadow-zinc-800/20">
+          <TheTitle class="px-3 py-1">
+            {{data.ecup.name}}
+          </TheTitle>
           <TheArchive @resetSeason="resetSeason" @seasonLoaded="loadSeason" :mode="'ecupResults'"/>
             <div class="w-full overflow-x-auto">
               <ClientOnly>

@@ -9,6 +9,9 @@
       </div>
       <template v-else>
         <div class="md:col-span-2 shadow-md shadow-zinc-800/20">
+          <TheTitle class="px-3 py-1">
+            {{data.champ}}
+          </TheTitle>
           <TheArchive @resetSeason="refresh" @seasonLoaded="loadSeason" :mode="'champStands'"/>
           <div v-if="showStands" class="w-full overflow-x-auto">
             <TheBaseTabInfo :info-to-show="teams" :info-type="'fullStands'" />

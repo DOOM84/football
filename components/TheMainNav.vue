@@ -14,7 +14,7 @@
         <div class="group-hover:bg-gray-200 h-full w-full flex items-center px-7 uppercase cursor-pointer">
           КУБКИ
         </div>
-        <ul class="hidden absolute z-[101] w-full bg-white  text-gray-800 shadow-xl group-hover:showMenu origin-top-right">
+        <ul class="hidden absolute min-w-[150px] z-[101] w-full bg-white  text-gray-800 shadow-xl group-hover:showMenu origin-top-right">
           <div class="z-[101] relative" v-for="champ in chs">
             <li  class="py-3 px-3 hover:bg-zinc-100 z-[101] group/cup cursor-pointer">
               {{ champ.name }}

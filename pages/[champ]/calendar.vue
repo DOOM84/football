@@ -9,6 +9,9 @@
       </div>
       <template v-else>
         <div class="md:col-span-2 shadow-md shadow-zinc-800/20">
+          <TheTitle class="px-3 py-1">
+            {{data.champ}}
+          </TheTitle>
           <TheArchive @resetSeason="resetSeason" @seasonLoaded="loadSeason" :mode="'champResults'"/>
           <div class="w-full overflow-x-auto">
             <ClientOnly>
@@ -30,7 +33,7 @@
 </template>
 
 <script setup lang="ts">
-import type {IChamp, IPost, IResult} from "~/types/interfaces";
+import type {IPost, IResult} from "~/types/interfaces";
 import { io, type Socket } from 'socket.io-client';
 
 const socket = ref<Socket>();
@@ -41,7 +44,7 @@ const season = ref<string>('');
 
 provide('season', season);
 
-const {data, pending, error, refresh} =  await useLazyFetch<{champ: IChamp;
+const {data, pending, error, refresh} =  await useLazyFetch<{champ: string;
   results: {[index: number]: {[index: number]: Partial<IResult>[]}};
   posts: IPost[];
 }>('/api/calendar', {params: {champ: route.params.champ}, onResponseError({request, response, options}) {

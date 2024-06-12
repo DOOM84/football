@@ -7,7 +7,7 @@
             <div ref="champsBox" class="flex overflow-hidden gap-5 uppercase">
                 <div v-if="infoType === 'shortStands'" v-for="(champ, i) in champs"
                      :key="infoType + ' ' + champ.name" @click.prevent="showInfo($event, i)"
-                     class="cursor-pointer underline-offset-4 text-[14px] font-semibold">
+                     class="cursor-pointer underline-offset-4 text-[14px] font-semibold whitespace-nowrap">
                     {{ champ.name }}
                 </div>
                 <div v-else-if="infoType === 'shortResults'" v-for="(champ, i) in tourResults"
@@ -17,7 +17,7 @@
                 </div>
                 <div v-else-if="infoType === 'scorers'" v-for="(champ, i) in scorers"
                      :key="infoType + ' scorers'+i + ' ' + champ.champ.name" @click.prevent="showInfo($event, i)"
-                     class="cursor-pointer underline-offset-4 text-[14px] font-semibold">
+                     class="cursor-pointer underline-offset-4 text-[14px] font-semibold whitespace-nowrap">
                     {{ champ.champ.name }}
                 </div>
                 <div v-else-if="infoType === 'ecupStands'" v-for="(ecup, group) in sortObj(ecupStands!.stands)"
