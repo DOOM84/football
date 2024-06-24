@@ -37,8 +37,14 @@ export default defineEventHandler(async (event) => {
             }
         })
 
+        const leagueRes =  await prisma.leagueResult.findFirst({
+            where: {
+                api_id: +updated.api_id
+            }
+        })
 
-        if(!isFinishedOrLive((tourChamp?.stamp || resChamp?.stamp || ecupChamp?.stamp || cupRes?.stamp) as unknown as number)){
+
+        if(!isFinishedOrLive((tourChamp?.stamp || resChamp?.stamp || ecupChamp?.stamp || cupRes?.stamp || leagueRes?.stamp) as unknown as number)){
 
             if(updated.is_info){
                 await prisma.matchInfo.upsert({
@@ -46,11 +52,13 @@ export default defineEventHandler(async (event) => {
                         ...(resChamp ? { ch_res: resChamp.api_id } : {}) as any,
                         ...(ecupChamp ? { ecup_res: ecupChamp.api_id } : {}) as any,
                         ...(cupRes ? { c_res: cupRes.api_id } : {}) as any,
+                        ...(leagueRes ? { l_res: leagueRes.api_id } : {}) as any,
                     },
                     update: {
                         ch_res: resChamp ? resChamp.api_id : null,
                         ecup_res: ecupChamp ? ecupChamp.api_id : null,
                         c_res: cupRes ? cupRes.api_id : null,
+                        l_res: leagueRes ? leagueRes.api_id : null,
                         info: [],
                         lineups: []
                     },
@@ -58,6 +66,7 @@ export default defineEventHandler(async (event) => {
                         ch_res: resChamp ? resChamp.api_id : null,
                         ecup_res: ecupChamp ? ecupChamp.api_id : null,
                         c_res: cupRes ? cupRes.api_id : null,
+                        l_res: leagueRes ? leagueRes.api_id : null,
                         info: [],
                         lineups: []
                     },
@@ -68,6 +77,7 @@ export default defineEventHandler(async (event) => {
                         ...(resChamp ? { ch_res: resChamp.api_id } : {}) as any,
                         ...(ecupChamp ? { ecup_res: ecupChamp.api_id } : {}) as any,
                         ...(cupRes ? { c_res: cupRes.api_id } : {}) as any,
+                        ...(leagueRes ? { l_res: leagueRes.api_id } : {}) as any,
                     }
                 })
             }
@@ -116,6 +126,15 @@ export default defineEventHandler(async (event) => {
                     data: {is_info: updated.is_info} //JSON.parse(JSON.stringify(updated))
                 });
             }
+
+            if(leagueRes){
+                await prisma.leagueResult.update({
+                    where: {
+                        api_id: leagueRes.api_id as any,
+                    },
+                    data: {is_info: updated.is_info} //JSON.parse(JSON.stringify(updated))
+                });
+            }
             return {result: true}
         }
 
@@ -130,7 +149,7 @@ export default defineEventHandler(async (event) => {
 
             const squads = await matchSquads(updated.api_id);
 
-            if(getPeriod((resChamp?.stamp || ecupChamp?.stamp || cupRes?.stamp) as unknown as number)){
+            if(getPeriod((resChamp?.stamp || ecupChamp?.stamp || cupRes?.stamp || leagueRes?.stamp) as unknown as number)){
                 events.map(event =>{
                     if(event.type.toLowerCase() === 'subst'){
                         const assist = {...event.assist}
@@ -146,6 +165,7 @@ export default defineEventHandler(async (event) => {
                     ch_res: resChamp ? resChamp.api_id : null,
                     ecup_res: ecupChamp ? ecupChamp.api_id : null,
                     c_res: cupRes ? cupRes.api_id : null,
+                    l_res: leagueRes ? leagueRes.api_id : null,
                     info: events,
                     lineups: squads,
                 }
@@ -156,6 +176,7 @@ export default defineEventHandler(async (event) => {
                     ...(resChamp ? { ch_res: resChamp.api_id } : {}) as any,
                     ...(ecupChamp ? { ecup_res: ecupChamp.api_id } : {}) as any,
                     ...(cupRes ? { c_res: cupRes.api_id } : {}) as any,
+                    ...(leagueRes ? { l_res: leagueRes.api_id } : {}) as any,
                 }
             })
         }
@@ -312,6 +333,42 @@ export default defineEventHandler(async (event) => {
                 await prisma.cupResult.update({
                     where: {
                         api_id: cupRes.api_id as unknown as number,
+                    },
+                    data: {is_info: updated.is_info} //JSON.parse(JSON.stringify(updated))
+                });
+            }
+        }
+
+        if(leagueRes){
+            if(updated.is_info){
+                const homeTeam = await prisma.leagueTeam.findFirst({
+                    where: {
+                        id: leagueRes.team1 as unknown as number,
+                    },
+                    select: {api_id: true}
+                })  as unknown as ILeagueTeam
+
+                const awayTeam = await prisma.leagueTeam.findFirst({
+                    where: {
+                        id: leagueRes.team2 as unknown as number,
+                    },
+                    select: {api_id: true}
+                }) as unknown as ILeagueTeam;
+
+                await prisma.leagueResult.update({
+                    where: {
+                        api_id: leagueRes.api_id as unknown as number,
+                    },
+                    data: {
+                        is_info: updated.is_info,
+                        res1: goals && updated.is_info ? (homeTeam?.api_id && Array.isArray(goals![homeTeam.api_id]) ? goals![homeTeam.api_id].length : 0) : 0,
+                        res2: goals && updated.is_info ? (awayTeam?.api_id && Array.isArray(goals![awayTeam.api_id]) ? goals![awayTeam.api_id].length : 0) : 0,
+                    } //JSON.parse(JSON.stringify(updated))
+                });
+            }else {
+                await prisma.leagueResult.update({
+                    where: {
+                        api_id: leagueRes.api_id as unknown as number,
                     },
                     data: {is_info: updated.is_info} //JSON.parse(JSON.stringify(updated))
                 });

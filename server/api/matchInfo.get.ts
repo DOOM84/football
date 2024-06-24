@@ -57,7 +57,6 @@ export default defineEventHandler(async (event) => {
             }
         }) as unknown as IMatchInfo;
 
-
         const cupMatch = await prisma.matchInfo.findFirst({
             where: {
                 c_res: +query.apiId!,
@@ -87,14 +86,43 @@ export default defineEventHandler(async (event) => {
             }
         }) as unknown as IMatchInfo;
 
-        if (!champMatch && !ecupMatch && !cupMatch) {
+        const leagueMatch = await prisma.matchInfo.findFirst({
+            where: {
+                l_res: +query.apiId!,
+            },
+            include: {
+                leagueResult: {
+                    include: {
+                        champ: {
+                            include: {
+                                champ: {
+                                    select: {id: true}
+                                }
+                            }
+                        },
+                        home: {
+                            include: {
+                                team: true
+                            }
+                        },
+                        away: {
+                            include: {
+                                team: true
+                            }
+                        },
+                    }
+                }
+            }
+        }) as unknown as IMatchInfo;
+
+        if (!champMatch && !ecupMatch && !cupMatch && !leagueMatch) {
             throw createError({
                 statusCode: 404,
                 message: 'Страница не найдена',
             })
         }
 
-        const res = champMatch || ecupMatch || cupMatch;
+        const res = champMatch || ecupMatch || cupMatch || leagueMatch;
 
         let posts: IPost[] = [];
         let ecupResults: IEcupResult | {} = {}
@@ -159,6 +187,23 @@ export default defineEventHandler(async (event) => {
             posts = await prisma.post.findMany({
                 where: {
                     champ_id: cupMatch.cupResult.cup.champ.id,
+                    status: true,
+                },
+                include: {
+                    ecup: true,
+                    champ: true
+                },
+                orderBy: {
+                    date: 'desc',
+                },
+                take: 10
+            }) as unknown as IPost[];
+        }
+
+        if (leagueMatch) {
+            posts = await prisma.post.findMany({
+                where: {
+                    champ_id: leagueMatch.leagueResult.champ.champ.id,
                     status: true,
                 },
                 include: {

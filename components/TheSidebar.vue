@@ -14,9 +14,41 @@
               Чемпионаты
             </div>
             <ul class="hidden z-10 bg-green-900">
-              <nuxt-link v-for="champ in chs" :to="'/'+champ.slug">
-                <li class="py-3 px-8 hover:bg-zinc-500/40 duration-300"> {{ champ.name }}</li>
-              </nuxt-link>
+              <div v-for="champ in chs" :key="champ.id">
+                <li @click="toggleMenu" class="py-3 px-8 hover:bg-zinc-500/40 duration-300 cursor-pointer"> {{ champ.name }}</li>
+                <ul class="hidden z-10 bg-green-900">
+                  <nuxt-link class="z-[101]" :to="'/'+champ.slug">
+                    <li class="py-3 px-8 hover:bg-blue-700/40 duration-300 bg-blue-900">
+                      Новости
+                    </li>
+                  </nuxt-link>
+                  <nuxt-link class="z-[101]" :to="'/'+champ.slug+'/stands'">
+                    <li class="py-3 px-8 hover:bg-blue-700/40 duration-300 bg-blue-900">
+                      Турнирная таблица
+                    </li>
+                  </nuxt-link>
+                  <nuxt-link class="z-[101]" :to="'/'+champ.slug+'/calendar'">
+                    <li class="py-3 px-8 hover:bg-blue-700/40 duration-300 bg-blue-900">
+                      Календарь
+                    </li>
+                  </nuxt-link>
+                  <template  v-for="league in champ.leagues" :key="league.slug">
+                    <li class="py-1 text-center hover:bg-blue-700/40 duration-300 bg-green-900">
+                      {{league.name}}
+                    </li>
+                    <li class="py-3 px-8 hover:bg-blue-700/40 duration-300 bg-blue-900">
+                      <nuxt-link class="z-[101]" :to="'/'+champ.slug+'/league/'+league.slug+'/stands'">
+                        Турнирная таблица
+                      </nuxt-link>
+                    </li>
+                    <li class="py-3 px-8 hover:bg-blue-700/40 duration-300 bg-blue-900">
+                      <nuxt-link class="z-[101]" :to="'/'+champ.slug+'/league/'+league.slug+'/calendar'">
+                        Календарь
+                      </nuxt-link>
+                    </li>
+                  </template>
+                </ul>
+              </div>
             </ul>
           </div>
           <div>
@@ -32,26 +64,6 @@
                   </nuxt-link>
                 </ul>
               </div>
-            </ul>
-          </div>
-          <div>
-            <div @click="toggleMenu" class="w-full flex items-center px-7 py-3 uppercase cursor-pointer">
-              Турнирные таблицы
-            </div>
-            <ul class="hidden z-10 bg-green-900">
-              <nuxt-link v-for="champ in chs" :to="'/'+champ.slug+'/stands'">
-                <li class="py-3 px-8 hover:bg-zinc-500/40 duration-300"> {{ champ.name }}</li>
-              </nuxt-link>
-            </ul>
-          </div>
-          <div>
-            <div @click="toggleMenu" class="w-full flex items-center px-7 py-3 uppercase cursor-pointer">
-              Календарь
-            </div>
-            <ul class="hidden z-10 bg-green-900">
-              <nuxt-link v-for="champ in chs" :to="'/'+champ.slug+'/calendar'">
-                <li class="py-3 px-8 hover:bg-zinc-500/40 duration-300"> {{ champ.name }}</li>
-              </nuxt-link>
             </ul>
           </div>
           <div v-for="ecup in ecups">

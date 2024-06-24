@@ -17,35 +17,35 @@
         <div class="flex justify-center font-bold flex-row  gap-3 text-lg sm:text-xl mb-3 items-center">
           <div class="flex text-sm sm:text-lg basis-1/3 flex-col items-center">
             <div>
-              <img v-if="data.match.champResult?.home.sprite || data.match.ecupResult?.home.sprite || data.match.cupResult?.home.sprite" class="w-[30px] h-[30px]"
-                   :title="data.match.champResult?.home.name || data.match.ecupResult?.home.name || data.match.cupResult?.home.name"
+              <img v-if="data.match.champResult?.home.sprite || data.match.ecupResult?.home.sprite || data.match.cupResult?.home.sprite || data.match.leagueResult?.home.sprite" class="w-[30px] h-[30px]"
+                   :title="data.match.champResult?.home.name || data.match.ecupResult?.home.name || data.match.cupResult?.home.name || data.match.leagueResult?.home.name"
                    src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVQYV2NgYAAAAAMAAWgmWQ0AAAAASUVORK5CYII="
                    :style="`
-             background: url('/teams.png') ${data.match.champResult?.home.sprite || data.match.ecupResult?.home.sprite || data.match.cupResult?.home.sprite}`"
-                   :alt="data.match.champResult?.home.name || data.match.ecupResult?.home.name || data.match.cupResult?.home.name"/>
+             background: url('/teams.png') ${data.match.champResult?.home.sprite || data.match.ecupResult?.home.sprite || data.match.cupResult?.home.sprite || data.match.leagueResult?.home.sprite}`"
+                   :alt="data.match.champResult?.home.name || data.match.ecupResult?.home.name || data.match.cupResult?.home.name || data.match.leagueResult?.home.name"/>
               <img v-else src="/no_team.png" alt="">
             </div>
             <div class="text-center leading-none">
-              <nuxt-link class="hover:underline"  v-if="data.match.champResult?.home.slug || data.match.ecupResult?.home?.team?.slug || data.match.cupResult?.home?.team?.slug"
-                         :to="data.match.champResult?.home.slug ? '/team/'+data.match.champResult?.home.slug : data.match.ecupResult?.home?.team?.slug ? '/team/'+data.match.ecupResult?.home?.team?.slug : '/team/'+data.match.cupResult?.home?.team?.slug">
-                {{ data.match.champResult?.home.name || data.match.ecupResult?.home.name || data.match.cupResult?.home.name }}
+              <nuxt-link class="hover:underline"  v-if="data.match.champResult?.home.slug || data.match.ecupResult?.home?.team?.slug || data.match.cupResult?.home?.team?.slug || data.match.leagueResult?.home?.team?.slug"
+                         :to="data.match.champResult?.home.slug ? '/team/'+data.match.champResult?.home.slug : data.match.ecupResult?.home?.team?.slug ? '/team/'+data.match.ecupResult?.home?.team?.slug : data.match.leagueResult?.home?.team?.slug ? '/team/'+data.match.leagueResult?.home?.team?.slug : '/team/'+data.match.cupResult?.home?.team?.slug">
+                {{ data.match.champResult?.home.name || data.match.ecupResult?.home.name || data.match.cupResult?.home.name || data.match.leagueResult?.home.name }}
               </nuxt-link>
-              <span v-else>{{ data.match.champResult?.home.name || data.match.ecupResult?.home.name || data.match.cupResult?.home.name }}</span>
+              <span v-else>{{ data.match.champResult?.home.name || data.match.ecupResult?.home.name || data.match.cupResult?.home.name || data.match.leagueResult?.home.name }}</span>
             </div>
           </div>
           <div class="flex font-bold basis-1/3 sm:basis-auto gap-2 justify-center items-center">
             <div class="flex flex-col justify-center">
               <div class="flex gap-2 justify-center">
               <div>
-                {{ data.match.champResult?.res1 >= 0 ? data.match.champResult.res1 : data.match.ecupResult?.res1 >= 0 ? data.match.ecupResult?.res1 : data.match.cupResult?.res1 }}
+                {{ data.match.champResult?.res1 >= 0 ? data.match.champResult.res1 : data.match.ecupResult?.res1 >= 0 ? data.match.ecupResult?.res1 : data.match.leagueResult?.res1 >= 0 ? data.match.leagueResult?.res1 : data.match.cupResult?.res1 }}
               </div>
               <div>:</div>
               <div>
-                {{ data.match.champResult?.res1 >= 0 ? data.match.champResult.res2 : data.match.ecupResult?.res2 >= 0 ? data.match.ecupResult?.res2 : data.match.cupResult?.res2 }}
+                {{ data.match.champResult?.res1 >= 0 ? data.match.champResult.res2 : data.match.ecupResult?.res2 >= 0 ? data.match.ecupResult?.res2 : data.match.leagueResult?.res2 >= 0 ? data.match.leagueResult?.res2 : data.match.cupResult?.res2 }}
               </div>
               </div>
               <div class="text-xs font-normal text-center flex flex-col">
-                <div>{{data.match.champResult ? $showDate(+data.match.champResult.stamp*1000) : data.match.ecupResult ? $showDate(+data.match.ecupResult.stamp*1000) : $showDate(+data.match.cupResult.stamp*1000)}}</div>
+                <div>{{data.match.champResult ? $showDate(+data.match.champResult.stamp*1000) : data.match.ecupResult ? $showDate(+data.match.ecupResult.stamp*1000) : data.match.leagueResult ? $showDate(+data.match.leagueResult.stamp*1000) : $showDate(+data.match.cupResult.stamp*1000)}}</div>
                 <div>{{matchInfo}}</div>
               </div>
             </div>
@@ -54,21 +54,21 @@
           <div
               class="flex text-sm sm:text-lg  basis-1/3 flex-grow: 0; flex-col justify-center items-center">
             <div>
-              <img v-if="data.match.champResult?.away.sprite || data.match.ecupResult?.away.sprite || data.match.cupResult?.away.sprite" class="w-[30px] h-[30px]"
-                   :title="data.match.champResult?.away.name || data.match.ecupResult?.away.name || data.match.cupResult?.away.name"
+              <img v-if="data.match.champResult?.away.sprite || data.match.ecupResult?.away.sprite || data.match.cupResult?.away.sprite || data.match.leagueResult?.away.sprite" class="w-[30px] h-[30px]"
+                   :title="data.match.champResult?.away.name || data.match.ecupResult?.away.name || data.match.cupResult?.away.name || data.match.leagueResult?.away.name"
                    src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVQYV2NgYAAAAAMAAWgmWQ0AAAAASUVORK5CYII="
                    :style="`
-             background: url('/teams.png') ${data.match.champResult?.away.sprite || data.match.ecupResult?.away.sprite || data.match.cupResult?.away.sprite}`"
-                   :alt="data.match.champResult?.away.name || data.match.ecupResult?.away.name || data.match.cupResult?.away.name"/>
+             background: url('/teams.png') ${data.match.champResult?.away.sprite || data.match.ecupResult?.away.sprite || data.match.cupResult?.away.sprite || data.match.leagueResult?.away.sprite}`"
+                   :alt="data.match.champResult?.away.name || data.match.ecupResult?.away.name || data.match.cupResult?.away.name || data.match.leagueResult?.away.name"/>
               <img v-else src="/no_team.png" alt="">
             </div>
             <div class="text-center leading-none">
               <nuxt-link class="hover:underline"
-                         v-if="data.match.champResult?.away.slug || data.match.ecupResult?.away?.team?.slug || data.match.cupResult?.away?.team?.slug"
-                         :to="data.match.champResult?.away.slug ? '/team/'+data.match.champResult?.away.slug : data.match.ecupResult?.away?.team?.slug ? '/team/'+data.match.ecupResult?.away?.team?.slug : '/team/'+data.match.cupResult?.away?.team?.slug">
-                {{ data.match.champResult?.away.name || data.match.ecupResult?.away.name || data.match.cupResult?.away.name }}
+                         v-if="data.match.champResult?.away.slug || data.match.ecupResult?.away?.team?.slug || data.match.cupResult?.away?.team?.slug || data.match.leagueResult?.away?.team?.slug"
+                         :to="data.match.champResult?.away.slug ? '/team/'+data.match.champResult?.away.slug : data.match.ecupResult?.away?.team?.slug ? '/team/'+data.match.ecupResult?.away?.team?.slug : data.match.leagueResult?.away?.team?.slug ? '/team/'+data.match.leagueResult?.away?.team?.slug : '/team/'+data.match.cupResult?.away?.team?.slug">
+                {{ data.match.champResult?.away.name || data.match.ecupResult?.away.name || data.match.cupResult?.away.name || data.match.leagueResult?.away.name }}
               </nuxt-link>
-              <span v-else>{{ data.match.champResult?.away.name || data.match.ecupResult?.away.name || data.match.cupResult?.away.name }}</span>
+              <span v-else>{{ data.match.champResult?.away.name || data.match.ecupResult?.away.name || data.match.cupResult?.away.name || data.match.leagueResult?.away.name }}</span>
             </div>
           </div>
           <div>
@@ -296,6 +296,12 @@ const matchInfo = computed(() => {
       const cupResult = data.value?.match.cupResult;
       return `${cupResult.cup?.name}, ${cupResult.stage}.`
     }
+
+  if(data.value?.match?.leagueResult){
+    const leagueResult = data.value?.match.leagueResult;
+    return `${leagueResult.champ?.name}, ${leagueResult.tour}-й тур.`
+  }
+
     if(data.value?.match?.champResult){
       const name = data.value?.match?.champResult?.champ?.name;
       const {tour} = data.value?.match?.champResult;
@@ -305,11 +311,11 @@ const matchInfo = computed(() => {
 });
 
 const homeApiId = computed(()=>{
-  return data.value?.match?.champResult?.home?.api_id || data.value?.match?.ecupResult?.home?.api_id || data.value?.match?.cupResult?.home?.api_id
+  return data.value?.match?.champResult?.home?.api_id || data.value?.match?.ecupResult?.home?.api_id || data.value?.match?.cupResult?.home?.api_id || data.value?.match?.leagueResult?.home?.api_id
 })
 
 const awayApiId = computed(()=>{
-  return data.value?.match?.champResult?.away?.api_id || data.value?.match?.ecupResult?.away?.api_id || data.value?.match?.cupResult?.away?.api_id
+  return data.value?.match?.champResult?.away?.api_id || data.value?.match?.ecupResult?.away?.api_id || data.value?.match?.cupResult?.away?.api_id || data.value?.match?.leagueResult?.away?.api_id
 })
 
 function getIcon(type: string, detail: string) {

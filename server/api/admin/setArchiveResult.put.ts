@@ -34,6 +34,12 @@ export default defineEventHandler(async (event) => {
             }
         })
 
+        const leagueChamp =  await (prisma[`leagueResult${updated.season as Season}`] as any).findFirst({
+            where: {
+                api_id: +updated.api_id
+            }
+        })
+
         if(updated.is_info){
             const events = await matchInfo(updated.api_id);
             const squads = await matchSquads(updated.api_id);
@@ -52,6 +58,7 @@ export default defineEventHandler(async (event) => {
                     ch_res: resChamp ? resChamp.api_id : null,
                     ecup_res: ecupChamp ? ecupChamp.api_id : null,
                     c_res: cupChamp ? cupChamp.api_id : null,
+                    l_res: leagueChamp ? leagueChamp.api_id : null,
                     info: events,
                     lineups: squads,
                 }
@@ -62,6 +69,7 @@ export default defineEventHandler(async (event) => {
                     ...(resChamp ? { ch_res: resChamp.api_id } : {}) as any,
                     ...(ecupChamp ? { ecup_res: ecupChamp.api_id } : {}) as any,
                     ...(cupChamp ? { c_res: cupChamp.api_id } : {}) as any,
+                    ...(leagueChamp ? { l_res: leagueChamp.api_id } : {}) as any,
                 }
             })
         }
@@ -89,6 +97,15 @@ export default defineEventHandler(async (event) => {
             await (prisma[`cupResult${updated.season as Season}`] as any).update({
                 where: {
                     api_id: cupChamp.api_id,
+                },
+                data: {is_info: updated.is_info} //JSON.parse(JSON.stringify(updated))
+            });
+        }
+
+        if(leagueChamp){
+            await (prisma[`leagueResult${updated.season as Season}`] as any).update({
+                where: {
+                    api_id: leagueChamp.api_id,
                 },
                 data: {is_info: updated.is_info} //JSON.parse(JSON.stringify(updated))
             });

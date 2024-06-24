@@ -67,7 +67,7 @@
         <input type="checkbox" class="check ml-2" v-model="intervalUpdate" id="allChampsLive">
       </div>
 
-      <div class="mt-2">
+      <div class="mt-2 pb-10">
         <label>Чемпионат</label>
         <ClientOnly>
           <Multiselect
@@ -96,7 +96,7 @@
         </button>
       </div>
 
-      <div class="form-group mt-2">
+      <div class="form-group mt-2 pb-10">
         <label>Кубок</label>
         <ClientOnly>
           <Multiselect
@@ -110,6 +110,45 @@
               placeholder="Выберите кубок"></Multiselect>
         </ClientOnly>
       </div>
+
+
+      <h1 class="text-2xl font-bold mt-10 text-zinc-800">
+        Низшие лиги
+      </h1>
+
+      <div class="flex flex-wrap g-1 justify-end gap-3">
+        <button
+            class="btn font-bold"
+            type="button"
+
+            @click.prevent="leagueStands">
+          Турнирная таблица
+        </button>
+        <button
+            class="btn font-bold"
+            type="button"
+
+            @click.prevent="leagueResults">
+          Результаты
+        </button>
+      </div>
+
+      <div class="form-group mt-2 pb-10">
+        <label>Лига</label>
+        <ClientOnly>
+          <Multiselect
+              v-model="league"
+              :options="data.divs"
+              :searchable="true"
+              valueProp="slug"
+              label="name"
+              :object="true"
+              @change="leagueChanged"
+              placeholder="Выберите лигу"></Multiselect>
+        </ClientOnly>
+      </div>
+
+
 
       <h1 class="text-2xl font-bold mt-10 text-zinc-800">
         Еврокубки
@@ -140,7 +179,7 @@
 
       </div>
 
-      <div class="form-group mt-2">
+      <div class="form-group mt-2 pb-52">
         <label>Еврокубок</label>
         <ClientOnly>
           <Multiselect
@@ -161,7 +200,7 @@
 </template>
 <script lang="ts" setup>
 import Multiselect from '@vueform/multiselect';
-import type {IChamp, IEcup, IError} from "~/types/interfaces";
+import type {IChamp, ICup, IEcup, ILeague, IError} from "~/types/interfaces";
 import { io, type Socket } from 'socket.io-client';
 
 
@@ -184,6 +223,8 @@ const ecup = ref<IEcup>();
 
 const cup = ref<ICup>();
 
+const league = ref<ILeague>();
+
 const tUpdate = ref<ReturnType<typeof setInterval>>();
 
 const ecupUpdate = ref<ReturnType<typeof setInterval>>();
@@ -198,6 +239,7 @@ const {data, pending} = useLazyFetch<{
   ecups: IEcup[];
   champs: IChamp[];
   cups: ICup[];
+  divs: ILeague[];
 }>('/api/admin/remote')
 
 
@@ -245,8 +287,12 @@ function ecupChanged(ecp: IEcup): void{
   ecup.value = {...ecp}
 }
 
-function cupChanged(cp: IСup): void{
+function cupChanged(cp: ICup): void{
   cup.value = {...cp}
+}
+
+function leagueChanged(lg: ILeague): void{
+  league.value = {...lg}
 }
 
 
@@ -532,6 +578,70 @@ async function cupResults(): Promise<void> {
 
     useNuxtApp().$toast.success('Результаты были успешно обновлены');
 
+
+  }catch (e) {
+    const typedError = e as IError;
+
+    if(typedError.status === 403){
+      throw createError({
+        fatal: true,
+        statusCode: 404,
+        message: 'Страница не найдена'
+      })
+    }
+    useNuxtApp().$toast.error('Ошибка');
+  }finally {
+    showLoading.value = false;
+  }
+}
+
+
+
+async function leagueStands(): Promise<void> {
+  if(!league.value || !league.value.slug || !league.value.api_id){
+    useNuxtApp().$toast.error('Выберите лигу');
+    return;
+  }
+
+  try {
+    showLoading.value = true;
+    await $fetch('/api/admin/remote/leagueStands', {
+      method: 'PUT',
+      body: league.value,
+    });
+    useNuxtApp().$toast.success('Турнирная таблица была успешно обновлена');
+
+  }catch (e) {
+    const typedError = e as IError;
+
+    if(typedError.status === 403){
+      throw createError({
+        fatal: true,
+        statusCode: 404,
+        message: 'Страница не найдена'
+      })
+    }
+    useNuxtApp().$toast.error('Ошибка');
+  }finally {
+    showLoading.value = false;
+  }
+}
+
+
+async function leagueResults(): Promise<void> {
+
+  if(!league.value || !league.value.slug || !league.value.api_id){
+    useNuxtApp().$toast.error('Выберите лигу');
+    return;
+  }
+
+  try {
+    showLoading.value = true;
+    await $fetch('/api/admin/remote/leagueResults', {
+      method: 'PUT',
+      body: league.value,
+    });
+    useNuxtApp().$toast.success('Турнирная таблица была успешно обновлена');
 
   }catch (e) {
     const typedError = e as IError;

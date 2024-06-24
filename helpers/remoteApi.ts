@@ -1,5 +1,5 @@
 import moment from "moment";
-import type {IChamp, IEcupTeam, IPlayer, IResult, IScorer, ITeam} from "~/types/interfaces";
+import type {IChamp, IEcupTeam, IPlayer, IResult, ILeagueTeam, ITeam} from "~/types/interfaces";
 
 const runtimeConfig = useRuntimeConfig();
 import {season} from "~/utils/archive";
@@ -113,6 +113,20 @@ export async function addChampsStands(champs: any[]): Promise<Partial<ITeam>[]> 
     }
 
     return teams;
+}
+
+
+export async function addLeagueStands(api_id: number): Promise<Partial<ILeagueTeam>[]> {
+
+    const {response} = await $fetch<Record<string, any>>(
+        `https://v3.football.api-sports.io/standings?league=${api_id}&season=${season}`, {
+            headers: {
+                'x-rapidapi-key': runtimeConfig.apiKey,
+                'x-rapidapi-host': runtimeConfig.apiHost,
+            },
+        })
+
+    return response[0]?.league?.standings[0] || [];
 }
 
 export async function addChampResults(champId: string | number, champApiId: string | number): Promise<Partial<IResult>[]> {
@@ -229,6 +243,20 @@ export async function addCupResults(cupApiId: string | number): Promise<Partial<
 
     const {response} = await $fetch<Record<string, any>>(
         `https://v3.football.api-sports.io/fixtures?league=${cupApiId}&season=${season}`, {
+            headers: {
+                'x-rapidapi-key': runtimeConfig.apiKey,
+                'x-rapidapi-host': runtimeConfig.apiHost,
+            },
+        })
+
+    return response;
+}
+
+
+export async function addLeagueResults(LeagueApiId: string | number): Promise<Partial<IResult>[]> {
+
+    const {response} = await $fetch<Record<string, any>>(
+        `https://v3.football.api-sports.io/fixtures?league=${LeagueApiId}&season=${season}`, {
             headers: {
                 'x-rapidapi-key': runtimeConfig.apiKey,
                 'x-rapidapi-host': runtimeConfig.apiHost,

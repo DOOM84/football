@@ -1,5 +1,5 @@
 import {addCupResults} from "~/helpers/remoteApi";
-import type {IError} from "~/types/interfaces";
+import type {IError, ICupTeam} from "~/types/interfaces";
 import prisma from "~/helpers/prisma";
 import moment from "moment";
 
@@ -50,7 +50,7 @@ export default defineEventHandler(async (event) => {
 
             const results = rawResults.map(res => {
                 return {...res, round: res.league.round, api_id: +api_id}
-            }).filter(res => rounds[res.api_id] ? rounds[res.api_id].includes(res.round.toLowerCase()) : true) as Record<string, any>[];
+            }).filter(res => rounds[res.api_id as keyof typeof rounds] ? rounds[res.api_id as keyof typeof rounds].includes(res.round.toLowerCase()) : true) as Record<string, any>[];
 
             return await Promise.all(results.map(async res => {
 

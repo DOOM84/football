@@ -51,6 +51,12 @@
           </div>
 
           <div class="pt-5">
+            <nuxt-link class="hover:opacity-40 transition duration-500" to="/admin/leagues">
+              Низшие лиги
+            </nuxt-link>
+          </div>
+
+          <div class="pt-5">
             <nuxt-link class="hover:opacity-40 transition duration-500" to="/admin/cups">
               Кубки
             </nuxt-link>
@@ -69,31 +75,41 @@
           </div>
 
           <div class="pt-5">
+            <nuxt-link class="hover:opacity-40 transition duration-500" to="/admin/cup_teams">
+              Команды (кубки)
+            </nuxt-link>
+          </div>
+
+          <div class="pt-5">
+            <nuxt-link class="hover:opacity-40 transition duration-500" to="/admin/league_teams">
+              Команды (низшие лиги)
+            </nuxt-link>
+          </div>
+
+          <div class="pt-5">
             <nuxt-link class="hover:opacity-40 transition duration-500" to="/admin/ecup_teams">
             Команды (Еврокубки)
             </nuxt-link>
           </div>
 
           <div class="pt-5">
-            <nuxt-link class="hover:opacity-40 transition duration-500" to="/admin/cup_teams">
-            Команды (кубки)
-            </nuxt-link>
-          </div>
-          <div class="pt-5">
             <nuxt-link class="hover:opacity-40 transition duration-500" to="/admin/tags">
               Теги
             </nuxt-link>
           </div>
+
           <div class="pt-5">
             <nuxt-link class="hover:opacity-40 transition duration-500" to="/admin/remote">
               Обновление по API
             </nuxt-link>
           </div>
+
           <div class="pt-5">
             <nuxt-link class="hover:opacity-40 transition duration-500" to="/admin/users">
               Пользователи
             </nuxt-link>
           </div>
+
         </div>
         <div @click="newSeason" class="mt-5 bg-red-700 text-white p-3 cursor-pointer font-bold text-center">Закончить сезон</div>
       </TheSidebar>

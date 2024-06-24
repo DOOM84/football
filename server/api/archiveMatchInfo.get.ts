@@ -9,7 +9,7 @@ import type {
     IEcupTeam,
     IResult,
     IEcup,
-    IEcupResult, ICupTeam, ICupResult, ICup
+    IEcupResult, ICupTeam, ICupResult, ICup, ILeagueTeam
 } from "~/types/interfaces";
 import postListTransformer from "~/utils/transformers/postListTransformer";
 import singleEcupResultsTransformer from "~/utils/transformers/singleEcupResultsTransformer";
@@ -42,6 +42,8 @@ export default defineEventHandler(async (event) => {
 
         let ecupTeams: IEcupTeam[] = [];
 
+        let leagueTeams: IEcupTeam[] = [];
+
         const champMatch = await (prisma[`matchInfo${query.season}`] as any).findFirst({
             where: {
                 ch_res: +query.apiId!,
@@ -60,7 +62,13 @@ export default defineEventHandler(async (event) => {
             },
         }) as unknown as IMatchInfo;
 
-        if (!champMatch && !ecupMatch && !cupMatch) {
+        const leagueMatch = await (prisma[`matchInfo${query.season}`] as any).findFirst({
+            where: {
+                l_res: +query.apiId!,
+            },
+        }) as unknown as IMatchInfo;
+
+        if (!champMatch && !ecupMatch && !cupMatch && !leagueMatch) {
             throw createError({
                 statusCode: 404,
                 message: 'Страница не найдена',
@@ -129,7 +137,41 @@ export default defineEventHandler(async (event) => {
                 team.id === +cupMatch.cupResult.away.team_id! )[0]
         }
 
-        const res = champMatch || ecupMatch  || cupMatch;
+        if(leagueMatch){
+
+            const leagueTeams = await (prisma[`leagueTeam${query.season}`] as any).findMany() as unknown as ITeam[];
+
+            const champTeams = await prisma.team.findMany({
+                select: {id: true, api_id: true, slug: true}
+            }) as unknown as ITeam[];
+
+            const origTeams = await prisma.leagueTeam.findMany({
+                include: {
+                    team: {select: {id: true, api_id: true, slug: true}}
+                }
+            }) as unknown as ILeagueTeam[];
+
+            leagueMatch.leagueResult = await (prisma[`leagueResult${query.season}`] as any).findFirst({
+                where: {
+                    api_id: +query.apiId!,
+                },
+            }) as unknown as IResult;
+
+            leagueMatch.leagueResult.home = leagueTeams.filter(team =>
+                team.id === +leagueMatch.leagueResult.team1)[0];
+
+            leagueMatch.leagueResult.home.team = {
+                slug: origTeams.filter(t => +t.api_id === +leagueMatch.leagueResult.home.api_id)[0]?.team?.slug || champTeams.filter(t => +t.api_id === +leagueMatch.leagueResult.home.api_id)[0]?.slug || null
+            };
+
+            leagueMatch.leagueResult.away = leagueTeams.filter(team =>
+                team.id === +leagueMatch.leagueResult.team2)[0];
+
+            leagueMatch.leagueResult.away.team = {slug: origTeams.filter(t => +t.api_id === +leagueMatch.leagueResult.away.api_id)[0]?.team?.slug || champTeams.filter(t => +t.api_id === +leagueMatch.leagueResult.away.api_id)[0]?.slug || null};
+
+        }
+
+        const res = champMatch || ecupMatch  || cupMatch || leagueMatch;
 
         let posts: IPost[] = [];
         let ecupResults: Record<string, any> = {}
@@ -263,6 +305,37 @@ export default defineEventHandler(async (event) => {
             posts = postListTransformer(champ!.posts);
 
             tourResults = singleChampTransformer(champ);
+        }
+
+        if(leagueMatch?.leagueResult?.champ_id){
+          const league =  await prisma.league.findFirst({
+                where: {
+                    id: +leagueMatch.leagueResult.champ_id
+                },
+                include: {
+                    champ: {
+                        include: {
+                            posts: query.loadPosts ? {
+                                where: {
+                                    status: true,
+                                },
+                                include: {
+                                    ecup: true,
+                                    champ: true
+                                },
+                                orderBy: {
+                                    date: 'desc',
+                                },
+                                take: 10
+                            } : false,
+                        }
+                    }
+                }
+            }) as ILeague;
+
+            leagueMatch.leagueResult.champ = {name: league.name}
+
+            posts = postListTransformer(league.champ!.posts as IPost[]);
         }
 
         const mixedSquads = [];

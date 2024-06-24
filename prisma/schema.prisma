@@ -18,6 +18,7 @@ model Champ {
   current_tour Int?
   posts        Post[]
   cups         Cup[]
+  leagues      League[]
   teams        Team[]
   scorers      Scorer[]
   results      Result[]
@@ -51,6 +52,129 @@ model Cup {
   champ_id Int
   results  CupResult[]
   status   Boolean     @default(true)
+}
+
+model League {
+  id       Int            @id @default(autoincrement())
+  api_id   Int?
+  name     String
+  slug     String         @unique
+  stage    String?
+  champ    Champ          @relation(fields: [champ_id], references: [id])
+  champ_id Int
+  teams    LeagueTeam[]
+  results  LeagueResult[]
+  status   Boolean        @default(true)
+}
+
+model LeagueResult {
+  id       Int        @id @default(autoincrement())
+  date     BigInt?
+  res1     Int?
+  res2     Int?
+  champ    League     @relation(fields: [champ_id], references: [id])
+  champ_id Int
+  home     LeagueTeam @relation(fields: [team1], references: [id], name: "home")
+  team1    Int
+  away     LeagueTeam @relation(fields: [team2], references: [id], name: "away")
+  team2    Int
+  stamp    BigInt?
+  api_id   BigInt?    @unique
+  is_info  Boolean    @default(false)
+  time     String?
+  tour     Int?
+  info     MatchInfo?
+}
+
+model LeagueResult22 {
+  id       Int     @id @default(autoincrement())
+  date     BigInt?
+  res1     Int?
+  res2     Int?
+  champ_id Int
+  team1    Int
+  team2    Int
+  stamp    BigInt?
+  time     String?
+  tour     Int?
+  api_id   BigInt? @unique
+  is_info  Boolean @default(false)
+}
+
+model LeagueResult23 {
+  id       Int     @id @default(autoincrement())
+  date     BigInt?
+  res1     Int?
+  res2     Int?
+  champ_id Int
+  team1    Int
+  team2    Int
+  stamp    BigInt?
+  time     String?
+  tour     Int?
+  api_id   BigInt? @unique
+  is_info  Boolean @default(false)
+}
+
+model LeagueTeam {
+  id       Int            @id @default(autoincrement())
+  api_id   Int            @unique
+  name     String
+  sprite   String?
+  champ    League         @relation(fields: [champ_id], references: [id])
+  champ_id Int
+  team     Team?          @relation(fields: [team_id], references: [id])
+  team_id  Int?           @unique
+  games    Int            @default(0)
+  win      Int            @default(0)
+  draw     Int            @default(0)
+  lost     Int            @default(0)
+  goals    Int            @default(0)
+  missed   Int            @default(0)
+  diff     Int            @default(0)
+  points   Int            @default(0)
+  order    Int?
+  status   Boolean        @default(true)
+  results1 LeagueResult[] @relation("home")
+  results2 LeagueResult[] @relation("away")
+}
+
+model LeagueTeam22 {
+  id       Int     @id @default(autoincrement())
+  api_id   Int     @unique
+  name     String
+  sprite   String?
+  champ_id Int
+  team_id  Int?    @unique
+  games    Int     @default(0)
+  win      Int     @default(0)
+  draw     Int     @default(0)
+  lost     Int     @default(0)
+  goals    Int     @default(0)
+  missed   Int     @default(0)
+  diff     Int     @default(0)
+  points   Int     @default(0)
+  order    Int?
+  status   Boolean @default(true)
+}
+
+model LeagueTeam23 {
+  id       Int     @id @default(autoincrement())
+  api_id   Int     @unique
+  name     String
+  sprite   String?
+  champ_id Int
+  team_id  Int?    @unique
+  games    Int     @default(0)
+  win      Int     @default(0)
+  draw     Int     @default(0)
+  lost     Int     @default(0)
+  goals    Int     @default(0)
+  missed   Int     @default(0)
+  diff     Int     @default(0)
+  points   Int     @default(0)
+  order    Int?
+  status   Boolean @default(true)
 }
 
 model CupResult {
@@ -153,6 +277,7 @@ model Team {
   resultsTour2 Tour[]         @relation("tourAway")
   ecupTeam     EcupTeam?
   cupTeam      CupTeam?
+  leagueTeam   LeagueTeam?
 }
 
 model Team23 {
@@ -224,15 +349,17 @@ model Result {
 }
 
 model MatchInfo {
-  id          Int         @id @default(autoincrement())
-  info        Json?
-  lineups     Json?
-  cupResult   CupResult?  @relation(fields: [c_res], references: [api_id])
-  c_res       BigInt?     @unique
-  champResult Result?     @relation(fields: [ch_res], references: [api_id])
-  ch_res      BigInt?     @unique
-  ecupResult  EcupResult? @relation(fields: [ecup_res], references: [api_id])
-  ecup_res    BigInt?     @unique
+  id           Int           @id @default(autoincrement())
+  info         Json?
+  lineups      Json?
+  cupResult    CupResult?    @relation(fields: [c_res], references: [api_id])
+  c_res        BigInt?       @unique
+  champResult  Result?       @relation(fields: [ch_res], references: [api_id])
+  ch_res       BigInt?       @unique
+  ecupResult   EcupResult?   @relation(fields: [ecup_res], references: [api_id])
+  ecup_res     BigInt?       @unique
+  leagueResult LeagueResult? @relation(fields: [l_res], references: [api_id])
+  l_res        BigInt?       @unique
 }
 
 model MatchInfo22 {
@@ -242,6 +369,7 @@ model MatchInfo22 {
   ch_res   BigInt? @unique
   ecup_res BigInt? @unique
   c_res    BigInt? @unique
+  l_res    BigInt? @unique
 }
 
 model MatchInfo23 {
@@ -251,6 +379,7 @@ model MatchInfo23 {
   ch_res   BigInt? @unique
   ecup_res BigInt? @unique
   c_res    BigInt? @unique
+  l_res    BigInt? @unique
 }
 
 model Result23 {

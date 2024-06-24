@@ -50,8 +50,12 @@ async function loadSeason(): Promise<void> {
 
     const res = await $fetch('/api/loadSeason', {
       params: {
-        season: season.value.toString().slice(-2), mode: props.mode,
-        champ: route.params.champ, ecup: route.params.ecup, cup: route.params.cup
+        season: season.value.toString().slice(-2),
+        mode: props.mode,
+        champ: route.params.champ,
+        ecup: route.params.ecup,
+        cup: route.params.cup,
+        league: route.params.league,
       }
     });
 

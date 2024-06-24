@@ -27,6 +27,13 @@ export default defineEventHandler(async (event) => {
                         name: true,
                         slug: true,
                     }
+                },
+                leagues: {
+                    select: {
+                        id: true,
+                        name: true,
+                        slug: true,
+                    }
                 }
             },
             orderBy: {
