@@ -18,28 +18,6 @@ export default defineEventHandler(async (event) => {
 
         if (slug && api_id) {
 
-            /*const teams = await prisma.team.findMany({
-            select: {
-                id: true,
-                api_id: true,
-                name: true,
-                sprite: true
-            }
-            })
-
-            for (let i = 0; i < teams.length; i++) {
-                await prisma.cupTeam.create({
-                    data: {
-                        api_id: teams[i].api_id,
-                        name: teams[i].name,
-                        team_id: teams[i].id,
-                        sprite: teams[i].sprite,
-                    }
-                })
-            }
-
-            return {}*/
-
             const rawResults = await addCupResults(+api_id) as Record<string, any>[];
 
             const cup_teams = await prisma.cupTeam.findMany({

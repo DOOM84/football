@@ -31,13 +31,13 @@
 </template>
 
 <script setup lang="ts">
-import type {ILeague, IPost, ITeam} from "~/types/interfaces";
+import type {ILeagueTeam, IPost} from "~/types/interfaces";
 import { io, type Socket } from 'socket.io-client';
 
 const socket = ref<Socket>();
 const route = useRoute();
 
-const {data, pending, error, refresh} =  await useLazyFetch<{ teams: ITeam[];
+const {data, pending, error, refresh} =  await useLazyFetch<{ teams: ILeagueTeam[];
   posts: IPost[]; league: string;
 }>('/api/leagueStands', {params: {league: route.params.league, champ: route.params.champ}, onResponseError({request, response, options}) {
     showError({
@@ -67,7 +67,7 @@ const teams = computed(()=>{
   return data.value!.teams
 })
 
-async function loadSeason(res: ITeam[]) {
+async function loadSeason(res: ILeagueTeam[]) {
   showStands.value = false;
   await new Promise(resolve => setTimeout(resolve, 100));
   data.value!.teams = [...res];

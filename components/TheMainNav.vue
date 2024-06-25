@@ -5,8 +5,7 @@
           ЧЕМПИОНАТЫ
         </div>
         <ul class="hidden absolute min-w-[150px] z-[101] w-full bg-white  text-gray-800 shadow-xl group-hover:showMenu origin-top-right">
-          <div class="z-[101] relative" v-for="champ in chs" :key="champ.slug">
-            <li  class="py-3 px-3 hover:bg-zinc-100 z-[101] group/cup">
+            <li  v-for="champ in chs" :key="champ.slug" class="relative py-3 px-3 hover:bg-zinc-100 z-[101] group/cup">
               <nuxt-link class="z-[101]" :to="'/'+champ.slug" >
                 <div class="hover:bg-zinc-100 z-[101]"> {{ champ.name }}</div>
               </nuxt-link>
@@ -36,21 +35,19 @@
                   <li class="p-1 text-center z-[101] border border-b-1">
                     {{league.name}}
                   </li>
-
+                  <nuxt-link class="z-[101]" :to="'/'+champ.slug+'/league/'+league.slug+'/stands'">
                   <li class="py-3 px-3 hover:bg-zinc-100 z-[101]">
-                    <nuxt-link class="z-[101]" :to="'/'+champ.slug+'/league/'+league.slug+'/stands'">
                       Турнирная таблица
-                    </nuxt-link>
                   </li>
+                  </nuxt-link>
+                  <nuxt-link class="z-[101]" :to="'/'+champ.slug+'/league/'+league.slug+'/calendar'">
                   <li class="py-3 px-3 hover:bg-zinc-100 z-[101]">
-                    <nuxt-link class="z-[101]" :to="'/'+champ.slug+'/league/'+league.slug+'/calendar'">
                       Календарь
-                    </nuxt-link>
                   </li>
+                  </nuxt-link>
                 </template>
               </ul>
             </li>
-          </div>
         </ul>
       </div>
       <div class="relative group h-full ">
@@ -58,8 +55,7 @@
           КУБКИ
         </div>
         <ul class="hidden absolute min-w-[150px] z-[101] w-full bg-white  text-gray-800 shadow-xl group-hover:showMenu origin-top-right">
-          <div class="z-[101] relative" v-for="champ in chs">
-            <li  class="py-3 px-3 hover:bg-zinc-100 z-[101] group/cup cursor-pointer">
+            <li v-for="champ in chs" :key="champ.id"  class="relative py-3 px-3 hover:bg-zinc-100 z-[101] group/cup cursor-pointer">
               {{ champ.name }}
               <ul class="
               min-w-[170px]
@@ -73,26 +69,36 @@
                 </nuxt-link>
               </ul>
             </li>
-          </div>
         </ul>
       </div>
-        <div class="relative group h-full" v-for="ecup in ecups" :key="ecup.slug">
-            <div class="group-hover:bg-zinc-200 h-full w-full flex items-center px-7 uppercase cursor-pointer">
-                {{ ecup.name }}
-            </div>
-            <ul class="hidden absolute z-[101] w-full bg-white   text-gray-800 shadow-xl
-                  group-hover:showMenu">
+
+      <div class="relative group h-full ">
+        <div class="group-hover:bg-gray-200 h-full w-full flex items-center px-7 uppercase cursor-pointer">
+          ЕВРОКУБКИ
+        </div>
+        <ul class="hidden absolute min-w-[150px] z-[101] w-full bg-white  text-gray-800 shadow-xl group-hover:showMenu origin-top-right">
+            <li v-for="ecup in ecups" :key="ecup.slug"  class="relative py-3 px-3 hover:bg-zinc-100 z-[101] group/cup cursor-pointer">
+              {{ ecup.name }}
+              <ul class="
+              min-w-[170px]
+              bg-white
+              text-gray-800
+              hidden
+              absolute
+              group-hover/cup:showSubMenu">
                 <nuxt-link :to="'/ecup/'+ecup.slug">
-                    <li class="py-3 px-3 hover:bg-zinc-100 z-[101]"> Новости</li>
+                  <li class="py-3 px-3 hover:bg-zinc-100 z-[101]"> Новости</li>
                 </nuxt-link>
                 <nuxt-link :to="'/ecup/'+ecup.slug+'/stands'">
-                    <li class="py-3 px-3 hover:bg-zinc-100 z-[101]"> Турнирные таблицы</li>
+                  <li class="py-3 px-3 hover:bg-zinc-100 z-[101]"> Турнирные таблицы</li>
                 </nuxt-link>
                 <nuxt-link :to="'/ecup/'+ecup.slug+'/calendar'">
-                    <li class="py-3 px-3 hover:bg-zinc-100 z-[101]"> Календарь</li>
+                  <li class="py-3 px-3 hover:bg-zinc-100 z-[101]"> Календарь</li>
                 </nuxt-link>
-            </ul>
-        </div>
+              </ul>
+            </li>
+        </ul>
+      </div>
     </nav>
 </template>
 

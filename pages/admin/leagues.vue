@@ -158,10 +158,7 @@ definePageMeta({
   middleware: ["admin"]
 })
 
-const {data, pending} = useLazyFetch<{leagues: Partial<ILeague>[]; champs: Partial<IChamp>[]}>('/api/admin/leagues')
-
-
-//const stages = [{name: 'Групповой турнир', slug: 'group'},{name: 'Плей-офф', slug: 'playoff'}];
+const {data, pending} = useLazyFetch<{leagues: Partial<ILeague>[]; champs: Partial<IChamp>[]}>('/api/admin/leagues');
 
 useHead({
   titleTemplate: '%s - Кубки'
@@ -208,12 +205,6 @@ async function storeItem(): Promise<void> {
     leagueToUpdate.value.slug = !leagueToUpdate.value.slug ?
         slugify(leagueToUpdate.value?.name as string || '',
             {strict: true, lower: true}) : leagueToUpdate.value.slug;
-
-    /*const cupToDb = {
-      ...leagueToUpdate.value,
-      api_id: +leagueToUpdate.value?.api_id!,
-      slug: leagueToUpdate.value.slug || slugify(leagueToUpdate.value?.name as string || '', {strict: true, lower:true}),
-    }*/
 
     if (mode.value === 'edit') {
       const {result} = await $fetch<{ result: ILeague }>('/api/admin/leagues/edit', {

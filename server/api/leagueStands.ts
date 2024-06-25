@@ -1,5 +1,5 @@
 import prisma from '~/helpers/prisma';
-import type {IChamp} from "~/types/interfaces";
+import type {IChamp, ILeague} from "~/types/interfaces";
 import postListTransformer from "~/utils/transformers/postListTransformer";
 
 export default defineEventHandler(async (event) => {

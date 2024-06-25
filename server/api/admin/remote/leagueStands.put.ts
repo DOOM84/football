@@ -1,12 +1,12 @@
 import {addLeagueStands} from "~/helpers/remoteApi";
 import prisma from '~/helpers/prisma';
-import type {ILeague, IError} from "~/types/interfaces";
+import type {IError, ITeam} from "~/types/interfaces";
 
 export default defineEventHandler(async (event) => {
 
     try {
 
-        const {slug, id, api_id} = await readBody(event);
+        const {id, api_id} = await readBody(event);
 
         const rawStands = await addLeagueStands(+api_id) as Record<string, any>[];
 
@@ -21,7 +21,7 @@ export default defineEventHandler(async (event) => {
                 name: true,
                 sprite: true
             }
-        })
+        }) as ITeam[];
 
 
         return await Promise.all(rawStands.map(async (team: Record<string, any>) => {

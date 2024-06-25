@@ -9,7 +9,7 @@ import type {
     IEcupTeam,
     IResult,
     IEcup,
-    IEcupResult, ICupTeam, ICupResult, ICup, ILeagueTeam
+    IEcupResult, ICupTeam, ICupResult, ICup, ILeagueTeam, ILeagueResult, ILeague
 } from "~/types/interfaces";
 import postListTransformer from "~/utils/transformers/postListTransformer";
 import singleEcupResultsTransformer from "~/utils/transformers/singleEcupResultsTransformer";
@@ -42,7 +42,7 @@ export default defineEventHandler(async (event) => {
 
         let ecupTeams: IEcupTeam[] = [];
 
-        let leagueTeams: IEcupTeam[] = [];
+        let leagueTeams: ILeagueTeam[] = [];
 
         const champMatch = await (prisma[`matchInfo${query.season}`] as any).findFirst({
             where: {
@@ -139,7 +139,7 @@ export default defineEventHandler(async (event) => {
 
         if(leagueMatch){
 
-            const leagueTeams = await (prisma[`leagueTeam${query.season}`] as any).findMany() as unknown as ITeam[];
+            leagueTeams = await (prisma[`leagueTeam${query.season}`] as any).findMany() as unknown as ILeagueTeam[];
 
             const champTeams = await prisma.team.findMany({
                 select: {id: true, api_id: true, slug: true}
@@ -155,19 +155,19 @@ export default defineEventHandler(async (event) => {
                 where: {
                     api_id: +query.apiId!,
                 },
-            }) as unknown as IResult;
+            }) as unknown as ILeagueResult;
 
             leagueMatch.leagueResult.home = leagueTeams.filter(team =>
                 team.id === +leagueMatch.leagueResult.team1)[0];
 
             leagueMatch.leagueResult.home.team = {
-                slug: origTeams.filter(t => +t.api_id === +leagueMatch.leagueResult.home.api_id)[0]?.team?.slug || champTeams.filter(t => +t.api_id === +leagueMatch.leagueResult.home.api_id)[0]?.slug || null
+                slug: origTeams.filter(t => +t.api_id! === +leagueMatch.leagueResult.home.api_id!)[0]?.team?.slug || champTeams.filter(t => +t.api_id === +leagueMatch.leagueResult.home.api_id!)[0]?.slug || null
             };
 
             leagueMatch.leagueResult.away = leagueTeams.filter(team =>
                 team.id === +leagueMatch.leagueResult.team2)[0];
 
-            leagueMatch.leagueResult.away.team = {slug: origTeams.filter(t => +t.api_id === +leagueMatch.leagueResult.away.api_id)[0]?.team?.slug || champTeams.filter(t => +t.api_id === +leagueMatch.leagueResult.away.api_id)[0]?.slug || null};
+            leagueMatch.leagueResult.away.team = {slug: origTeams.filter(t => +t.api_id! === +leagueMatch.leagueResult.away.api_id!)[0]?.team?.slug || champTeams.filter(t => +t.api_id === +leagueMatch.leagueResult.away.api_id!)[0]?.slug || null};
 
         }
 
@@ -331,9 +331,9 @@ export default defineEventHandler(async (event) => {
                         }
                     }
                 }
-            }) as ILeague;
+            }) as unknown as ILeague;
 
-            leagueMatch.leagueResult.champ = {name: league.name}
+            (leagueMatch.leagueResult.champ as Partial<ILeague>) = {name: league.name};
 
             posts = postListTransformer(league.champ!.posts as IPost[]);
         }

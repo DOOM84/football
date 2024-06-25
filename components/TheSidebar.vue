@@ -14,8 +14,8 @@
               Чемпионаты
             </div>
             <ul class="hidden z-10 bg-green-900">
-              <div v-for="champ in chs" :key="champ.id">
-                <li @click="toggleMenu" class="py-3 px-8 hover:bg-zinc-500/40 duration-300 cursor-pointer"> {{ champ.name }}</li>
+              <li v-for="champ in chs" :key="champ.id">
+                <div @click="toggleMenu" class="py-3 px-8 hover:bg-zinc-500/40 duration-300 cursor-pointer"> {{ champ.name }}</div>
                 <ul class="hidden z-10 bg-green-900">
                   <nuxt-link class="z-[101]" :to="'/'+champ.slug">
                     <li class="py-3 px-8 hover:bg-blue-700/40 duration-300 bg-blue-900">
@@ -48,7 +48,7 @@
                     </li>
                   </template>
                 </ul>
-              </div>
+              </li>
             </ul>
           </div>
           <div>
@@ -56,30 +56,35 @@
               Кубки
             </div>
             <ul class="hidden z-10 bg-green-900">
-              <div v-for="champ in chs">
-                <li @click="toggleMenu" class="py-3 px-8 hover:bg-zinc-500/40 duration-300 cursor-pointer"> {{ champ.name }}</li>
+              <li v-for="champ in chs" :key="champ.slug">
+                <div @click="toggleMenu" class="py-3 px-8 hover:bg-zinc-500/40 duration-300 cursor-pointer"> {{ champ.name }}</div>
                 <ul class="hidden z-10 bg-green-900">
-                  <nuxt-link v-for="cup in champ.cups" :to="'/'+champ.slug+'/cup/'+cup.slug">
+                  <nuxt-link v-for="cup in champ.cups" :to="'/'+champ.slug+'/cup/'+cup.slug" :key="cup.slug">
                     <li class="py-3 px-8 hover:bg-blue-700/40 duration-300 bg-blue-900"> {{ cup.name }}</li>
                   </nuxt-link>
                 </ul>
-              </div>
+              </li>
             </ul>
           </div>
-          <div v-for="ecup in ecups">
+          <div>
             <div @click="toggleMenu" class="w-full flex items-center px-7 py-3 uppercase cursor-pointer">
-              {{ ecup.name }}
+              Еврокубки
             </div>
             <ul class="hidden z-10 bg-green-900">
-              <nuxt-link :to="'/ecup/'+ecup.slug">
-                <li class="py-3 px-8 hover:bg-zinc-500/40 duration-300"> Новости</li>
-              </nuxt-link>
-              <nuxt-link :to="'/ecup/'+ecup.slug+'/stands'">
-                <li class="py-3 px-8 hover:bg-zinc-500/40 duration-300"> Турнирные таблицы</li>
-              </nuxt-link>
-              <nuxt-link :to="'/ecup/'+ecup.slug+'/calendar'">
-                <li class="py-3 px-8 hover:bg-zinc-500/40 duration-300"> Календарь</li>
-              </nuxt-link>
+              <li v-for="ecup in ecups" :key="ecup.slug">
+                <div @click="toggleMenu" class="py-3 px-8 hover:bg-zinc-500/40 duration-300 cursor-pointer"> {{ ecup.name }}</div>
+                <ul class="hidden z-10 bg-green-900">
+                  <nuxt-link :to="'/ecup/'+ecup.slug">
+                    <li class="py-3 px-8 hover:bg-zinc-500/40 duration-300 bg-blue-900"> Новости</li>
+                  </nuxt-link>
+                  <nuxt-link :to="'/ecup/'+ecup.slug+'/stands'">
+                    <li class="py-3 px-8 hover:bg-zinc-500/40 duration-300 bg-blue-900"> Турнирные таблицы</li>
+                  </nuxt-link>
+                  <nuxt-link :to="'/ecup/'+ecup.slug+'/calendar'">
+                    <li class="py-3 px-8 hover:bg-zinc-500/40 duration-300 bg-blue-900"> Календарь</li>
+                  </nuxt-link>
+                </ul>
+              </li>
             </ul>
           </div>
         </div>

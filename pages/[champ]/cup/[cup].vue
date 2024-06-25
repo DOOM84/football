@@ -34,9 +34,10 @@
 <script setup lang="ts">
 
 import type {ICup, ICupResult, IPost} from "~/types/interfaces";
-//import { io, type Socket } from 'socket.io-client';
+import { io, type Socket } from 'socket.io-client';
 
-//const socket = ref<Socket>();
+const socket = ref<Socket>();
+
 const route = useRoute();
 
 const {data, pending, error, refresh} = await useLazyFetch<{ cup: ICup; posts: IPost[];
@@ -95,45 +96,30 @@ function resetSeason(){
   refresh();
 }
 
-/*onMounted(() => {
+onMounted(async () => {
   socket.value = io({
     path: '/api/socket.io'
   })
 
-  socket.value.emit('joinRoom', 'ecup-calendar');
+  socket.value.emit('joinRoom', 'champ-stands');
 
   socket.value.on("add-post", (post) => {
-
-    if (route.params.ecup && route.params.ecup === post.ecup?.slug) {
+    if (route.params.champ && route.params.champ === post.champ?.slug) {
       if(post){
         data.value?.posts.unshift(post);
-      }
-
-      if (data.value?.posts) {
-        if (data.value.posts.length > 10) {
-          data.value.posts.splice(-1, 1);
+        if (data.value?.posts) {
+          if (data.value.posts.length > 10) {
+            data.value.posts.splice(-1, 1);
+          }
         }
       }
     }
-
   });
-
-  socket.value.on("update-ecup", (res) => {
-
-    if (!season.value && route.params.ecup && route.params.ecup === res.ecup) {
-
-      if(data.value){
-        data.value.results = res.poResults;
-      }
-    }
-
-  });
-
 })
 
 onBeforeUnmount(() => {
   socket.value?.disconnect();
-})*/
+})
 
 </script>
 

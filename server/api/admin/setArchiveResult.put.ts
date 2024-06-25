@@ -1,5 +1,5 @@
 import prisma from '~/helpers/prisma';
-import type {IError} from "~/types/interfaces";
+import type {ICupResult, IEcupResult, IError, ILeagueResult, IResult} from "~/types/interfaces";
 import {matchInfo, matchSquads} from "~/helpers/remoteApi";
 import type {Season} from "~/types/types";
 
@@ -20,25 +20,25 @@ export default defineEventHandler(async (event) => {
             where: {
                 api_id: +updated.api_id
             }
-        })
+        }) as IResult;
 
         const ecupChamp =  await (prisma[`ecupResult${updated.season as Season}`] as any).findFirst({
             where: {
                 api_id: +updated.api_id
             }
-        })
+        }) as IEcupResult;
 
         const cupChamp =  await (prisma[`cupResult${updated.season as Season}`] as any).findFirst({
             where: {
                 api_id: +updated.api_id
             }
-        })
+        }) as ICupResult;
 
         const leagueChamp =  await (prisma[`leagueResult${updated.season as Season}`] as any).findFirst({
             where: {
                 api_id: +updated.api_id
             }
-        })
+        }) as ILeagueResult;
 
         if(updated.is_info){
             const events = await matchInfo(updated.api_id);
@@ -55,7 +55,7 @@ export default defineEventHandler(async (event) => {
 
             await prisma[`matchInfo${updated.season as Season}`].create({
                 data: {
-                    ch_res: resChamp ? resChamp.api_id : null,
+                    ch_res: resChamp ? (resChamp.api_id as number) : null,
                     ecup_res: ecupChamp ? ecupChamp.api_id : null,
                     c_res: cupChamp ? cupChamp.api_id : null,
                     l_res: leagueChamp ? leagueChamp.api_id : null,
@@ -132,11 +132,3 @@ export default defineEventHandler(async (event) => {
     }
 
 })
-
-function getPeriod(gameStamp: number){
-    return (Math.round(Date.now() / 1000) - Number(gameStamp))/3600 >= 12
-}
-
-function isFinishedOrLive(gameStamp: number){
-    return Number(gameStamp) < Math.round(Date.now() / 1000)
-}

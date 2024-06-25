@@ -12,7 +12,7 @@ import type {
     IEcup,
     IEcupResult,
     IEcupStand,
-    IEcupTeam,
+    IEcupTeam, ILeague, ILeagueResult,
     ILeagueTeam,
     IResult,
     ITeam
@@ -96,7 +96,7 @@ export default defineEventHandler(async (event) => {
             }) as unknown as ITeam[];
 
           return await Promise.all(leagueTeams.map(async (team: Record<string, any>) => {
-              team.slug = origTeams.filter(t => +t.api_id === +team.api_id)[0]?.team?.slug || champTeams.filter(t => +t.api_id === +team.api_id)[0]?.slug || null;
+              team.slug = origTeams.filter(t => +t.api_id! === +team.api_id)[0]?.team?.slug || champTeams.filter(t => +t.api_id === +team.api_id)[0]?.slug || null;
               return team;
             }));
         }
@@ -156,12 +156,12 @@ export default defineEventHandler(async (event) => {
 
             for (let i = 0; i < DBresults.length; i++) {
                 DBresults[i].home = teams.filter(team => team.id === DBresults[i].team1)[0];
-                DBresults[i].home.slug = origTeams.filter(t => +t.api_id === +DBresults[i].home.api_id)[0]?.team?.slug || champTeams.filter(t => +t.api_id === +DBresults[i].home.api_id)[0]?.slug || null;
+                DBresults[i].home.slug = origTeams.filter(t => +t.api_id! === +DBresults[i].home.api_id!)[0]?.team?.slug || champTeams.filter(t => +t.api_id === +DBresults[i].home.api_id!)[0]?.slug || null;
                 DBresults[i].away = teams.filter(team => team.id === DBresults[i].team2)[0];
-                DBresults[i].away.slug = origTeams.filter(t => +t.api_id === +DBresults[i].away.api_id)[0]?.team?.slug || champTeams.filter(t => +t.api_id === +DBresults[i].away.api_id)[0]?.slug || null;
+                DBresults[i].away.slug = origTeams.filter(t => +t.api_id! === +DBresults[i].away.api_id!)[0]?.team?.slug || champTeams.filter(t => +t.api_id === +DBresults[i].away.api_id!)[0]?.slug || null;
             }
 
-            return leagueCalendarTransformer(DBresults);
+            return leagueCalendarTransformer(DBresults as unknown as IResult[]);
         }
 
         if(mode === 'ecupResults'){

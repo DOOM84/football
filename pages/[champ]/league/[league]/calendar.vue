@@ -33,13 +33,13 @@
 
 <script setup lang="ts">
 
-import type {ILeague, ILeagueResult, IPost, IResult} from "~/types/interfaces";
+import type {IPost, IResult} from "~/types/interfaces";
 import { io, type Socket } from 'socket.io-client';
 
 const socket = ref<Socket>();
 const route = useRoute();
 
-const {data, pending, error, refresh} = await useLazyFetch<{ league: ILeague; posts: IPost[];
+const {data, pending, error, refresh} = await useLazyFetch<{ league: Record<string, string>; posts: IPost[];
   results: {[index: number]: {[index: number]: Partial<IResult>[]}};
 
 }>('/api/leagueResults', {params: {league: route.params.league, champ: route.params.champ}, onResponseError({request, response, options}) {

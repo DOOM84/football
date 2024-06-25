@@ -1,5 +1,14 @@
 import prisma from '~/helpers/prisma';
-import type {ICupTeam, IEcupTeam, IError, ITeam} from "~/types/interfaces";
+import type {
+    ICupResult,
+    ICupTeam,
+    IEcupResult,
+    IEcupTeam,
+    IError,
+    ILeagueResult, ILeagueTeam,
+    IResult,
+    ITeam
+} from "~/types/interfaces";
 import {matchInfo, matchSquads} from "~/helpers/remoteApi";
 import getGoals from "~/utils/getGoals";
 
@@ -17,31 +26,31 @@ export default defineEventHandler(async (event) => {
             where: {
                 api_id: +updated.api_id
             }
-        })
+        }) as unknown as IResult;
 
         const tourChamp =  await prisma.tour.findFirst({
             where: {
                 api_id: +updated.api_id
             }
-        })
+        }) as unknown as IResult;
 
         const ecupChamp =  await prisma.ecupResult.findFirst({
             where: {
                 api_id: +updated.api_id
             }
-        })
+        }) as unknown as IEcupResult;
 
         const cupRes =  await prisma.cupResult.findFirst({
             where: {
                 api_id: +updated.api_id
             }
-        })
+        }) as unknown as ICupResult;
 
         const leagueRes =  await prisma.leagueResult.findFirst({
             where: {
                 api_id: +updated.api_id
             }
-        })
+        }) as unknown as ILeagueResult;
 
 
         if(!isFinishedOrLive((tourChamp?.stamp || resChamp?.stamp || ecupChamp?.stamp || cupRes?.stamp || leagueRes?.stamp) as unknown as number)){
@@ -55,7 +64,7 @@ export default defineEventHandler(async (event) => {
                         ...(leagueRes ? { l_res: leagueRes.api_id } : {}) as any,
                     },
                     update: {
-                        ch_res: resChamp ? resChamp.api_id : null,
+                        ch_res: resChamp ? (resChamp.api_id as number) : null,
                         ecup_res: ecupChamp ? ecupChamp.api_id : null,
                         c_res: cupRes ? cupRes.api_id : null,
                         l_res: leagueRes ? leagueRes.api_id : null,
@@ -63,7 +72,7 @@ export default defineEventHandler(async (event) => {
                         lineups: []
                     },
                     create: {
-                        ch_res: resChamp ? resChamp.api_id : null,
+                        ch_res: resChamp ? (resChamp.api_id as number) : null,
                         ecup_res: ecupChamp ? ecupChamp.api_id : null,
                         c_res: cupRes ? cupRes.api_id : null,
                         l_res: leagueRes ? leagueRes.api_id : null,
@@ -89,7 +98,7 @@ export default defineEventHandler(async (event) => {
                     },
                     data: {is_info: updated.is_info,
                         stamp: tourChamp?.stamp || undefined,
-                        date: tourChamp?.date || undefined,
+                        date: (tourChamp?.date as number) || undefined,
                     } //JSON.parse(JSON.stringify(updated))
                 });
 
@@ -162,7 +171,7 @@ export default defineEventHandler(async (event) => {
 
             await prisma.matchInfo.create({
                 data: {
-                    ch_res: resChamp ? resChamp.api_id : null,
+                    ch_res: resChamp ? (resChamp.api_id as number) : null,
                     ecup_res: ecupChamp ? ecupChamp.api_id : null,
                     c_res: cupRes ? cupRes.api_id : null,
                     l_res: leagueRes ? leagueRes.api_id : null,
@@ -203,7 +212,7 @@ export default defineEventHandler(async (event) => {
                     },
                     data: {
                         stamp: tourChamp?.stamp || undefined,
-                        date: tourChamp?.date || undefined,
+                        date: (tourChamp?.date as number) || undefined,
                         is_info: updated.is_info,
                         res1: goals && updated.is_info ? (homeTeam?.api_id && Array.isArray(goals![homeTeam.api_id]) ? goals![homeTeam.api_id].length : 0) : 0,
                         res2: goals && updated.is_info ? (awayTeam?.api_id && Array.isArray(goals![awayTeam.api_id]) ? goals![awayTeam.api_id].length : 0) : 0,
@@ -216,7 +225,7 @@ export default defineEventHandler(async (event) => {
                     },
                     data: {is_info: updated.is_info,
                         stamp: tourChamp?.stamp || undefined,
-                        date: tourChamp?.date || undefined,
+                        date: (tourChamp?.date as number) || undefined,
                     } //JSON.parse(JSON.stringify(updated))
                 });
             }
@@ -346,7 +355,7 @@ export default defineEventHandler(async (event) => {
                         id: leagueRes.team1 as unknown as number,
                     },
                     select: {api_id: true}
-                })  as unknown as ILeagueTeam
+                })  as unknown as ILeagueTeam;
 
                 const awayTeam = await prisma.leagueTeam.findFirst({
                     where: {

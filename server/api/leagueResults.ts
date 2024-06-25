@@ -1,5 +1,5 @@
 import prisma from '~/helpers/prisma';
-import type {IChamp} from "~/types/interfaces";
+import type {IChamp, ILeague, IResult} from "~/types/interfaces";
 import postListTransformer from "~/utils/transformers/postListTransformer";
 import calendarTransformer from "~/utils/transformers/calendarTransformer";
 
@@ -83,7 +83,7 @@ export default defineEventHandler(async (event) => {
 
         const posts = postListTransformer(champ?.posts);
 
-        const results= calendarTransformer(league.results!);
+        const results= calendarTransformer(league.results! as unknown as IResult[]);
 
         return {posts, league: league.name, results};
 

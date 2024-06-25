@@ -95,6 +95,62 @@ export interface ICupTeam {
     status: boolean;
 }
 
+export interface ILeague {
+    id: number;
+    api_id: number;
+    name: string;
+    slug: string;
+    stage?: string;
+    champ: Partial<IChamp>;
+    champ_id: number | null;
+    teams: ILeagueTeam[];
+    results: ILeagueResult[];
+    status: boolean;
+}
+
+export interface ILeagueResult {
+    id: number;
+    date: number;
+    res1: number;
+    res2: number;
+    champ: ILeague;
+    champ_id: number;
+    home: ILeagueTeam;
+    team1: number;
+    team2: number;
+    away: ILeagueTeam;
+    stamp: number;
+    api_id: number;
+    is_info: boolean;
+    time?: string;
+    tour?: number;
+    info?: IMatchInfo;
+}
+
+export interface ILeagueTeam {
+    id: number;
+    api_id: number | null;
+    name: string;
+    slug?: string | null;
+    sprite?: string | null;
+    champ: ILeague;
+    champ_id: number | null;
+    games: number;
+    win: number;
+    draw: number;
+    lost: number;
+    goals: number;
+    missed: number;
+    diff: number;
+    points: number;
+    order: number;
+    team?: Partial<ITeam>;
+    team_id?: number | null;
+    status: boolean;
+    results1: ILeagueResult[];
+    results2: ILeagueResult[];
+}
+
 
 export interface IEcup {
     id: number;
@@ -127,7 +183,7 @@ export interface ITeam {
     id: number;
     api_id: number;
     name: string;
-    slug: string;
+    slug: string | null;
     img: string;
     sprite: string;
     champ: IChamp;
@@ -204,6 +260,7 @@ export interface IMatchInfo {
     champResult: IResult;
     ecupResult: IEcupResult;
     cupResult: ICupResult;
+    leagueResult: ILeagueResult;
 
 }
 
