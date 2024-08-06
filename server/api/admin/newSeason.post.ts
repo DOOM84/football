@@ -61,6 +61,8 @@ export default defineEventHandler(async (event) => {
         await prisma.matchInfo.deleteMany();
         await prisma.ecupResult.deleteMany();
         await prisma.cupResult.deleteMany();
+        await prisma.scorer.deleteMany();
+        await prisma.tour.deleteMany();
         await prisma.leagueResult.deleteMany();
         await prisma.result.deleteMany();
         await prisma.team.updateMany({
