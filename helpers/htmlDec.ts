@@ -6,6 +6,7 @@ export default (str: string): string => {
         .replace("Ãº", 'ú')
         .replace("Ã", 'í')
         .replace("í¡", 'á')
+        .replace("í³", 'ó')
 }
 
 

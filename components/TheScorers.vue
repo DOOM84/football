@@ -7,12 +7,20 @@
                      :style="`
              background: url('/teams.png') ${player.team.sprite};`"/>
 
+              <img v-else class="w-[30px] h-[30px]" alt="team" :title="player.name"
+                   :src="'/no_team.png'"
+              />
 
-                <nuxt-link class="hover:underline overflow-x-hidden" :to="'/player/'+player.slug">
+                <nuxt-link v-if="player.slug" class="hover:underline overflow-x-hidden" :to="'/player/'+player.slug">
                     {{htmlDec(player.name)}}
                 </nuxt-link>
+
+              <span v-else class="overflow-x-hidden">
+                {{htmlDec(player.name)}}
+              </span>
+
               <img class="w-[30px] h-[30px]" :alt="player.name" :title="player.name"
-                                  :src="player.img"
+                                  :src="player.img || '/no_player.png'"
                                   />
             </div>
         </td>
