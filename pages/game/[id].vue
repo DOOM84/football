@@ -112,8 +112,9 @@
             <template v-if="event.type.toLowerCase() === 'goal'">
               <ThePlayerLink  :name="event.player.name" :slug="event.player.slug"/>
               {{ event.detail }}
-              {{ event.detail.toLowerCase() === 'забивает гол' && event.assist?.name ? 'после паса' : '' }}
-              <ThePlayerLink :name="event.assist.name" :slug="event.assist.slug"/>
+              {{ event.assist?.name && event.assist?.name !==  event.player.name ? 'после паса' : '' }}
+              <ThePlayerLink v-if="event.assist?.name && event.assist?.name !==  event.player.name"
+                             :name="event.assist.name" :slug="event.assist.slug"/>
             </template>
 
             <ThePlayerLink v-if="event.type.toLowerCase() === 'card' || event.type.toLowerCase() === 'var'" :name="event.player.name"
@@ -233,8 +234,10 @@
           </div>
           <div>
             <ClientOnly>
-            <TheTabs v-if="Object.keys(data.ecupResults).length && Object.keys(data.ecupResults.groupResults).length" :ecupResults="data.ecupResults.groupResults"
-                   :info-type="'ecupResults'"/>
+<!--            <TheTabs v-if="Object.keys(data.ecupResults).length && Object.keys(data.ecupResults.groupResults).length" :ecupResults="data.ecupResults.groupResults"
+                   :info-type="'ecupResults'"/>-->
+              <TheTabs v-if="Object.keys(data.ecupResults).length && Object.keys(data.ecupResults.groupResults).length" :ecupResults="data.ecupResults.groupResults['null']"
+                       :info-type="'ecupResults'"/>
             </ClientOnly>
           </div>
           <ThePostsItem :post="post" v-for="post in data.posts" :key="post.slug"/>
@@ -290,7 +293,8 @@ const title = computed(() => 'Новости европейского футбо
 const matchInfo = computed(() => {
     if(data.value?.match?.ecupResult){
       const ecupResult = data.value?.match?.ecupResult;
-      return `${ecupResult.ecup?.name}, ${ecupResult.stage || 'группа '+ecupResult.group}.`
+      return `${ecupResult.ecup?.name}, ${ecupResult.stage ? ecupResult.stage :
+          ecupResult.group ? 'группа '+ecupResult.group : 'Фаза лиги'}.`
     }
     if(data.value?.match?.cupResult){
       const cupResult = data.value?.match.cupResult;

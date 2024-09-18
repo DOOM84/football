@@ -278,8 +278,34 @@ export async function addEcupStands(ecupApiId: string | number, ecup_teams: IEcu
 
     if (!response[0]?.league?.standings) return []
 
+    const teams = response[0].league.standings[0].map((team: Record<any, any>) => {
 
-    const groups = response[0].league.standings.map((ecupGroupTeams: any[]) => {
+        const ind = ecup_teams.findIndex((ecupTeam) => {
+            return +ecupTeam.api_id! === +team.team.id
+        })
+
+        team.team_id = ecup_teams[ind].id;
+
+        return {
+            games: team.all.played,
+            win: team.all.win,
+            draw: team.all.draw,
+            lost: team.all.lose,
+            goals: team.all.goals.for,
+            missed: team.all.goals.against,
+            diff: team.goalsDiff,
+            points: team.points,
+            order: team.rank,
+            group: null,//team.group.split(" ")[1],
+            team_id: team.team_id,
+            ecup_id: +ecupId,
+        }
+    })
+
+    return teams;
+
+
+    /*const groups = response[0].league.standings.map((ecupGroupTeams: any[]) => {
 
         return ecupGroupTeams.map((team) => {
 
@@ -308,7 +334,7 @@ export async function addEcupStands(ecupApiId: string | number, ecup_teams: IEcu
 
     })
 
-    return groups.flat();
+    return groups.flat();*/
 }
 
 export async function matchInfo(matchApiId: number | string): Promise<Record<string, any>[]> {

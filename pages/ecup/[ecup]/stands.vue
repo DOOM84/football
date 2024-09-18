@@ -18,7 +18,9 @@
                         <thead>
                         <tr>
                             <th class="text-center pl-1 py-[0.7rem] bg-zinc-800 text-zinc-200 px-2">#</th>
-                            <th class="text-center pl-1 py-[0.7rem] bg-zinc-800 text-zinc-200 px-2" colspan="2">Группа {{group}}</th>
+                            <th class="text-center pl-1 py-[0.7rem] bg-zinc-800 text-zinc-200 px-2" colspan="2">
+                              {{group !== 'null' ? 'Группа '+group : 'Команда'}}
+                            </th>
                             <th class="text-center bg-zinc-800 text-zinc-200 px-2">И</th>
                             <th class="text-center  bg-zinc-800 text-zinc-200 px-2">В</th>
                             <th class="text-center  bg-zinc-800 text-zinc-200 px-2">Н</th>

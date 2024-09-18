@@ -36,14 +36,18 @@
                   </thead>
                 </TheTabs>
               </div>
-              <div class="overflow-x-auto">
+<!--              <div class="overflow-x-auto">
                 <template v-if="data && data.ecupStands" :key="ecup.slug" v-for="ecup in data.ecupStands">
                   <div class="w-full text-left bg-zinc-100">
                     {{ ecup.name }}
                   </div>
                   <TheTabs v-if="Object.keys(ecup?.stands).length" :ecup-stands="ecup" :info-type="'ecupStands'"/>
                 </template>
-              </div>
+              </div>-->
+              <template v-if="data && data.ecupStands">
+                <TheTabs v-if="Object.keys(data.ecupStands).length"
+                         :ecup-stands="data.ecupStands" :info-type="'ecupStands'"/>
+              </template>
             </div>
           </div>
           <div class="shadow-md shadow-zinc-800/20 z-10">
@@ -83,11 +87,17 @@
             </TheTabs>
           </div>
           <div class="overflow-x-auto">
-            <template v-if="data && data.ecupStands" :key="ecup.slug+i" v-for="(ecup, i) in data.ecupStands">
-              <div class="w-full text-left bg-zinc-100">
-                {{ ecup.name }}
-              </div>
-              <TheTabs v-if="Object.keys(ecup?.stands).length" :ecup-stands="ecup" :info-type="'ecupStands'"/>
+            <!--              <div class="overflow-x-auto">
+                <template v-if="data && data.ecupStands" :key="ecup.slug" v-for="ecup in data.ecupStands">
+                  <div class="w-full text-left bg-zinc-100">
+                    {{ ecup.name }}
+                  </div>
+                  <TheTabs v-if="Object.keys(ecup?.stands).length" :ecup-stands="ecup" :info-type="'ecupStands'"/>
+                </template>
+              </div>-->
+            <template v-if="data && data.ecupStands">
+              <TheTabs v-if="Object.keys(data.ecupStands).length"
+                       :ecup-stands="data.ecupStands" :info-type="'ecupStands'"/>
             </template>
           </div>
         </div>

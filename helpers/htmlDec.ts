@@ -7,6 +7,9 @@ export default (str: string): string => {
         .replace("Ã", 'í')
         .replace("í¡", 'á')
         .replace("í³", 'ó')
+        .replace("í§", 'ç')
+        .replace("í£", 'ã')
+        .replace("Ãª", 'ê')
 }
 
 

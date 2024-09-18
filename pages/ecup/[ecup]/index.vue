@@ -19,7 +19,8 @@
                   <thead>
                   <tr>
                     <th class="text-center pl-1 py-[0.7rem] bg-zinc-800 text-zinc-200 ">#</th>
-                    <th class="text-center pl-1 py-[0.7rem] bg-zinc-800 text-zinc-200" colspan="2">Группа {{ group }}
+                    <th class="text-center pl-1 py-[0.7rem] bg-zinc-800 text-zinc-200" colspan="2">
+                      {{group !== 'null' ? 'Группа '+group : 'Команда'}}
                     </th>
                     <th class="text-center py-[0.7rem] bg-zinc-800 text-zinc-200">И</th>
                     <th class="text-center py-[0.7rem] bg-zinc-800 text-zinc-200">О</th>
@@ -29,7 +30,7 @@
               </template>
               <div class="lg:order-last order-first lg:hidden">
                 <TheTabs v-if="data.poResults.length" :ecupPoResults="data.poResults" :info-type="'ecupPoResults'"/>
-                <TheTabs v-if="Object.keys(data.groupResults).length" :ecupResults="data.groupResults"
+                <TheTabs v-if="Object.keys(data.groupResults).length" :ecupResults="data.groupResults['null']"
                          :info-type="'ecupResults'"/>
               </div>
             </div>
@@ -48,7 +49,7 @@
         <div class="hidden lg:block">
           <div class="overflow-x-auto">
             <TheTabs v-if="data.poResults.length" :ecupPoResults="data.poResults" :info-type="'ecupPoResults'"/>
-            <TheTabs v-if="Object.keys(data.groupResults).length" :ecupResults="data.groupResults"
+            <TheTabs v-if="Object.keys(data.groupResults).length" :ecupResults="data.groupResults['null']"
                      :info-type="'ecupResults'"/>
           </div>
         </div>

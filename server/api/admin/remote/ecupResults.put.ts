@@ -21,7 +21,9 @@ export default defineEventHandler(async (event) => {
 
             const results = await addEcupResults(+api_id) as Record<string, any>[];
 
-            const groupFiltered = results.filter(res => res.league.round.toLowerCase().includes('group'));
+            let groupFiltered = results.filter(res => res.league.round.toLowerCase().includes('group'));
+
+            groupFiltered = groupFiltered.length ? groupFiltered : results.filter(res => res.league.round.toLowerCase().includes('stage'));
 
             const poFiltered = results.filter(res =>
                 res.league.round.toLowerCase().includes('knockout round play-offs') ||
@@ -95,33 +97,6 @@ export default defineEventHandler(async (event) => {
                     update: allRes[i],
                     create: allRes[i],
                 })
-
-                /*const exists = await prisma.ecupResult.findFirst({
-                    where: {
-                        stamp: +allRes[i].stamp,
-                        AND: [
-                            {
-                                team1: +allRes[i].team1
-                            },
-                            {
-                                team2: +allRes[i].team2
-                            },
-                        ],
-                    },
-                })
-
-                if (exists?.id) {
-                    await prisma.ecupResult.update({
-                        where: {
-                            id: +exists.id
-                        },
-                        data: allRes[i]
-                    })
-                } else {
-                    await prisma.ecupResult.create({
-                        data: allRes[i]
-                    })
-                }*/
             }
 
             const dbRes = await prisma.ecupResult.findMany({

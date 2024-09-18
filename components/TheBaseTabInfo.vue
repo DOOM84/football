@@ -42,7 +42,20 @@
             </tbody>
         </template>
 
-        <template v-else-if="infoType === 'ecupResults'"
+      <template v-else-if="infoType === 'ecupResults'"
+                v-for="(results, date, i) in infoToShow"
+                :key="'ecupResults '+i">
+        <thead>
+        <tr>
+          <th colspan="6" class="text-center py-[0.7rem] bg-zinc-100">{{ $resultDate(+date) }}</th>
+        </tr>
+        </thead>
+        <tbody>
+        <TheShortResults :iter="i"  :results="results"/>
+        </tbody>
+      </template>
+
+<!--        <template v-else-if="infoType === 'ecupResults'"
                   v-for="(info, tourNum, i) in infoToShow"
                   :key="'ecupResults '+i">
             <template v-for="(results, date) in sortObj(info)" :key="'dateResults '+date">
@@ -55,7 +68,7 @@
                 <TheShortResults :iter="i"  :results="results"/>
                 </tbody>
             </template>
-        </template>
+        </template>-->
 
         <template v-else-if="infoType === 'ecupPoResults'"
                   v-for="(results, date, i)  in (infoToShow ? sortObj(infoToShow) :  infoToShow)"
@@ -79,7 +92,7 @@
                 <thead>
                 <tr>
                     <th colspan="6" class="text-center py-3 bg-zinc-800 text-zinc-100">
-                        Группа {{ group }}
+                      {{group !== 'null' ? 'Группа '+group : 'Фаза лиги' }}
                     </th>
                 </tr>
                 </thead>

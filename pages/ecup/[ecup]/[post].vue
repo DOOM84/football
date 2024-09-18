@@ -17,13 +17,30 @@
         </div>
         <div>
           <div>
-            <TheTabs  :ecup-stands="data.ecupStands" :info-type="'ecupStands'" />
+<!--            <TheTabs  :ecup-stands="data.ecupStands" :info-type="'ecupStands'" />-->
+            <template v-if="Object.keys(data.ecupStands?.stands).length"
+                      v-for="(info, group) in data.ecupStands.stands">
+              <TheBaseTabInfo :infoToShow="info.teams" :info-type="'ecupTableStands'">
+                <thead>
+                <tr>
+                  <th class="text-center pl-1 py-[0.7rem] bg-zinc-800 text-zinc-200 ">#</th>
+                  <th class="text-center pl-1 py-[0.7rem] bg-zinc-800 text-zinc-200" colspan="2">
+                    {{group !== 'null' ? 'Группа '+group : 'Команда'}}
+                  </th>
+                  <th class="text-center py-[0.7rem] bg-zinc-800 text-zinc-200">И</th>
+                  <th class="text-center py-[0.7rem] bg-zinc-800 text-zinc-200">О</th>
+                </tr>
+                </thead>
+              </TheBaseTabInfo>
+            </template>
           </div>
           <div class="">
             <TheTabs v-if="data.poResults.length"  :ecupPoResults="data.poResults" :info-type="'ecupPoResults'"/>
           </div>
           <div>
-            <TheTabs v-if="Object.keys(data.groupResults).length"  :ecupResults="data.groupResults" :info-type="'ecupResults'"/>
+<!--            <TheTabs v-if="Object.keys(data.groupResults).length"  :ecupResults="data.groupResults" :info-type="'ecupResults'"/>-->
+            <TheTabs v-if="Object.keys(data.groupResults).length" :ecupResults="data.groupResults['null']"
+                     :info-type="'ecupResults'"/>
           </div>
           <div class="z-10">
             <ThePostsItem :post="post" v-for="post in data.posts" :key="post.slug"/>

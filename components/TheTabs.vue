@@ -20,19 +20,36 @@
                      class="cursor-pointer underline-offset-4 text-[14px] font-semibold whitespace-nowrap">
                     {{ champ.champ.name }}
                 </div>
-                <div v-else-if="infoType === 'ecupStands'" v-for="(ecup, group) in sortObj(ecupStands!.stands)"
+
+              <div v-else-if="infoType === 'ecupStands'" v-for="(ecup, i) in ecupStands"
+                   :key="infoType + ' ecupStands'+ i + ' '  + ecup!.slug"
+                   @click.prevent="showInfo($event, i)"
+                   class="cursor-pointer underline-offset-4 text-[14px] font-semibold whitespace-nowrap">
+                {{ecup.name}}
+              </div>
+
+
+
+<!--                <div v-else-if="infoType === 'ecupStands'" v-for="(ecup, group) in sortObj(ecupStands!.stands)"
                      :key="infoType + ' ecupStands'+ group + ' '  + ecupStands!.slug"
                      @click.prevent="showInfo($event, group)"
                      class="cursor-pointer underline-offset-4 text-[14px] font-semibold whitespace-nowrap">
                    Группа {{ group }}
-                </div>
+                </div>-->
 
-                <div v-else-if="infoType === 'ecupResults'" v-for="(info, group) in sortObj(ecupResults!)"
+<!--                <div v-else-if="infoType === 'ecupResults'" v-for="(info, group) in sortObj(ecupResults!)"
                      :key="infoType + ' ' + group"
                      @click.prevent="showInfo($event, group)"
                      class="cursor-pointer underline-offset-4 text-[14px] font-semibold whitespace-nowrap">
-                    Группа {{ group }}
-                </div>
+                   {{group !== 'null' ? 'Группа '+group : 'Фаза лиги' }}
+                </div>-->
+
+              <div v-else-if="infoType === 'ecupResults'" v-for="(date, tour) in ecupResults"
+                   :key="infoType + ' ' + tour"
+                   @click.prevent="showInfo($event, tour)"
+                   class="cursor-pointer underline-offset-4 text-[14px] font-semibold whitespace-nowrap">
+                Тур {{tour}}
+              </div>
 
                 <div v-else-if="infoType === 'ecupPoResults'" v-for="(info, i) in ecupPoResults"
                      :key="infoType + ' ' + i"
@@ -63,13 +80,13 @@ import sortObj from "~/helpers/sortObj";
 const props = defineProps<{
     champs?: IChamp[],
     tourResults?: ITourResult[],
-    ecupStands?: IEcupStand,
+    ecupStands?: IEcupStand[],
     ecupResults?: {
-      [index: string]: {
+    //  [index: string]: {
         [index: number]: {
           [index: number]: Partial<IEcupResult>[]
         }
-      }
+     // }
     },
     ecupPoResults?: {
       stage: string;
@@ -103,7 +120,7 @@ watch(
 watch(
     () => props.ecupResults,
     () => {
-      infoToShow.value = props.ecupResults![currentEcupResultInd.value as string]
+      infoToShow.value = props.ecupResults![currentEcupResultInd.value as number]
     },
     { deep: true }
 )
@@ -125,7 +142,9 @@ onMounted(() => {
     }else if(props.infoType === 'scorers'){
         infoToShow.value = props.scorers![0]
     }else if(props.infoType === 'ecupStands'){
-        infoToShow.value = Object.values(sortObj(props.ecupStands!.stands))[0]
+        //infoToShow.value = Object.values(sortObj(props.ecupStands!.stands))[0]
+        infoToShow.value = Object.values(sortObj(props.ecupStands![0].stands))[0]
+
     }else if(props.infoType === 'ecupResults'){
       infoToShow.value = Object.values(sortObj(props.ecupResults!))[0];
       currentEcupResultInd.value = Object.keys(sortObj(props.ecupResults!))[0];
@@ -180,10 +199,12 @@ function showInfo(event: Event, i: number | string) {
     }else if(props.infoType === 'scorers'){
         infoToShow.value = props.scorers![i as number]
     }else if(props.infoType === 'ecupStands'){
-        infoToShow.value = props.ecupStands!.stands[i]
+       // infoToShow.value = props.ecupStands!.stands[i]
+    //  infoToShow.value = props.ecupStands[i]!.stands['null'];
+      infoToShow.value = Object.values(sortObj(props.ecupStands![i as number].stands))[0]
     }else if(props.infoType === 'ecupResults'){
-      currentEcupResultInd.value = i as string;
-      infoToShow.value = props.ecupResults![i];
+      currentEcupResultInd.value = i as number;
+      infoToShow.value = props.ecupResults![i as number];
     }else if(props.infoType === 'ecupPoResults'){
         currentEcupPoResultInd.value = i as number;
         infoToShow.value = props.ecupPoResults![i as number].scores
