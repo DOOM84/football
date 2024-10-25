@@ -9,7 +9,7 @@ export default ((champs: IChamp[], source = 'tour', isRelegation: boolean = fals
            if(isRelegation){
                champ[source as champSrc] = champ.results!.filter((r: IResult) => +r.tour === 99);
            }else{
-               champ[source as champSrc] = champ.results!.filter((r: IResult) => +r.tour < +champ.current_tour);
+               champ[source as champSrc] = champ.results!.filter((r: IResult) => +r.tour !== +champ.current_tour);
            }
        }
 

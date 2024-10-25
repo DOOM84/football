@@ -89,6 +89,45 @@ export default defineEventHandler(async (event) => {
         const startDay = moment(now).startOf('day').format('x');
         const endDay = moment(now).endOf('day').format('x');
 
+        const ecups = await prisma.ecup.findMany({
+            orderBy: {
+                id: 'asc',
+            },
+            include: {
+                results: {
+                    where: {
+                        stamp: {
+                            gte: +startDay/1000,
+                            lt: Math.floor(+endDay/1000)
+                        },
+                    },
+                    orderBy: {
+                        stamp: 'asc',
+                    },
+                    include: {
+                        info: {
+                            select: {
+                                info:true
+                            }
+                        },
+                        ecup: {
+                            select: {slug: true}
+                        },
+                        home: {
+                            include: {
+                                team: true
+                            }
+                        },
+                        away: {
+                            include: {
+                                team: true
+                            }
+                        },
+                    }
+                },
+            }
+        }) as unknown as IEcup[];
+
         const champs = await prisma.champ.findMany({
             where: {
                 status: true,
@@ -132,13 +171,18 @@ export default defineEventHandler(async (event) => {
 
         const tourResults  = champTransformer(champs);
 
+        const ecupResults = ecups.map(ecup=> ({
+            ...singleEcupResultsTransformer(ecup.results),
+            ecup: ecup.name
+        }));
+
         const delayResults: ITourResult[]  = champTransformer(champs, 'delay')
             .filter(champ => Object.keys(champ.tour!.scores).length);
 
         const relegationResults: ITourResult[]  = champTransformer(champs, 'relegation', true)
             .filter(champ => Object.keys(champ.tour!.scores).length);
 
-        return {tourResults, delayResults, relegationResults};
+        return {tourResults, delayResults, relegationResults, ecupResults};
 
     }catch (e) {
         console.log(e);

@@ -25,6 +25,14 @@
               <div class="overflow-x-auto">
                 <TheTabs v-if="data && data.tourResults"
                          :tourResults="data.tourResults" :info-type="'shortResults'"/>
+                <template v-for="ecupRes in data.ecupResults">
+                  <div v-if="ecupRes.poResults.length || Object.keys(ecupRes.groupResults).length" class="overflow-x-auto">
+                    <div class="bg-blue-50">{{ecupRes.ecup}}</div>
+                    <TheTabs v-if="ecupRes.poResults.length" :ecupPoResults="ecupRes.poResults" :info-type="'ecupPoResults'"/>
+                    <TheTabs v-if="Object.keys(ecupRes.groupResults).length" :ecupResults="ecupRes.groupResults['null']"
+                             :info-type="'ecupResults'"/>
+                  </div>
+                </template>
               </div>
               <div class="overflow-x-auto">
                 <TheTabs v-if="data && data.players" :scorers="data.players" :info-type="'scorers'">
@@ -75,6 +83,14 @@
           <div class="overflow-x-auto">
             <TheTabs v-if="data && data.tourResults"
                      :tourResults="data.tourResults" :info-type="'shortResults'"/>
+            <template v-for="ecupRes in data.ecupResults">
+              <div v-if="ecupRes.poResults.length || Object.keys(ecupRes.groupResults).length" class="overflow-x-auto">
+                <div class="bg-blue-50">{{ecupRes.ecup}}</div>
+                <TheTabs v-if="ecupRes.poResults.length" :ecupPoResults="ecupRes.poResults" :info-type="'ecupPoResults'"/>
+                <TheTabs v-if="Object.keys(ecupRes.groupResults).length" :ecupResults="ecupRes.groupResults['null']"
+                         :info-type="'ecupResults'"/>
+              </div>
+            </template>
           </div>
           <div class="overflow-x-auto">
             <TheTabs v-if="data && data.players" :scorers="data.players" :info-type="'scorers'">
@@ -107,21 +123,49 @@
 </template>
 
 <script setup lang="ts">
-import type {IChamp, IEcupStand, IScorer, IPost, ITourResult} from "~/types/interfaces";
+import type {IChamp, IEcupStand, IScorer, IPost, ITourResult, IEcupResult} from "~/types/interfaces";
 import { io, type Socket } from 'socket.io-client';
 const socket = ref<Socket>();
 
 const {data, pending} = await useLazyFetch<{
-  champs: IChamp[];
+  champs: IChamp[]; ecupResults: {
+    ecup: string;
+    groupResults: {[index: string]: {
+        [index: number]: {
+          [index: number]: Partial<IEcupResult>[]
+        }
+      }};
+    poResults: {
+      stage: string,
+      scores: {
+        [index: number]: Partial<IEcupResult>[]
+      }
+    }[]
+  }[];
   tourResults: ITourResult[]; delayResults: ITourResult[]; relegationResults: ITourResult[];
   ecupStands: IEcupStand[]; posts: IPost[]; headLines: IPost[]; players: IScorer[];
 }>('/api/main')
 
 async function refreshInfo() {
   try {
-    const {tourResults, delayResults, relegationResults} = await $fetch<{tourResults: ITourResult[],
-      delayResults: ITourResult[], relegationResults: ITourResult[]}>('/api/liveResults');
+    const {tourResults, delayResults, relegationResults, ecupResults} = await $fetch<{tourResults: ITourResult[];
+      ecupResults: {
+        ecup: string;
+        groupResults: {[index: string]: {
+            [index: number]: {
+              [index: number]: Partial<IEcupResult>[]
+            }
+          }};
+        poResults: {
+          stage: string,
+          scores: {
+            [index: number]: Partial<IEcupResult>[]
+          }
+        }[]
+      }[];
+      delayResults: ITourResult[]; relegationResults: ITourResult[]}>('/api/liveResults');
     data.value!.tourResults = tourResults;
+    data.value!.ecupResults = ecupResults;
     data.value!.delayResults = delayResults;
     data.value!.relegationResults = relegationResults;
   } catch (e) {

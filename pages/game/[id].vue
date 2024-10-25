@@ -457,6 +457,9 @@ function getInfo(info: string) {
   if (info.toLowerCase() === 'handling') {
     return 'игра рукой'
   }
+  if (info.toLowerCase() === 'professional handball') {
+    return 'умышленная игра рукой'
+  }
   if (info.toLowerCase() === 'tripping') {
     return 'подножка'
   }

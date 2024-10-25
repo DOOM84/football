@@ -5,6 +5,7 @@ import type {IChamp, IEcup, IPost, IScorer, ITourResult} from "~/types/interface
 import postListTransformer from "~/utils/transformers/postListTransformer";
 import moment from "moment";
 import champScorersTransformer from "~/utils/transformers/champScorersTransformer";
+import singleEcupResultsTransformer from "~/utils/transformers/singleEcupResultsTransformer";
 
 export default defineEventHandler(async (event) => {
 
@@ -15,11 +16,64 @@ export default defineEventHandler(async (event) => {
             return this.toString();
         };
 
+        const now = Date.now();
+
+        const startDay = moment(now).startOf('day').format('x'); //Math.floor(Date.now()/1000)
+        const endDay = moment(now).endOf('day').format('x');
+
         const ecups = await prisma.ecup.findMany({
             orderBy: {
                 id: 'asc',
             },
             include: {
+                results: {
+                    where: {
+                        stamp: {
+                            gte: +startDay/1000,
+                            lt: Math.floor(+endDay/1000)
+                        },
+                    },
+                    orderBy: {
+                        stamp: 'asc',
+                    },
+                    include: {
+                        info: {
+                            select: {
+                                info:true
+                            }
+                        },
+                        ecup: {
+                            select: {slug: true}
+                        },
+                        home: {
+                            include: {
+                                team: true
+                            }
+                        },
+                        away: {
+                            include: {
+                                team: true
+                            }
+                        },
+                    }
+                },
+                /*results: {
+                    where: {
+                        stamp: {
+                            gte: +startDay/1000,
+                            lt: Math.floor(+endDay/1000)
+                        },
+                    },
+                    orderBy: {
+                        stamp: 'asc',
+                    },
+                    include: {
+                        info: true,
+                        home: {select: {slug: true, sprite: true, name: true, api_id: true}},
+                        away: {select: {slug: true, sprite: true, name: true, api_id: true}},
+                        champ: {select: {name: true, slug: true}}
+                    }
+                },*/
                 stands: {
                     orderBy: {
                         order: 'asc',
@@ -31,7 +85,8 @@ export default defineEventHandler(async (event) => {
                             }
                         }
                     }
-                }
+                },
+
             }
         }) as unknown as IEcup[];
 
@@ -63,11 +118,6 @@ export default defineEventHandler(async (event) => {
             },
             take: 4
         }) as unknown as IPost[];
-
-        const now = Date.now();
-
-        const startDay = moment(now).startOf('day').format('x'); //Math.floor(Date.now()/1000)
-        const endDay = moment(now).endOf('day').format('x');
 
         const champs = await prisma.champ.findMany({
             where: {
@@ -143,6 +193,11 @@ export default defineEventHandler(async (event) => {
             },
         }) as unknown as IChamp[];
 
+        const ecupResults = ecups.map(ecup=> ({
+            ...singleEcupResultsTransformer(ecup.results),
+            ecup: ecup.name
+        }));
+
         const ecupStands = ecups.map(ecup=> ecupTransformer(ecup));
 
         const tourResults: ITourResult[] = champTransformer(champs);
@@ -159,7 +214,7 @@ export default defineEventHandler(async (event) => {
 
         const headLines: Partial<IPost[]>  = postListTransformer(headLinesDb);
 
-        return {champs, tourResults, ecupStands, posts, headLines, players, delayResults, relegationResults};
+        return {champs, tourResults, ecupStands, ecupResults, posts, headLines, players, delayResults, relegationResults};
 
     }catch (e) {
         console.log(e);
